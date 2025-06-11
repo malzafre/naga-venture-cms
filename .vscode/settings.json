@@ -1,0 +1,81 @@
+{
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+    "text" : "Be concise and descriptive. Use imperative mood.",
+   }
+  ],
+  "github.copilot.chat.codeGeneration.instructions": [
+    {
+      "file": "./github/copilot-instructions.md"
+    },
+    {
+      "file": "./db/naga-venture-schema.sql"
+    },
+    {
+      "file": "./docs/requirement-analysis.md"
+    },
+    {
+      "file": ".docs/naga-venture-rbac-documentation.md"
+    },
+    {
+      "file": "./docs/naga-venture-tourismcms-development-roadmap.md"
+    }
+  ],
+  "github.copilot.chat.reviewSelection.instructions": [
+    {
+      "file": "./docs/copilot-review-instructions.md"
+    },
+  ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit",
+    "source.sortMembers": "explicit"
+  },
+  "editor.formatOnSave": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.workingDirectories": ["."],
+  "files.eol": "\r\n",
+  "typescript.preferences.organizeImports": {
+    "enable": true
+  },
+  "editor.insertSpaces": true,
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "editor.rulers": [80],
+  "editor.wordWrap": "wordWrapColumn",
+  "editor.wordWrapColumn": 80,
+  "emmet.includeLanguages": {
+    "typescript": "typescriptreact",
+    "javascript": "javascriptreact"
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.expo": true,
+    "**/build": true,
+    "**/web-build": true
+  }
+}
