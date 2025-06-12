@@ -8,6 +8,7 @@ You are working on the NAGA VENTURE Tourism CMS, a React Native (Expo) applicati
 ## Key Libraries Usage Summary
 
 - TanStack Query: Server state management - All API calls and caching
+- Zustand: Global client state management - UI state, user preferences, app-wide settings
 - Zod: Data validation - Forms and API response validation
 - @shopify/flash-list: List rendering - Replace FlatList/ScrollView
 - expo-image: Image optimization - All image components
@@ -61,6 +62,8 @@ You are working on the NAGA VENTURE Tourism CMS, a React Native (Expo) applicati
 - Handle all data states explicitly: `isLoading`, `isError`, and empty data states
 
 ### Client State
+- Use Zustand for global client state management (UI state, user preferences, app-wide settings)
+- Organize stores by feature/domain with immutable updates
 - Use standard **React Hooks** (`useState`, `useCallback`, `useReducer`) for local component state
 
 ### Type Safety
