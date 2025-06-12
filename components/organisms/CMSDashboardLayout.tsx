@@ -1,6 +1,7 @@
 // filepath: components/TourismCMS/organisms/CMSDashboardLayout.tsx
 import React from 'react';
 import { ScrollView, StyleSheet, View, ViewStyle } from 'react-native';
+
 import { CMSText } from '../atoms';
 import { CMSStatCard } from '../molecules';
 

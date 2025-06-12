@@ -1,7 +1,8 @@
 # Tourism CMS Development Roadmap
+
 **Naga Venture Platform - Comprehensive Implementation Plan**
 
-*Last Updated: June 10, 2025*
+_Last Updated: June 10, 2025_
 
 ---
 
@@ -14,6 +15,7 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
 ## ✅ **COMPLETED PHASES**
 
 ### **Phase 0: Foundation Setup**
+
 - ✅ **Supabase Authentication**: Complete auth system with JWT tokens
 - ✅ **RBAC System**: Role-based access control with 4 user roles
 - ✅ **Hierarchical Sidebar Navigation**: Expandable sections with per-user state persistence
@@ -26,11 +28,14 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
 
 ## 🚀 **UPCOMING PHASES**
 
-## **Phase 1: Core Dashboard & Analytics** *(Priority: HIGH)*
-*Estimated Timeline: 2-3 weeks*
+## **Phase 1: Core Dashboard & Analytics** _(Priority: HIGH)_
+
+_Estimated Timeline: 2-3 weeks_
 
 ### **1.1 Dashboard Foundation**
+
 - [ ] **Tourism Admin Dashboard**
+
   - [ ] Overview statistics component
   - [ ] Recent activities feed
   - [ ] System health metrics
@@ -39,17 +44,17 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
 
 - [ ] **Role-Specific Dashboards**
   - [ ] Business Listing Manager dashboard
-  - [ ] Tourism Content Manager dashboard  
+  - [ ] Tourism Content Manager dashboard
   - [ ] Business Registration Manager dashboard
   - [ ] Shared dashboard components for reusability
 
 ### **1.2 Analytics Framework**
+
 - [ ] **Analytics Components**
   - [ ] Chart components (Bar, Line, Pie, Donut)
   - [ ] KPI cards with trend indicators
   - [ ] Date range pickers
   - [ ] Export functionality (PDF, CSV)
-  
 - [ ] **Data Visualization**
   - [ ] Visitor statistics
   - [ ] Business performance metrics
@@ -57,6 +62,7 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
   - [ ] Popular content analytics
 
 ### **1.3 Notification System**
+
 - [ ] **Real-time Notifications**
   - [ ] Toast notifications
   - [ ] Badge counters on sidebar
@@ -65,11 +71,14 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
 
 ---
 
-## **Phase 2: Business Management System** *(Priority: HIGH)*
-*Estimated Timeline: 3-4 weeks*
+## **Phase 2: Business Management System** _(Priority: HIGH)_
+
+_Estimated Timeline: 3-4 weeks_
 
 ### **2.1 Business Listings Management**
+
 - [ ] **Business Listing Components**
+
   - [ ] Business card components
   - [ ] Business detail view
   - [ ] Business form (create/edit)
@@ -83,7 +92,9 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
   - [ ] Bulk category operations
 
 ### **2.2 Business Registration Workflow**
+
 - [ ] **Registration Pipeline**
+
   - [ ] Multi-step registration form
   - [ ] Document upload system
   - [ ] Approval workflow interface
@@ -97,6 +108,7 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
   - [ ] Owner communication tools
 
 ### **2.3 Business Analytics**
+
 - [ ] **Performance Metrics**
   - [ ] Business performance dashboards
   - [ ] Popular business rankings
@@ -105,10 +117,12 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
 
 ---
 
-## **Phase 3: Tourism Content Management** *(Priority: HIGH)*
-*Estimated Timeline: 3-4 weeks*
+## **Phase 3: Tourism Content Management** _(Priority: HIGH)_
+
+_Estimated Timeline: 3-4 weeks_
 
 ### **3.1 Tourist Spots Management**
+
 - [ ] **Tourist Spot Components**
   - [ ] Spot listing interface
   - [ ] Spot detail management
@@ -117,6 +131,7 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
   - [ ] Spot categorization
 
 ### **3.2 Events Management**
+
 - [ ] **Event System**
   - [ ] Event calendar interface
   - [ ] Event creation/editing forms
@@ -125,6 +140,7 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
   - [ ] Event analytics
 
 ### **3.3 Promotions & Marketing**
+
 - [ ] **Promotion Management**
   - [ ] Promotion creation tools
   - [ ] Seasonal campaign management
@@ -134,10 +150,12 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
 
 ---
 
-## **Phase 4: Content Approval & Moderation** *(Priority: MEDIUM)*
-*Estimated Timeline: 2-3 weeks*
+## **Phase 4: Content Approval & Moderation** _(Priority: MEDIUM)_
+
+_Estimated Timeline: 2-3 weeks_
 
 ### **4.1 Content Approval Workflow**
+
 - [ ] **Approval Interface**
   - [ ] Pending content queue
   - [ ] Approval/rejection workflow
@@ -146,6 +164,7 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
   - [ ] Approval history tracking
 
 ### **4.2 Reviews & Ratings System**
+
 - [ ] **Review Management**
   - [ ] Review moderation interface
   - [ ] Flagged content management
@@ -155,10 +174,12 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
 
 ---
 
-## **Phase 5: User Management System** *(Priority: MEDIUM)*
-*Estimated Timeline: 2-3 weeks*
+## **Phase 5: User Management System** _(Priority: MEDIUM)_
+
+_Estimated Timeline: 2-3 weeks_
 
 ### **5.1 Staff Management**
+
 - [ ] **Staff Administration**
   - [ ] Staff account creation
   - [ ] Role assignment interface
@@ -167,6 +188,7 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
   - [ ] Access control management
 
 ### **5.2 User Account Management**
+
 - [ ] **User Administration**
   - [ ] Tourist account management
   - [ ] Business owner management
@@ -176,10 +198,12 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
 
 ---
 
-## **Phase 6: Bookings & Financial Management** *(Priority: MEDIUM)*
-*Estimated Timeline: 3-4 weeks*
+## **Phase 6: Bookings & Financial Management** _(Priority: MEDIUM)_
+
+_Estimated Timeline: 3-4 weeks_
 
 ### **6.1 Booking Management**
+
 - [ ] **Booking System**
   - [ ] Booking overview interface
   - [ ] Booking status management
@@ -188,6 +212,7 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
   - [ ] Dispute resolution system
 
 ### **6.2 Financial Dashboard**
+
 - [ ] **Financial Management**
   - [ ] Revenue tracking
   - [ ] Commission management
@@ -197,10 +222,12 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
 
 ---
 
-## **Phase 7: System Administration** *(Priority: LOW)*
-*Estimated Timeline: 2-3 weeks*
+## **Phase 7: System Administration** _(Priority: LOW)_
+
+_Estimated Timeline: 2-3 weeks_
 
 ### **7.1 System Settings**
+
 - [ ] **Configuration Management**
   - [ ] System parameter configuration
   - [ ] Feature toggles
@@ -208,6 +235,7 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
   - [ ] General settings interface
 
 ### **7.2 Integration Management**
+
 - [ ] **Third-party Integrations**
   - [ ] Google Maps API management
   - [ ] Payment gateway configuration
@@ -215,6 +243,7 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
   - [ ] Email service configuration
 
 ### **7.3 Security & Backup**
+
 - [ ] **Security Management**
   - [ ] Security settings interface
   - [ ] User session management
@@ -223,10 +252,12 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
 
 ---
 
-## **Phase 8: Advanced Features & Optimization** *(Priority: LOW)*
-*Estimated Timeline: 2-3 weeks*
+## **Phase 8: Advanced Features & Optimization** _(Priority: LOW)_
+
+_Estimated Timeline: 2-3 weeks_
 
 ### **8.1 Advanced Analytics**
+
 - [ ] **Custom Reports**
   - [ ] Report builder interface
   - [ ] Scheduled reports
@@ -235,6 +266,7 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
   - [ ] Custom dashboards
 
 ### **8.2 Performance & Mobile Optimization**
+
 - [ ] **Performance Enhancements**
   - [ ] Mobile responsiveness
   - [ ] Offline functionality
@@ -247,13 +279,16 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
 ## 🎯 **IMMEDIATE NEXT STEPS (Week 1-2)**
 
 ### **Priority 1: Dashboard Foundation**
+
 1. **Create Tourism Admin Dashboard Layout**
+
    - Implement main dashboard template
    - Add statistics overview cards
    - Create recent activities component
    - Add quick action buttons
 
 2. **Build Analytics Components**
+
    - Chart wrapper components
    - KPI card components
    - Data fetching hooks
@@ -265,7 +300,9 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
    - Real-time updates structure
 
 ### **Priority 2: Business Listing Foundation**
+
 1. **Business Listing Interface**
+
    - Business card component
    - Business list view
    - Search and filter functionality
@@ -282,17 +319,20 @@ The Tourism CMS is a comprehensive management system for the Naga Venture touris
 ## 🛠 **TECHNICAL ARCHITECTURE DECISIONS**
 
 ### **State Management Strategy**
+
 - **Tanstack Query**: For server state management and caching
 - **useReducer + Context**: For complex local state (like forms)
 - **Custom Hooks**: For reusable business logic
 - **Zustand**: If global client state becomes complex
 
 ### **Form Management**
+
 - **React Hook Form**: For form state and validation
 - **Zod**: For schema validation and TypeScript integration
 - **Custom Form Components**: Following atomic design principles
 
 ### **Data Fetching Pattern**
+
 ```typescript
 // Example hook pattern for data fetching
 const useBusinessListings = (filters: BusinessFilters) => {
@@ -305,6 +345,7 @@ const useBusinessListings = (filters: BusinessFilters) => {
 ```
 
 ### **Component Structure**
+
 ```
 components/TourismCMS/
 ├── atoms/          (Button, Input, Icon, etc.)
@@ -319,18 +360,21 @@ components/TourismCMS/
 ## 📋 **DEVELOPMENT STANDARDS**
 
 ### **Code Quality**
+
 - **TypeScript**: Strict mode enabled
 - **ESLint + Prettier**: Consistent code formatting
 - **Unit Testing**: Jest + React Native Testing Library
 - **Component Documentation**: JSDoc for all components
 
 ### **Performance Standards**
+
 - **60 FPS**: Smooth animations and transitions
 - **Bundle Size**: Lazy loading for heavy components
 - **Memory Management**: Proper cleanup in useEffect
 - **Accessibility**: WCAG 2.1 AA compliance
 
 ### **Git Workflow**
+
 - **Feature Branches**: One feature per branch
 - **Conventional Commits**: Structured commit messages
 - **Code Reviews**: All changes reviewed before merge
@@ -341,6 +385,7 @@ components/TourismCMS/
 ## 🎉 **SUCCESS METRICS**
 
 ### **Phase Completion Criteria**
+
 - [ ] All components follow atomic design principles
 - [ ] 90%+ TypeScript coverage
 - [ ] All user stories tested and approved
@@ -349,6 +394,7 @@ components/TourismCMS/
 - [ ] Code review approval
 
 ### **Quality Gates**
+
 - [ ] No TypeScript errors
 - [ ] ESLint passing
 - [ ] Unit tests passing (80%+ coverage)

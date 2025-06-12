@@ -1,7 +1,8 @@
 // filepath: c:\Users\Hans Candor\Documents\capstone-NV\naga-venture\app\TourismCMS\(admin)\bookings-finance\financial-overview.tsx
 // filepath: app/TourismCMS/(admin)/bookings-finance/financial-overview/index.tsx
-import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
 import React from 'react';
+
+import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
 
 export default function FinancialOverviewScreen() {
   const features = [

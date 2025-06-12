@@ -1,7 +1,8 @@
 // filepath: c:\Users\Hans Candor\Documents\capstone-NV\naga-venture\app\TourismCMS\(admin)\business-management\business-listings\featured-businesses.tsx
 // filepath: app/TourismCMS/(admin)/business-management/business-listings/featured-businesses/index.tsx
-import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
 import React from 'react';
+
+import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
 
 /**
  * Featured Businesses Management Page

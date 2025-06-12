@@ -1,4 +1,5 @@
 #### COLOR PALETTE
+
 Primary Color
 #0A1B47
 Brand Headings, Navigation Backgrounds, Top App Bars, Key Brand Elements. This deep blue is the core brand color for major branding and structural UI elements.
@@ -16,6 +17,7 @@ Complementary Color
 Alert Banners (Secondary), Promotional Highlights, Map Pins, Secondary Chart Elements. Provides harmonious accent and contrast.
 
 #### Neutral Colors
+
 Background
 #FFFFFF
 Main Content Background, Page Background, Modal Overlays (Base), Context Menus. Use for maximum readability and clean interface.
@@ -41,6 +43,7 @@ Neutral 500
 Secondary Text, Labels, Placeholder Text, Less Prominent Icons. Ideal for supporting content.
 
 #### Semantic Colors
+
 Success
 #2E7D32
 Success Messages, Positive Confirmations, Valid States, Toggle Switch (Active), Progress Step (Completed), Permission Badges.
@@ -54,6 +57,7 @@ Destructive
 Error Messages, Critical Alerts, Destructive Actions, Permission 'Denied' Badge, Error States.
 
 #### Interactive Colors
+
 Hover Button
 #1A3F7A
 Primary Button Hover State, FAB Hover State, Context Menu Trigger Hover. Provides clear visual feedback.

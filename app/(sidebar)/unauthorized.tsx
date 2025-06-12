@@ -1,8 +1,9 @@
-import { useAuth } from '@/context/AuthContext';
 import { FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+import { useAuth } from '@/context/AuthContext';
 
 export default function UnauthorizedScreen() {
   const { userProfile } = useAuth();

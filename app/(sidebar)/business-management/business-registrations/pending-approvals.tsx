@@ -1,7 +1,8 @@
 // filepath: c:\Users\Hans Candor\Documents\capstone-NV\naga-venture\app\TourismCMS\(admin)\business-management\business-registrations\pending-approvals\index.tsx
 // filepath: app/TourismCMS/(admin)/business-management/business-registrations/pending-approvals/index.tsx
-import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
 import React from 'react';
+
+import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
 
 /**
  * Pending Approvals Page

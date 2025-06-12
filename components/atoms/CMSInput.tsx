@@ -8,6 +8,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+
 import CMSText from './CMSText';
 
 export interface CMSInputProps extends Omit<TextInputProps, 'style'> {
@@ -47,14 +48,12 @@ const CMSInput: React.FC<CMSInputProps> = React.memo(
 
     return (
       <View style={[styles.container, containerStyle]}>
-        
         {label && (
           <View style={styles.labelContainer}>
             <CMSText type="label" darkColor="#333" style={styles.label}>
               {label}
               {required && (
                 <CMSText type="label" darkColor="#FF3B30">
-                  
                   *
                 </CMSText>
               )}
@@ -116,4 +115,3 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 });
-

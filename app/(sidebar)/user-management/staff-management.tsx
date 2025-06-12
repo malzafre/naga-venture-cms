@@ -1,7 +1,8 @@
 // filepath: c:\Users\Hans Candor\Documents\capstone-NV\naga-venture\app\TourismCMS\(admin)\user-management\staff-management\index.tsx
 // filepath: app/TourismCMS/(admin)/user-management/staff-management/index.tsx
-import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
 import React from 'react';
+
+import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
 
 /**
  * Staff Management Page

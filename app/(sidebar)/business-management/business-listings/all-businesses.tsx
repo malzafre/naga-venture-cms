@@ -1,4 +1,3 @@
-// filepath: c:\Users\Hans Candor\Documents\capstone-NV\naga-venture\app\TourismCMS\(admin)\business-management\business-listings\all-businesses.tsx
 // filepath: app/TourismCMS/(admin)/business-management/business-listings/all-businesses/index.tsx
 import { Picker } from '@react-native-picker/picker';
 import {
@@ -9,6 +8,8 @@ import {
   Trash,
 } from 'phosphor-react-native';
 import React, { useMemo, useState } from 'react';
+
+// Hooks and types
 import {
   Dimensions,
   Platform,
@@ -20,26 +21,24 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Hooks and types
-import {
-  useBusinessListings,
-  useDeleteBusiness,
-  type BusinessFilters,
-} from '@/hooks/useBusinessManagement';
-import { useBusinessSubscription } from '@/hooks/useSupabaseSubscription';
-import { Business } from '@/types/supabase';
-
 // Services
-import { NavigationService } from '@/services/NavigationService';
 
 // Components
-import { CMSButton } from '@/components/TourismCMS/atoms';
+import { CMSButton } from '@/components/atoms';
 import {
   DataTable,
   StatusBadge,
   type DataTableColumn,
-} from '@/components/TourismCMS/molecules';
-import { ConfirmationModal } from '@/components/TourismCMS/molecules/ConfirmationModal';
+} from '@/components/molecules';
+import { ConfirmationModal } from '@/components/molecules/ConfirmationModal';
+import { NavigationService } from '@/constants/NavigationService';
+import { useBusinessFilterManagement } from '@/hooks/useBusinessFilterManagement';
+import {
+  useBusinessListings,
+  useDeleteBusiness,
+} from '@/hooks/useBusinessManagement';
+import { useBusinessSubscription } from '@/hooks/useSupabaseSubscription';
+import { Business } from '@/types/supabase';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -49,13 +48,17 @@ const { width: screenWidth } = Dimensions.get('window');
  * Comprehensive view and management of all business listings in the platform.
  */
 export default function AllBusinessesScreen() {
-  // State for filters
-  const [filters, setFilters] = useState<BusinessFilters>({
-    page: 1,
-    limit: 20,
-  });
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
+  // === ZUSTAND INTEGRATION ===
+  // Replaced useState filter management with centralized Zustand store
+  const {
+    filters,
+    searchQuery,
+    showFilters,
+    setFilter,
+    setSearchQuery,
+    toggleShowFilters,
+  } = useBusinessFilterManagement();
+  // ============================
 
   // State for delete confirmation modal
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -71,63 +74,49 @@ export default function AllBusinessesScreen() {
     refetch,
   } = useBusinessListings(filters);
   const deleteBusinessMutation = useDeleteBusiness();
-
   // Real-time subscription using production-grade hook
   useBusinessSubscription(true);
-
-  // Handle search with debouncing
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setFilters((prev) => ({
-        ...prev,
-        searchQuery: searchQuery.trim(),
-        page: 1, // Reset to first page on search
-      }));
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  // Handle filter changes
-  const handleFilterChange = (key: keyof BusinessFilters, value: any) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: value,
-      page: 1, // Reset to first page on filter change
-    }));
-  }; // Handle delete business
+  // Handle delete business
   const handleDeleteBusiness = React.useCallback((business: Business) => {
-    console.log(
-      '🗑️ [AllBusinesses] Delete button clicked for:',
-      business.business_name
-    );
+    if (__DEV__) {
+      console.log(
+        '🗑️ [AllBusinesses] Delete button clicked for:',
+        business.business_name
+      );
+    }
     setBusinessToDelete(business);
     setDeleteModalVisible(true);
   }, []);
-
   // Confirm delete business
   const confirmDeleteBusiness = React.useCallback(async () => {
     if (!businessToDelete) return;
 
-    console.log(
-      '🗑️ [AllBusinesses] Confirming delete for:',
-      businessToDelete.business_name
-    );
+    if (__DEV__) {
+      console.log(
+        '🗑️ [AllBusinesses] Confirming delete for:',
+        businessToDelete.business_name
+      );
+    }
     setDeleteModalVisible(false);
 
     try {
       await deleteBusinessMutation.mutateAsync(businessToDelete.id);
-      console.log('✅ [AllBusinesses] Business deleted successfully');
+      if (__DEV__) {
+        console.log('✅ [AllBusinesses] Business deleted successfully');
+      }
     } catch (error) {
-      console.error('❌ [AllBusinesses] Delete error:', error);
+      if (__DEV__) {
+        console.error('❌ [AllBusinesses] Delete error:', error);
+      }
     } finally {
       setBusinessToDelete(null);
     }
   }, [businessToDelete, deleteBusinessMutation]);
-
   // Cancel delete business
   const cancelDeleteBusiness = React.useCallback(() => {
-    console.log('🚫 [AllBusinesses] Delete cancelled');
+    if (__DEV__) {
+      console.log('🚫 [AllBusinesses] Delete cancelled');
+    }
     setDeleteModalVisible(false);
     setBusinessToDelete(null);
   }, []);
@@ -281,10 +270,10 @@ export default function AllBusinessesScreen() {
           placeholderTextColor="#9CA3AF"
         />
       </View>
-      {/* Filter Toggle */}
+      {/* Filter Toggle */}{' '}
       <TouchableOpacity
         style={styles.filterButton}
-        onPress={() => setShowFilters(!showFilters)}
+        onPress={() => toggleShowFilters()}
       >
         <Funnel size={20} color="#6B7280" />
         <Text style={styles.filterButtonText}>Filters</Text>
@@ -296,10 +285,11 @@ export default function AllBusinessesScreen() {
             <View style={styles.filterGroup}>
               <Text style={styles.filterLabel}>Status</Text>
               <View style={styles.pickerContainer}>
+                {' '}
                 <Picker
                   selectedValue={filters.status || ''}
                   onValueChange={(value) =>
-                    handleFilterChange('status', value || undefined)
+                    setFilter('status', (value || undefined) as any)
                   }
                   style={styles.picker}
                 >
@@ -315,10 +305,11 @@ export default function AllBusinessesScreen() {
             <View style={styles.filterGroup}>
               <Text style={styles.filterLabel}>Business Type</Text>
               <View style={styles.pickerContainer}>
+                {' '}
                 <Picker
                   selectedValue={filters.business_type || ''}
                   onValueChange={(value) =>
-                    handleFilterChange('business_type', value || undefined)
+                    setFilter('business_type', (value || undefined) as any)
                   }
                   style={styles.picker}
                 >

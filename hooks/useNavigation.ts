@@ -1,4 +1,17 @@
 // filepath: hooks/useNavigation.ts
+
+/**
+ * DEPRECATED: This hook has been replaced by Zustand stores
+ *
+ * Migration Guide:
+ * - Replace useNavigation() with useNavigationManagement()
+ * - Import from '@/hooks/useNavigationManagement' instead
+ * - The new hook provides the same functionality with better performance
+ *
+ * This file will be removed in a future version.
+ *
+ * @deprecated Use useNavigationManagement from '@/hooks/useNavigationManagement' instead
+ */
 import { tourismAdminNavigation } from '@/constants/NavigationConfig';
 import { NavigationItem, SidebarState } from '@/types/navigation';
 import { UserRole } from '@/types/supabase';

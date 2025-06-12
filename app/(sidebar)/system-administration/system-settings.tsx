@@ -1,7 +1,8 @@
 // filepath: c:\Users\Hans Candor\Documents\capstone-NV\naga-venture\app\TourismCMS\(admin)\system-administration\system-settings\index.tsx
 // filepath: app/TourismCMS/(admin)/system-administration/system-settings/index.tsx
-import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
 import React from 'react';
+
+import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
 
 export default function SystemSettingsScreen() {
   const features = [

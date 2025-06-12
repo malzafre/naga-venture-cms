@@ -2,6 +2,7 @@
 import { FontAwesome } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+
 import { CMSText } from '../atoms';
 
 export interface CMSHeaderProps {
@@ -29,7 +30,6 @@ const CMSHeader: React.FC<CMSHeaderProps> = React.memo(
   ({ title, userName, userEmail, onNotificationPress, onUserPress }) => {
     return (
       <View style={styles.headerContainer}>
-        
         <View style={styles.headerLeft}>
           <CMSText type="headerTitle" darkColor="#000">
             {title}
@@ -125,4 +125,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-

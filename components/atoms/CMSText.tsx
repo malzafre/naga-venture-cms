@@ -1,7 +1,8 @@
 // filepath: components/TourismCMS/atoms/CMSText.tsx
-import { useTheme } from '@/hooks/useTheme';
 import React from 'react';
 import { StyleSheet, Text, TextProps } from 'react-native';
+
+import { useTheme } from '@/hooks/useTheme';
 
 export type CMSTextType =
   | 'default'

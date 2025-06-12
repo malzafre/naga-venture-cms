@@ -9,11 +9,11 @@ import { useCreateBusiness } from '@/hooks/useBusinessManagement';
 import { BusinessInsert } from '@/types/supabase';
 
 // Services
-import { NavigationService } from '@/services/NavigationService';
 
 // Components
 import { ConfirmationModal } from '@/components/TourismCMS/molecules/ConfirmationModal';
 import { BusinessForm, CMSRouteGuard } from '@/components/TourismCMS/organisms';
+import { NavigationService } from '@/services/NavigationService';
 
 /**
  * Create Business Page

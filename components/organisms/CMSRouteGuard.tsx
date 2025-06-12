@@ -1,10 +1,12 @@
 // filepath: components/TourismCMS/organisms/CMSRouteGuard.tsx
-import { useAuth } from '@/context/AuthContext';
-import { useRouteGuard } from '@/hooks/useRouteGuard';
 import { FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
+
+import { useAuth } from '@/context/AuthContext';
+import { useRouteGuard } from '@/hooks/useRouteGuard';
+
 import { CMSButton, CMSText } from '../atoms';
 
 interface CMSRouteGuardProps {

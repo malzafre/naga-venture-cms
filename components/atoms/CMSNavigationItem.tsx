@@ -1,6 +1,4 @@
 // filepath: components/TourismCMS/atoms/CMSNavigationItem.tsx
-import { useTheme } from '@/hooks/useTheme';
-import { NavigationBadge, NavigationItem } from '@/types/navigation';
 import { router } from 'expo-router';
 import {
   Bed,
@@ -46,6 +44,10 @@ import {
 } from 'phosphor-react-native';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+import { NavigationBadge, NavigationItem } from '@/types/navigation';
+
+import { useTheme } from '@/hooks/useTheme';
 
 interface CMSNavigationItemProps {
   item: NavigationItem;
@@ -165,7 +167,6 @@ export const CMSNavigationItem: React.FC<CMSNavigationItemProps> = ({
       onPress={handlePress}
       activeOpacity={0.8}
     >
-      
       <View style={styles.content}>
         {/* Only show icons for main navigation items, not subsections */}
         {!isSubsection &&
@@ -234,4 +235,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-

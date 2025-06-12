@@ -26,12 +26,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useBusiness } from '@/hooks/useBusinessManagement';
 
 // Services
-import { NavigationService } from '@/services/NavigationService';
 
 // Components
 import { CMSButton } from '@/components/TourismCMS/atoms';
 import { StatusBadge } from '@/components/TourismCMS/molecules';
 import { CMSRouteGuard } from '@/components/TourismCMS/organisms';
+import { NavigationService } from '@/services/NavigationService';
 
 /**
  * View Business Page

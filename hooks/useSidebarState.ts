@@ -1,4 +1,17 @@
 // hooks/useSidebarState.ts
+
+/**
+ * DEPRECATED: This hook has been replaced by Zustand stores
+ *
+ * Migration Guide:
+ * - Replace useSidebarState() with useSidebarNavigation()
+ * - Import from '@/hooks/useSidebarNavigation' instead
+ * - The new hook provides the same functionality with better performance
+ *
+ * This file will be removed in a future version.
+ *
+ * @deprecated Use useSidebarNavigation from '@/hooks/useSidebarNavigation' instead
+ */
 import { useAuth } from '@/context/AuthContext'; // Import useAuth for user context
 import { NavigationItem, SidebarState } from '@/types/navigation';
 import { UserRole } from '@/types/supabase';

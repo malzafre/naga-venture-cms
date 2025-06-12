@@ -1,7 +1,8 @@
 // filepath: c:\Users\Hans Candor\Documents\capstone-NV\naga-venture\app\TourismCMS\(admin)\tourism-content\tourist-spots\index.tsx
 // filepath: app/TourismCMS/(admin)/tourism-content/tourist-spots/index.tsx
-import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
 import React from 'react';
+
+import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
 
 /**
  * Tourist Spots Management Page

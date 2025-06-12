@@ -1,9 +1,4 @@
 // filepath: components/TourismCMS/organisms/CMSSidebar.tsx
-import { tourismAdminNavigation } from '@/constants/NavigationConfig';
-import { useAuth } from '@/context/AuthContext';
-import { useSidebarState } from '@/hooks/useSidebarState';
-import { NavigationItem } from '@/types/navigation';
-import { UserRole } from '@/types/supabase';
 import { usePathname, useRouter } from 'expo-router';
 import { Bell, SignOut, User } from 'phosphor-react-native';
 import React from 'react';
@@ -16,6 +11,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+
+import { tourismAdminNavigation } from '@/constants/NavigationConfig';
+import { useAuth } from '@/context/AuthContext';
+import { useSidebarNavigation } from '@/hooks/useSidebarNavigation';
+import { NavigationItem } from '@/types/navigation';
+import { UserRole } from '@/types/supabase';
+
 import { CMSText } from '../atoms';
 import { CMSNavigationSection } from '../molecules';
 
@@ -74,15 +76,18 @@ export const CMSSidebar: React.FC<CMSSidebarProps> = ({
     };
 
     return filterByPermissions(tourismAdminNavigation);
-  }, [userRole]); // === REPLACED STATE LOGIC ===
-  // All the complex useState, useEffect, and useCallback logic for state
-  // is now replaced by a single, clean call to your custom hook.
-  const { sidebarState, handleToggleExpand } = useSidebarState(
+  }, [userRole]);
+
+  // === ZUSTAND INTEGRATION ===
+  // Replaced complex useState/useEffect logic with Zustand-based smart hook
+  const { sidebarState, handleToggleExpand } = useSidebarNavigation(
     userRole,
     pathname,
     filteredNavigation
   );
-  // ============================  // Handle navigation
+  // ============================
+
+  // Handle navigation
   const handleNavigate = React.useCallback(
     (path: string) => {
       if (onNavigate) {
@@ -93,15 +98,15 @@ export const CMSSidebar: React.FC<CMSSidebarProps> = ({
       }
     },
     [router, onNavigate] // This dependency array is correct
-  );
-
-  // Handle sign out
+  ); // Handle sign out
   const handleSignOut = React.useCallback(async () => {
     try {
       await signOut();
-      router.replace('/TourismCMS/login');
+      router.replace('/login' as any);
     } catch (error) {
-      console.error('Sign out error:', error);
+      if (__DEV__) {
+        console.error('Sign out error:', error);
+      }
     }
   }, [signOut, router]);
   const renderHeader = () => (
@@ -180,10 +185,14 @@ export const CMSSidebar: React.FC<CMSSidebarProps> = ({
             <CMSText type="caption" style={styles.profileRole}>
               {displayRole}
             </CMSText>
-          </View>
+          </View>{' '}
           <TouchableOpacity
             style={styles.notificationButton}
-            onPress={() => console.log('Notification pressed')}
+            onPress={() => {
+              if (__DEV__) {
+                console.log('Notification pressed');
+              }
+            }}
             activeOpacity={0.7}
           >
             <Bell size={18} color="rgba(255, 255, 255, 0.7)" weight="bold" />
@@ -359,4 +368,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-

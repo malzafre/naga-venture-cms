@@ -10,12 +10,12 @@ import { useBusiness, useUpdateBusiness } from '@/hooks/useBusinessManagement';
 import { BusinessUpdate } from '@/types/supabase';
 
 // Services
-import { NavigationService } from '@/services/NavigationService';
 
 // Components
 import { CMSButton } from '@/components/TourismCMS/atoms';
 import { ConfirmationModal } from '@/components/TourismCMS/molecules/ConfirmationModal';
 import { BusinessForm, CMSRouteGuard } from '@/components/TourismCMS/organisms';
+import { NavigationService } from '@/services/NavigationService';
 
 /**
  * Edit Business Page

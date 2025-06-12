@@ -1,12 +1,435 @@
 /**
- * Query Key Factory - Centralized query key management
- * Following the Query Key Factory pattern for ultimate maintainability
+ * Enhanced Query Key Factory - Phase 3 Optimization
+ *
+ * Comprehensive query key management system following TanStack Query best practices.
+ * Provides hierarchical, type-safe query keys with optimized cache invalidation patterns.
+ *
+ * Features:
+ * - Hierarchical key structure for precise cache management
+ * - Type-safe query key generation with TypeScript support
+ * - Optimized invalidation patterns for related data
+ * - Consistent naming conventions across all domains
+ * - Support for complex filtering and relationships
+ *
  * @see https://tkdodo.eu/blog/effective-react-query-keys
+ * @see https://tanstack.com/query/latest/docs/framework/react/guides/query-keys
  */
 
-// Base query keys
+// Base query keys following domain-driven design
 const queryKeys = {
-  // Shops query keys
+  // Business Management Domain
+  businesses: {
+    all: ['businesses'] as const,
+    lists: () => [...queryKeys.businesses.all, 'list'] as const,
+    list: (filters: Record<string, unknown>) =>
+      [...queryKeys.businesses.lists(), { ...filters }] as const,
+    details: () => [...queryKeys.businesses.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.businesses.details(), id] as const,
+
+    // Business-specific relationships
+    images: (businessId: string) =>
+      [...queryKeys.businesses.detail(businessId), 'images'] as const,
+    categories: (businessId: string) =>
+      [...queryKeys.businesses.detail(businessId), 'categories'] as const,
+    reviews: (businessId: string) =>
+      [...queryKeys.businesses.detail(businessId), 'reviews'] as const,
+    amenities: (businessId: string) =>
+      [...queryKeys.businesses.detail(businessId), 'amenities'] as const,
+    hours: (businessId: string) =>
+      [...queryKeys.businesses.detail(businessId), 'hours'] as const,
+
+    // Business filtering and search
+    byStatus: (status: string) =>
+      [...queryKeys.businesses.lists(), { status }] as const,
+    byType: (type: string) =>
+      [...queryKeys.businesses.lists(), { business_type: type }] as const,
+    byCategory: (categoryId: string) =>
+      [...queryKeys.businesses.lists(), { category: categoryId }] as const,
+    byOwner: (ownerId: string) =>
+      [...queryKeys.businesses.lists(), { owner: ownerId }] as const,
+    search: (query: string) =>
+      [...queryKeys.businesses.all, 'search', query] as const,
+    featured: () =>
+      [...queryKeys.businesses.lists(), { featured: true }] as const,
+    pending: () =>
+      [...queryKeys.businesses.lists(), { status: 'pending' }] as const,
+
+    // Analytics and statistics
+    analytics: () => [...queryKeys.businesses.all, 'analytics'] as const,
+    stats: (timeframe?: string) =>
+      [
+        ...queryKeys.businesses.analytics(),
+        'stats',
+        timeframe || 'all',
+      ] as const,
+  },
+
+  // User Management Domain
+  users: {
+    all: ['users'] as const,
+    lists: () => [...queryKeys.users.all, 'list'] as const,
+    list: (filters: Record<string, unknown>) =>
+      [...queryKeys.users.lists(), { ...filters }] as const,
+    details: () => [...queryKeys.users.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.users.details(), id] as const,
+
+    // User relationships
+    profile: (userId: string) =>
+      [...queryKeys.users.detail(userId), 'profile'] as const,
+    businesses: (userId: string) =>
+      [...queryKeys.users.detail(userId), 'businesses'] as const,
+    permissions: (userId: string) =>
+      [...queryKeys.users.detail(userId), 'permissions'] as const,
+
+    // User filtering
+    byRole: (role: string) => [...queryKeys.users.lists(), { role }] as const,
+    staff: () => [...queryKeys.users.lists(), { type: 'staff' }] as const,
+    tourists: () => [...queryKeys.users.lists(), { type: 'tourists' }] as const,
+    businessOwners: () =>
+      [...queryKeys.users.lists(), { type: 'business_owners' }] as const,
+  },
+
+  // Category Management Domain
+  categories: {
+    all: ['categories'] as const,
+    lists: () => [...queryKeys.categories.all, 'list'] as const,
+    details: () => [...queryKeys.categories.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.categories.details(), id] as const,
+
+    // Category hierarchy
+    main: () => [...queryKeys.categories.lists(), { type: 'main' }] as const,
+    sub: (mainCategoryId?: string) =>
+      mainCategoryId
+        ? ([
+            ...queryKeys.categories.lists(),
+            { type: 'sub', parent: mainCategoryId },
+          ] as const)
+        : ([...queryKeys.categories.lists(), { type: 'sub' }] as const),
+
+    // Category relationships
+    businesses: (categoryId: string) =>
+      [...queryKeys.categories.detail(categoryId), 'businesses'] as const,
+    touristSpots: (categoryId: string) =>
+      [...queryKeys.categories.detail(categoryId), 'tourist-spots'] as const,
+    events: (categoryId: string) =>
+      [...queryKeys.categories.detail(categoryId), 'events'] as const,
+  },
+
+  // Tourist Spots Domain
+  touristSpots: {
+    all: ['tourist-spots'] as const,
+    lists: () => [...queryKeys.touristSpots.all, 'list'] as const,
+    list: (filters: Record<string, unknown>) =>
+      [...queryKeys.touristSpots.lists(), { ...filters }] as const,
+    details: () => [...queryKeys.touristSpots.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.touristSpots.details(), id] as const,
+
+    // Tourist spot relationships
+    images: (spotId: string) =>
+      [...queryKeys.touristSpots.detail(spotId), 'images'] as const,
+    reviews: (spotId: string) =>
+      [...queryKeys.touristSpots.detail(spotId), 'reviews'] as const,
+    events: (spotId: string) =>
+      [...queryKeys.touristSpots.detail(spotId), 'events'] as const,
+
+    // Tourist spot filtering
+    byType: (type: string) =>
+      [...queryKeys.touristSpots.lists(), { spot_type: type }] as const,
+    byStatus: (status: string) =>
+      [...queryKeys.touristSpots.lists(), { status }] as const,
+    featured: () =>
+      [...queryKeys.touristSpots.lists(), { featured: true }] as const,
+    nearby: (lat: number, lng: number, radius: number) =>
+      [
+        ...queryKeys.touristSpots.lists(),
+        { location: { lat, lng, radius } },
+      ] as const,
+  },
+
+  // Events Domain
+  events: {
+    all: ['events'] as const,
+    lists: () => [...queryKeys.events.all, 'list'] as const,
+    list: (filters: Record<string, unknown>) =>
+      [...queryKeys.events.lists(), { ...filters }] as const,
+    details: () => [...queryKeys.events.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.events.details(), id] as const,
+
+    // Event relationships
+    images: (eventId: string) =>
+      [...queryKeys.events.detail(eventId), 'images'] as const,
+    reviews: (eventId: string) =>
+      [...queryKeys.events.detail(eventId), 'reviews'] as const,
+
+    // Event filtering
+    byStatus: (status: string) =>
+      [...queryKeys.events.lists(), { status }] as const,
+    byDateRange: (startDate: string, endDate: string) =>
+      [
+        ...queryKeys.events.lists(),
+        { dateRange: { startDate, endDate } },
+      ] as const,
+    upcoming: () =>
+      [...queryKeys.events.lists(), { status: 'upcoming' }] as const,
+    ongoing: () =>
+      [...queryKeys.events.lists(), { status: 'ongoing' }] as const,
+    featured: () => [...queryKeys.events.lists(), { featured: true }] as const,
+  },
+
+  // Bookings Domain
+  bookings: {
+    all: ['bookings'] as const,
+    lists: () => [...queryKeys.bookings.all, 'list'] as const,
+    list: (filters: Record<string, unknown>) =>
+      [...queryKeys.bookings.lists(), { ...filters }] as const,
+    details: () => [...queryKeys.bookings.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.bookings.details(), id] as const,
+
+    // Booking relationships
+    payments: (bookingId: string) =>
+      [...queryKeys.bookings.detail(bookingId), 'payments'] as const,
+
+    // Booking filtering
+    byGuest: (guestId: string) =>
+      [...queryKeys.bookings.lists(), { guest: guestId }] as const,
+    byBusiness: (businessId: string) =>
+      [...queryKeys.bookings.lists(), { business: businessId }] as const,
+    byStatus: (status: string) =>
+      [...queryKeys.bookings.lists(), { status }] as const,
+    byDateRange: (startDate: string, endDate: string) =>
+      [
+        ...queryKeys.bookings.lists(),
+        { dateRange: { startDate, endDate } },
+      ] as const,
+  },
+
+  // Reviews Domain
+  reviews: {
+    all: ['reviews'] as const,
+    lists: () => [...queryKeys.reviews.all, 'list'] as const,
+    list: (filters: Record<string, unknown>) =>
+      [...queryKeys.reviews.lists(), { ...filters }] as const,
+    details: () => [...queryKeys.reviews.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.reviews.details(), id] as const,
+
+    // Review relationships
+    responses: (reviewId: string) =>
+      [...queryKeys.reviews.detail(reviewId), 'responses'] as const,
+    images: (reviewId: string) =>
+      [...queryKeys.reviews.detail(reviewId), 'images'] as const,
+
+    // Review filtering
+    byType: (type: 'business' | 'tourist_spot' | 'event') =>
+      [...queryKeys.reviews.lists(), { review_type: type }] as const,
+    byTarget: (type: string, targetId: string) =>
+      [
+        ...queryKeys.reviews.lists(),
+        { target: { type, id: targetId } },
+      ] as const,
+    byReviewer: (reviewerId: string) =>
+      [...queryKeys.reviews.lists(), { reviewer: reviewerId }] as const,
+    pending: () =>
+      [...queryKeys.reviews.lists(), { status: 'pending' }] as const,
+  },
+
+  // Promotions Domain
+  promotions: {
+    all: ['promotions'] as const,
+    lists: () => [...queryKeys.promotions.all, 'list'] as const,
+    list: (filters: Record<string, unknown>) =>
+      [...queryKeys.promotions.lists(), { ...filters }] as const,
+    details: () => [...queryKeys.promotions.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.promotions.details(), id] as const,
+
+    // Promotion relationships
+    images: (promotionId: string) =>
+      [...queryKeys.promotions.detail(promotionId), 'images'] as const,
+
+    // Promotion filtering
+    byBusiness: (businessId: string) =>
+      [...queryKeys.promotions.lists(), { business: businessId }] as const,
+    byStatus: (status: string) =>
+      [...queryKeys.promotions.lists(), { status }] as const,
+    active: () =>
+      [...queryKeys.promotions.lists(), { status: 'active' }] as const,
+    platform: () =>
+      [...queryKeys.promotions.lists(), { scope: 'platform' }] as const,
+  },
+
+  // Analytics Domain
+  analytics: {
+    all: ['analytics'] as const,
+
+    // Business analytics
+    businessStats: (timeframe?: string) =>
+      [
+        ...queryKeys.analytics.all,
+        'business-stats',
+        timeframe || 'all',
+      ] as const,
+    businessMetrics: (businessId: string, timeframe?: string) =>
+      [
+        ...queryKeys.analytics.all,
+        'business-metrics',
+        businessId,
+        timeframe || 'all',
+      ] as const,
+
+    // User analytics
+    userStats: (timeframe?: string) =>
+      [...queryKeys.analytics.all, 'user-stats', timeframe || 'all'] as const,
+    userActivity: (userId: string, timeframe?: string) =>
+      [
+        ...queryKeys.analytics.all,
+        'user-activity',
+        userId,
+        timeframe || 'all',
+      ] as const,
+
+    // Platform analytics
+    platformStats: (timeframe?: string) =>
+      [
+        ...queryKeys.analytics.all,
+        'platform-stats',
+        timeframe || 'all',
+      ] as const,
+    pageViews: (filters: Record<string, unknown>) =>
+      [...queryKeys.analytics.all, 'page-views', { ...filters }] as const,
+
+    // Revenue analytics
+    revenue: (timeframe?: string) =>
+      [...queryKeys.analytics.all, 'revenue', timeframe || 'all'] as const,
+    bookingMetrics: (timeframe?: string) =>
+      [
+        ...queryKeys.analytics.all,
+        'booking-metrics',
+        timeframe || 'all',
+      ] as const,
+  },
+
+  // Content Approval Domain - Phase 4
+  contentApproval: {
+    all: ['content-approval'] as const,
+    queues: () => [...queryKeys.contentApproval.all, 'queue'] as const,
+    queue: (filters: Record<string, unknown>) =>
+      [...queryKeys.contentApproval.queues(), { ...filters }] as const,
+    details: () => [...queryKeys.contentApproval.all, 'detail'] as const,
+    detail: (id: string) =>
+      [...queryKeys.contentApproval.details(), id] as const,
+
+    // Approval workflow
+    pending: () =>
+      [...queryKeys.contentApproval.queues(), { status: 'pending' }] as const,
+    approved: () =>
+      [...queryKeys.contentApproval.queues(), { status: 'approved' }] as const,
+    rejected: () =>
+      [...queryKeys.contentApproval.queues(), { status: 'rejected' }] as const,
+
+    // Content type filtering
+    byType: (
+      contentType: 'business_profile' | 'tourist_spot' | 'event' | 'promotion'
+    ) =>
+      [
+        ...queryKeys.contentApproval.queues(),
+        { content_type: contentType },
+      ] as const,
+    bySubmitter: (submitterId: string) =>
+      [
+        ...queryKeys.contentApproval.queues(),
+        { submitter: submitterId },
+      ] as const,
+    byReviewer: (reviewerId: string) =>
+      [
+        ...queryKeys.contentApproval.queues(),
+        { reviewer: reviewerId },
+      ] as const,
+
+    // Content comparison and history
+    comparison: (contentId: string) =>
+      [...queryKeys.contentApproval.detail(contentId), 'comparison'] as const,
+    history: () => [...queryKeys.contentApproval.all, 'history'] as const,
+    changeHistory: (contentId: string) =>
+      [...queryKeys.contentApproval.detail(contentId), 'history'] as const,
+
+    // Analytics and metrics
+    analytics: () => [...queryKeys.contentApproval.all, 'analytics'] as const,
+    staffMetrics: (staffId: string, timeframe?: string) =>
+      [
+        ...queryKeys.contentApproval.analytics(),
+        'staff',
+        staffId,
+        timeframe || 'month',
+      ] as const,
+    approvalStats: (timeframe?: string) =>
+      [
+        ...queryKeys.contentApproval.analytics(),
+        'stats',
+        timeframe || 'week',
+      ] as const,
+  },
+
+  // Review Moderation Domain - Phase 4
+  reviewModeration: {
+    all: ['review-moderation'] as const,
+    queues: () => [...queryKeys.reviewModeration.all, 'queue'] as const,
+    queue: (filters: Record<string, unknown>) =>
+      [...queryKeys.reviewModeration.queues(), { ...filters }] as const,
+
+    // Moderation filtering
+    flagged: () =>
+      [...queryKeys.reviewModeration.queues(), { status: 'flagged' }] as const,
+    pendingApproval: () =>
+      [...queryKeys.reviewModeration.queues(), { status: 'pending' }] as const,
+    autoModerated: () =>
+      [
+        ...queryKeys.reviewModeration.queues(),
+        { auto_moderated: true },
+      ] as const,
+
+    // Content analysis
+    sentiment: (reviewId: string) =>
+      [...queryKeys.reviewModeration.all, 'sentiment', reviewId] as const,
+    toxicity: (reviewId: string) =>
+      [...queryKeys.reviewModeration.all, 'toxicity', reviewId] as const,
+
+    // Response management
+    responses: () => [...queryKeys.reviewModeration.all, 'responses'] as const,
+    pendingResponses: () =>
+      [
+        ...queryKeys.reviewModeration.responses(),
+        { status: 'pending' },
+      ] as const,
+
+    // Analytics
+    analytics: () => [...queryKeys.reviewModeration.all, 'analytics'] as const,
+    moderationStats: (timeframe?: string) =>
+      [
+        ...queryKeys.reviewModeration.analytics(),
+        'stats',
+        timeframe || 'week',
+      ] as const,
+  },
+
+  // System Domain
+  system: {
+    all: ['system'] as const,
+
+    // Configuration
+    config: () => [...queryKeys.system.all, 'config'] as const,
+    features: () => [...queryKeys.system.all, 'features'] as const,
+    settings: () => [...queryKeys.system.all, 'settings'] as const,
+
+    // Health and monitoring
+    health: () => [...queryKeys.system.all, 'health'] as const,
+    logs: (filters: Record<string, unknown>) =>
+      [...queryKeys.system.all, 'logs', { ...filters }] as const,
+
+    // Integrations
+    integrations: () => [...queryKeys.system.all, 'integrations'] as const,
+    apis: () => [...queryKeys.system.all, 'apis'] as const,
+  },
+
+  // Legacy compatibility (will be phased out)
   shops: {
     all: ['shops'] as const,
     lists: () => [...queryKeys.shops.all, 'list'] as const,
@@ -15,7 +438,7 @@ const queryKeys = {
     details: () => [...queryKeys.shops.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.shops.details(), id] as const,
 
-    // Specific shop queries
+    // Legacy shop queries
     featured: () => [...queryKeys.shops.all, 'featured'] as const,
     recommended: () => [...queryKeys.shops.all, 'recommended'] as const,
     byCategory: (categoryId: string) =>
@@ -23,19 +446,12 @@ const queryKeys = {
     bySubcategory: (subcategoryId: string) =>
       [...queryKeys.shops.lists(), { subcategory: subcategoryId }] as const,
     byIds: (ids: string[]) =>
-      [...queryKeys.shops.lists(), { ids: ids.sort().join(',') }] as const, // Sort IDs for consistent cache key
+      [...queryKeys.shops.lists(), { ids: ids.sort().join(',') }] as const,
     search: (query: string) =>
       [...queryKeys.shops.all, 'search', query] as const,
   },
 
-  // Categories query keys
-  categories: {
-    all: ['categories'] as const,
-    main: () => [...queryKeys.categories.all, 'main'] as const,
-    byId: (id: string) => [...queryKeys.categories.all, 'detail', id] as const,
-  },
-
-  // Special offers query keys
+  // Legacy special offers (migrate to promotions)
   specialOffers: {
     all: ['specialOffers'] as const,
     lists: () => [...queryKeys.specialOffers.all, 'list'] as const,
@@ -44,14 +460,13 @@ const queryKeys = {
     details: () => [...queryKeys.specialOffers.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.specialOffers.details(), id] as const,
 
-    // Specific offer queries
     active: () =>
       [...queryKeys.specialOffers.lists(), { active: true }] as const,
     byCategory: (category: string) =>
       [...queryKeys.specialOffers.lists(), { category }] as const,
   },
 
-  // Authentication query keys
+  // Legacy auth (migrate to users)
   auth: {
     all: ['auth'] as const,
     profile: (userId: string) =>
@@ -68,8 +483,19 @@ const queryKeys = {
 export default queryKeys;
 
 // Export individual query key factories for convenience
-export const shopKeys = queryKeys.shops;
+export const businessKeys = queryKeys.businesses;
+export const userKeys = queryKeys.users;
 export const categoryKeys = queryKeys.categories;
+export const touristSpotKeys = queryKeys.touristSpots;
+export const eventKeys = queryKeys.events;
+export const bookingKeys = queryKeys.bookings;
+export const reviewKeys = queryKeys.reviews;
+export const promotionKeys = queryKeys.promotions;
+export const analyticsKeys = queryKeys.analytics;
+export const contentApprovalKeys = queryKeys.contentApproval;
+export const reviewModerationKeys = queryKeys.reviewModeration;
+export const systemKeys = queryKeys.system;
+export const shopKeys = queryKeys.shops;
 export const specialOfferKeys = queryKeys.specialOffers;
 export const authKeys = queryKeys.auth;
 
@@ -89,8 +515,9 @@ export type ShopQueryKey =
 
 export type CategoryQueryKey =
   | typeof queryKeys.categories.all
-  | ReturnType<typeof queryKeys.categories.main>
-  | ReturnType<typeof queryKeys.categories.byId>;
+  | ReturnType<typeof queryKeys.categories.lists>
+  | ReturnType<typeof queryKeys.categories.details>
+  | ReturnType<typeof queryKeys.categories.detail>;
 
 export type SpecialOfferQueryKey =
   | typeof queryKeys.specialOffers.all

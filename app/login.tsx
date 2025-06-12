@@ -1,6 +1,3 @@
-import logo from '@/assets/images/logo.png';
-import { CMSButton, CMSText } from '@/components/TourismCMS';
-import { useAuth } from '@/context/AuthContext';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
@@ -10,6 +7,11 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
+
+import { useAuth } from '@/context/AuthContext';
+
+import logo from '@/assets/images/logo.png';
+import { CMSButton, CMSText } from '@/components/TourismCMS';
 
 // Zod schema for login form validation
 const LoginSchema = z.object({
@@ -280,4 +282,3 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
 });
-

@@ -1,6 +1,7 @@
 // filepath: components/TourismCMS/organisms/CMSPlaceholderPage.tsx
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
+
 import { CMSText } from '../atoms';
 import { CMSDashboardLayout, CMSRouteGuard } from '../organisms';
 

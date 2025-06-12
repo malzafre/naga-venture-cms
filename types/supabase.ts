@@ -60,9 +60,8 @@ export type PageViewType = Database['public']['Enums']['page_view_type'];
 
 // Utility types for common patterns
 export type DbResult<T> = T extends PromiseLike<infer U> ? U : never;
-export type DbResultOk<T> = T extends PromiseLike<{ data: infer U }>
-  ? NonNullable<U>
-  : never;
+export type DbResultOk<T> =
+  T extends PromiseLike<{ data: infer U }> ? NonNullable<U> : never;
 export type DbResultErr = { error: string };
 
 // Helper type for Supabase queries

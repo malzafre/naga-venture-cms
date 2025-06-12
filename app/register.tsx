@@ -1,12 +1,14 @@
-import logo from '@/assets/images/logo.png';
-import { CMSButton, CMSText } from '@/components/TourismCMS';
-import { useAuth } from '@/context/AuthContext';
 import { Image } from 'expo-image';
 import { Link, router } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { useAuth } from '@/context/AuthContext';
+
+import logo from '@/assets/images/logo.png';
+import { CMSButton, CMSText } from '@/components/TourismCMS';
 
 const RegisterWeb = () => {
   const [email, setEmail] = useState('');
@@ -152,8 +154,8 @@ const RegisterWeb = () => {
             <View style={styles.loginRow}>
               <CMSText type="body" darkColor="#000">
                 Already have an account?
-              </CMSText>
-              <Link href="/TourismCMS/login">
+              </CMSText>{' '}
+              <Link href="/login">
                 <CMSText type="label" darkColor="#007AFF">
                   Sign In
                 </CMSText>
@@ -222,4 +224,3 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
 });
-

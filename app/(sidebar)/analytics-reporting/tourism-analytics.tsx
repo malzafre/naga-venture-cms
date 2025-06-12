@@ -1,7 +1,8 @@
 // filepath: c:\Users\Hans Candor\Documents\capstone-NV\naga-venture\app\TourismCMS\(admin)\analytics-reporting\tourism-analytics.tsx
 // filepath: app/TourismCMS/(admin)/analytics-reporting/tourism-analytics/index.tsx
-import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
 import React from 'react';
+
+import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
 
 export default function TourismAnalyticsScreen() {
   const features = [

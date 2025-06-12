@@ -1,7 +1,8 @@
 // filepath: components/TourismCMS/molecules/StatusBadge.tsx
-import { BusinessStatus } from '@/types/supabase';
 import React, { memo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+
+import { BusinessStatus } from '@/types/supabase';
 
 /**
  * StatusBadge - Molecule Component

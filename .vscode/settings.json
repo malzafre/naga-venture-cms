@@ -57,13 +57,12 @@
     "typescriptreact"
   ],
   "eslint.workingDirectories": ["."],
-  "files.eol": "\r\n",
   "typescript.preferences.organizeImports": {
     "enable": true
   },
-  "editor.insertSpaces": true,
-  "editor.tabSize": 2,
+	"editor.insertSpaces": true,
   "editor.detectIndentation": false,
+	"editor.tabSize": 2,
   "editor.rulers": [80],
   "editor.wordWrap": "wordWrapColumn",
   "editor.wordWrapColumn": 80,

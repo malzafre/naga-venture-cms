@@ -15,6 +15,7 @@ components/TourismCMS/
 ## Atoms (Basic Components)
 
 ### CMSButton
+
 - **File**: `atoms/CMSButton.tsx`
 - **Purpose**: Standardized button component for TourismCMS
 - **Features**:
@@ -26,6 +27,7 @@ components/TourismCMS/
   - Disabled states
 
 ### CMSText
+
 - **File**: `atoms/CMSText.tsx`
 - **Purpose**: Typography component for consistent text styling
 - **Features**:
@@ -34,6 +36,7 @@ components/TourismCMS/
   - Light/dark mode support
 
 ### CMSInput
+
 - **File**: `atoms/CMSInput.tsx`
 - **Purpose**: Standardized input component for forms
 - **Features**:
@@ -46,6 +49,7 @@ components/TourismCMS/
 ## Molecules (Component Combinations)
 
 ### CMSHeader
+
 - **File**: `molecules/CMSHeader.tsx`
 - **Purpose**: Header component for admin interface
 - **Features**:
@@ -55,6 +59,7 @@ components/TourismCMS/
   - User profile actions
 
 ### CMSStatCard
+
 - **File**: `molecules/CMSStatCard.tsx`
 - **Purpose**: Statistics display card for dashboards
 - **Features**:
@@ -66,6 +71,7 @@ components/TourismCMS/
 ## Organisms (Complex Components)
 
 ### CMSRouteGuard
+
 - **File**: `organisms/CMSRouteGuard.tsx`
 - **Purpose**: Route protection for TourismCMS pages
 - **Features**:
@@ -76,6 +82,7 @@ components/TourismCMS/
   - Navigation fallbacks
 
 ### CMSDashboardLayout
+
 - **File**: `organisms/CMSDashboardLayout.tsx`
 - **Purpose**: Standardized layout for dashboard pages
 - **Features**:
@@ -88,9 +95,15 @@ components/TourismCMS/
 ## Usage
 
 ### Import Components
+
 ```typescript
 // Import individual components
-import { CMSButton, CMSText, CMSHeader, CMSRouteGuard } from '@/components/TourismCMS';
+import {
+  CMSButton,
+  CMSText,
+  CMSHeader,
+  CMSRouteGuard,
+} from '@/components/TourismCMS';
 
 // Or import from specific levels
 import { CMSButton } from '@/components/TourismCMS/atoms';
@@ -100,6 +113,7 @@ import { CMSHeader } from '@/components/TourismCMS/molecules';
 ### Example Usage
 
 #### CMSButton
+
 ```tsx
 <CMSButton
   title="Save Changes"
@@ -112,6 +126,7 @@ import { CMSHeader } from '@/components/TourismCMS/molecules';
 ```
 
 #### CMSText
+
 ```tsx
 <CMSText type="title" darkColor="#000">
   Dashboard Title
@@ -119,6 +134,7 @@ import { CMSHeader } from '@/components/TourismCMS/molecules';
 ```
 
 #### CMSHeader
+
 ```tsx
 <CMSHeader
   title="Tourism CMS"
@@ -130,6 +146,7 @@ import { CMSHeader } from '@/components/TourismCMS/molecules';
 ```
 
 #### CMSInput
+
 ```tsx
 <CMSInput
   label="Business Name"
@@ -143,6 +160,7 @@ import { CMSHeader } from '@/components/TourismCMS/molecules';
 ```
 
 #### CMSStatCard
+
 ```tsx
 <CMSStatCard
   title="Total Bookings"
@@ -153,6 +171,7 @@ import { CMSHeader } from '@/components/TourismCMS/molecules';
 ```
 
 #### CMSRouteGuard
+
 ```tsx
 <CMSRouteGuard routePath="/TourismCMS/(admin)/dashboard">
   <YourProtectedContent />
@@ -160,6 +179,7 @@ import { CMSHeader } from '@/components/TourismCMS/molecules';
 ```
 
 #### CMSDashboardLayout
+
 ```tsx
 <CMSDashboardLayout
   title="Analytics Dashboard"
@@ -174,16 +194,19 @@ import { CMSHeader } from '@/components/TourismCMS/molecules';
 ## Design Principles Applied
 
 ### KISS (Keep It Simple, Stupid)
+
 - Each component has a single, clear responsibility
 - Simple, intuitive APIs
 - Minimal configuration required
 
 ### DRY (Don't Repeat Yourself)
+
 - Shared styling through design tokens
 - Reusable component patterns
 - Common functionality abstracted
 
 ### SOLID Principles
+
 - **Single Responsibility**: Each component handles one concern
 - **Open/Closed**: Components extensible through props
 - **Liskov Substitution**: Components can be safely replaced
@@ -191,6 +214,7 @@ import { CMSHeader } from '@/components/TourismCMS/molecules';
 - **Dependency Inversion**: Components depend on abstractions
 
 ### Atomic Design
+
 - **Atoms**: Basic UI elements (buttons, text)
 - **Molecules**: Simple combinations of atoms
 - **Organisms**: Complex components with business logic
@@ -207,6 +231,7 @@ The following components have been migrated from generic components to TourismCM
 - Added new components: `CMSInput`, `CMSStatCard`, `CMSDashboardLayout`
 
 ### Files Updated:
+
 - ✅ `app/TourismCMS/login.tsx`
 - ✅ `app/TourismCMS/register.tsx`
 - ✅ `app/TourismCMS/(admin)/_layout.tsx`

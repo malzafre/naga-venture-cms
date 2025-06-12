@@ -1,12 +1,29 @@
 // filepath: context/NavigationContext.tsx
-import { useNavigation } from '@/hooks/useNavigation';
-import { NavigationItem, SidebarState } from '@/types/navigation';
-import { UserRole } from '@/types/supabase';
-import React, { createContext, ReactNode, useContext } from 'react';
 
+/**
+ * MIGRATION NOTICE: NavigationContext → Zustand Stores
+ *
+ * This file has been migrated to use Zustand stores instead of React Context.
+ * The NavigationProvider is no longer needed as Zustand provides global state.
+ *
+ * Migration Steps:
+ * 1. Replace useNavigationContext() with useNavigationManagement()
+ * 2. Remove <NavigationProvider> wrapper from component tree
+ * 3. Import from '@/hooks/useNavigationManagement' instead
+ *
+ * Example:
+ * Before: const { toggleExpand } = useNavigationContext();
+ * After:  const { toggleExpand } = useNavigationManagement();
+ */
+
+import { useNavigationManagement } from '@/hooks/useNavigationManagement';
+import { NavigationItem } from '@/types/navigation';
+import { UserRole } from '@/types/supabase';
+import React, { ReactNode } from 'react';
+
+// Backward compatibility type - matches the new hook interface
 interface NavigationContextType {
   // State
-  sidebarState: SidebarState;
   filteredNavigation: NavigationItem[];
   isLoading: boolean;
 
@@ -27,51 +44,35 @@ interface NavigationContextType {
   ) => { section: string; subsection?: string };
 }
 
-const NavigationContext = createContext<NavigationContextType | undefined>(
-  undefined
-);
-
 interface NavigationProviderProps {
   children: ReactNode;
   userRole?: UserRole;
 }
 
 /**
- * NavigationProvider - Context Provider for Navigation State
+ * NavigationProvider - DEPRECATED - Use Zustand stores instead
  *
- * Provides navigation state and actions to child components.
- * Manages sidebar expand/collapse state, active sections, and role-based filtering.
+ * This provider is now a simple passthrough that doesn't provide any context.
+ * Components should use the useNavigationManagement hook directly.
  *
- * @param children - Child components
- * @param userRole - Current user's role for permission filtering
+ * @deprecated Use useNavigationManagement() hook directly instead
  */
 export const NavigationProvider: React.FC<NavigationProviderProps> = ({
   children,
-  userRole,
+  userRole: _userRole, // Ignored since Zustand manages this internally
 }) => {
-  const navigationHook = useNavigation(userRole);
-
-  return (
-    <NavigationContext.Provider value={navigationHook}>
-      {children}
-    </NavigationContext.Provider>
-  );
+  // No context needed - Zustand manages state globally
+  return <>{children}</>;
 };
 
 /**
- * Hook to access navigation context
+ * Hook to access navigation context - DEPRECATED
  *
- * @returns Navigation context value
- * @throws Error if used outside NavigationProvider
+ * @deprecated Use useNavigationManagement() from '@/hooks/useNavigationManagement' instead
+ * @returns Navigation management hooks
  */
 export const useNavigationContext = (): NavigationContextType => {
-  const context = useContext(NavigationContext);
-
-  if (context === undefined) {
-    throw new Error(
-      'useNavigationContext must be used within a NavigationProvider'
-    );
-  }
-
-  return context;
+  // Delegate to the Zustand-based hook for backward compatibility
+  // Note: userRole is managed internally by the store, so we pass undefined
+  return useNavigationManagement(undefined);
 };

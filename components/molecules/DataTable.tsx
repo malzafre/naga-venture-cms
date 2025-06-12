@@ -68,8 +68,8 @@ export const DataTable = <T extends Record<string, any>>({
                 column.align === 'center'
                   ? 'center'
                   : column.align === 'right'
-                  ? 'flex-end'
-                  : 'flex-start',
+                    ? 'flex-end'
+                    : 'flex-start',
             },
             index === columns.length - 1 && styles.lastColumn,
           ]}
@@ -114,8 +114,8 @@ export const DataTable = <T extends Record<string, any>>({
                   column.align === 'center'
                     ? 'center'
                     : column.align === 'right'
-                    ? 'flex-end'
-                    : 'flex-start',
+                      ? 'flex-end'
+                      : 'flex-start',
               },
               colIndex === columns.length - 1 && styles.lastColumn,
             ]}
@@ -168,8 +168,8 @@ export const DataTable = <T extends Record<string, any>>({
         {isLoading
           ? renderLoadingState()
           : data.length === 0
-          ? renderEmptyState()
-          : data.map((item, index) => renderRow(item, index))}
+            ? renderEmptyState()
+            : data.map((item, index) => renderRow(item, index))}
       </ScrollView>
     </View>
   );

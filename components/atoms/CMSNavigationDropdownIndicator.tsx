@@ -49,11 +49,9 @@ export const CMSNavigationDropdownIndicator: React.FC<
       onPress={onPress}
       activeOpacity={0.7}
     >
-      
       <Animated.View
         style={[styles.iconContainer, { transform: [{ rotate: rotation }] }]}
       >
-        
         <CaretRight size={14} color="rgba(255, 255, 255, 0.6)" weight="bold" />
       </Animated.View>
     </TouchableOpacity>
@@ -72,4 +70,3 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-

@@ -1,7 +1,8 @@
 // filepath: c:\Users\Hans Candor\Documents\capstone-NV\naga-venture\app\TourismCMS\(admin)\content-management\reviews-ratings\index.tsx
 // filepath: app/TourismCMS/(admin)/content-management/reviews-ratings/index.tsx
-import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
 import React from 'react';
+
+import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
 
 export default function ReviewsRatingsScreen() {
   const features = [

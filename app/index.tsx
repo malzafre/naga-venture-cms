@@ -1,11 +1,12 @@
-import PressableButton from '@/components/PressableButton';
-import { ThemedText } from '@/components/ThemedText';
 import { useFonts } from 'expo-font';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React from 'react';
 import { ImageBackground, Text, View } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
+
+import PressableButton from '@/components/PressableButton';
+import { ThemedText } from '@/components/ThemedText';
 import 'react-native-url-polyfill/auto';
 
 const Index = () => {

@@ -1,5 +1,4 @@
 // filepath: components/TourismCMS/molecules/CMSNavigationSection.tsx
-import { NavigationItem } from '@/types/navigation';
 import React from 'react';
 import {
   Animated,
@@ -9,6 +8,9 @@ import {
   UIManager,
   View,
 } from 'react-native';
+
+import { NavigationItem } from '@/types/navigation';
+
 import { CMSNavigationDropdownIndicator, CMSNavigationItem } from '../atoms';
 
 // Enable LayoutAnimation on Android
@@ -125,7 +127,6 @@ export const CMSNavigationSection: React.FC<CMSNavigationSectionProps> = ({
         ]}
         pointerEvents={isExpanded ? 'auto' : 'none'}
       >
-        
         {section.subsections.map((subsection) => {
           const isSubsectionActive = activeSubsection === subsection.id;
 
@@ -194,4 +195,3 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
 });
-

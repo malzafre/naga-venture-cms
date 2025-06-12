@@ -1,7 +1,3 @@
-import { CMSSidebar } from '@/components/TourismCMS';
-import { AccommodationProvider } from '@/context/AccommodationContext';
-import { useAuth } from '@/context/AuthContext';
-import { NavigationProvider } from '@/context/NavigationContext';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, router } from 'expo-router';
 import { useEffect } from 'react';
@@ -13,6 +9,11 @@ import {
   Text,
   View,
 } from 'react-native';
+
+import { useAuth } from '@/context/AuthContext';
+
+import { CMSSidebar } from '@/components/TourismCMS';
+import { AccommodationProvider } from '@/context/AccommodationContext';
 
 const { width: screenWidth } = Dimensions.get('window');
 const SIDEBAR_WIDTH = Platform.select({
@@ -66,21 +67,18 @@ export default function AdminLayout() {
   }
   return (
     <AccommodationProvider>
-      <NavigationProvider userRole={userProfile?.role}>
-        <ThemeProvider value={DefaultTheme}>
-          <View style={styles.container}>
-            
-            {/* New Hierarchical Sidebar */}
-            <CMSSidebar userRole={userProfile?.role} />
-            {/* Main Content Area */}
-            <View style={styles.content}>
-              <Stack
-                screenOptions={{ headerShown: false, headerBackVisible: false }}
-              />
-            </View>
+      <ThemeProvider value={DefaultTheme}>
+        <View style={styles.container}>
+          {/* New Hierarchical Sidebar */}
+          <CMSSidebar userRole={userProfile?.role} />
+          {/* Main Content Area */}
+          <View style={styles.content}>
+            <Stack
+              screenOptions={{ headerShown: false, headerBackVisible: false }}
+            />
           </View>
-        </ThemeProvider>
-      </NavigationProvider>
+        </View>
+      </ThemeProvider>
     </AccommodationProvider>
   );
 }
@@ -111,4 +109,3 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 });
-
