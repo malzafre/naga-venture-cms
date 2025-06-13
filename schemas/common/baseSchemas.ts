@@ -119,7 +119,7 @@ export const NameSchema = z
  */
 export const TextContentSchema = z
   .string()
-  .min(10, 'Content must be at least 10 characters')
+  .min(200, 'Content must be at least 200 characters')
   .max(2000, 'Content must be less than 2000 characters');
 
 /**

@@ -1,6 +1,6 @@
 // filepath: hooks/useSupabaseSubscription.ts
 import { useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { supabase } from '@/lib/supabaseClient';
 
@@ -75,12 +75,26 @@ export function useSupabaseSubscription(
       );
     }
   }, [table]);
+  // Keep track of the last subscription attempt time
+  const lastSubscriptionAttemptRef = useRef(0);
 
   const setupSubscription = useCallback(() => {
     // Don't setup if already subscribed or not enabled
     if (isSubscribedRef.current || !enabled) {
       return;
     }
+
+    // Prevent rapid subscription attempts (debounce of 500ms)
+    const now = Date.now();
+    if (now - lastSubscriptionAttemptRef.current < 500) {
+      console.log(
+        `🔄 [useSupabaseSubscription] Throttling subscription request for ${table}`
+      );
+      return;
+    }
+
+    // Update last attempt time
+    lastSubscriptionAttemptRef.current = now;
 
     try {
       // Create unique channel name to prevent conflicts
@@ -154,16 +168,31 @@ export function useSupabaseSubscription(
     queryClient,
   ]);
 
-  // Setup subscription when enabled
+  // Create a ref to track the current effect instance to prevent cleanup race conditions
+  const effectInstanceRef = useRef(0);
+
+  // Setup subscription when enabled - with optimization to avoid thrashing
   useEffect(() => {
+    // Generate unique ID for this effect instance
+    const effectId = Date.now();
+    effectInstanceRef.current = effectId;
+
     if (enabled) {
-      setupSubscription();
+      // Only setup if not already subscribed
+      if (!isSubscribedRef.current) {
+        setupSubscription();
+      }
     } else {
       cleanup();
     }
 
-    // Always cleanup on unmount or when dependencies change
-    return cleanup;
+    // Cleanup on unmount or when dependencies change
+    return () => {
+      // Only run cleanup if this is still the current effect instance
+      if (effectInstanceRef.current === effectId) {
+        cleanup();
+      }
+    };
   }, [enabled, setupSubscription, cleanup]);
 
   // Return subscription status and manual control functions
@@ -178,27 +207,35 @@ export function useSupabaseSubscription(
 }
 
 /**
- * Convenience hook for business table subscriptions
+ * Convenience hook for business table subscriptions with built-in memoization
+ * to avoid creating multiple subscriptions
  */
 export function useBusinessSubscription(enabled: boolean = true) {
-  return useSupabaseSubscription(
-    {
+  // Use useMemo to ensure the config object doesn't change on re-renders
+  // This prevents unnecessary re-subscriptions
+  const config = useMemo(
+    () => ({
       table: 'businesses',
       invalidateQueries: [['businesses'], ['businesses', 'list']],
-    },
-    enabled
+    }),
+    []
   );
+
+  return useSupabaseSubscription(config, enabled);
 }
 
 /**
- * Convenience hook for profiles table subscriptions
+ * Convenience hook for profiles table subscriptions with built-in memoization
  */
 export function useProfilesSubscription(enabled: boolean = true) {
-  return useSupabaseSubscription(
-    {
+  // Use useMemo to ensure the config object doesn't change on re-renders
+  const config = useMemo(
+    () => ({
       table: 'profiles',
       invalidateQueries: [['profiles'], ['users']],
-    },
-    enabled
+    }),
+    []
   );
+
+  return useSupabaseSubscription(config, enabled);
 }

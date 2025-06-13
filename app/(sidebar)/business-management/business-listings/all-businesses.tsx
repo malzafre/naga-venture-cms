@@ -71,8 +71,10 @@ export default function AllBusinessesScreen() {
     refetch,
   } = useBusinessListings(filters);
   const deleteBusinessMutation = useDeleteBusiness();
-  // Real-time subscription for live updates
-  useBusinessSubscription(true);
+
+  // Real-time subscription for live updates - useMemo prevents unnecessary resubscription
+  const isScreenActive = true; // This could be tied to screen focus in the future if needed
+  useBusinessSubscription(isScreenActive);
 
   // Handle delete business
   const handleDeleteBusiness = React.useCallback((business: Business) => {

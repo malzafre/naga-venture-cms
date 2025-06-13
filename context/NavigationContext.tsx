@@ -19,6 +19,7 @@
 import { useNavigationManagement } from '@/hooks/useNavigationManagement';
 import { NavigationItem } from '@/types/navigation';
 import { UserRole } from '@/types/supabase';
+
 import React, { ReactNode } from 'react';
 
 // Backward compatibility type - matches the new hook interface

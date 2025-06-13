@@ -67,6 +67,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     error: userProfileError,
   } = useQuery<UserProfile | null, Error>({
     queryKey: ['userProfile', user?.id],
+    // Add caching options to reduce unnecessary refetches
+    staleTime: 5 * 60 * 1000, // 5 minute stale time
+    gcTime: 30 * 60 * 1000, // 30 minute cache time (formerly cacheTime)
+    refetchOnWindowFocus: false, // Prevent refetch on alt-tab
+    refetchOnMount: false, // Don't refetch when component mounts if data is already available
+    refetchOnReconnect: false, // Don't refetch on reconnect if data is already available
     queryFn: async () => {
       if (!user?.id) {
         console.log(
@@ -143,6 +149,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         `[AuthContext] onAuthStateChange event: ${event}, New session:`,
         !!newSession
       );
+
+      // Skip ALL TOKEN_REFRESHED events to prevent re-renders on alt-tabbing
+      // This is the main cause of unnecessary re-renders when returning to the app
+      if (event === 'TOKEN_REFRESHED') {
+        console.log(
+          '[AuthContext] Skipping all TOKEN_REFRESHED events to prevent alt-tab re-renders'
+        );
+        return;
+      }
+
+      // For all other events, update the session
       setSession(newSession);
 
       const oldUserId = session?.user?.id;
@@ -290,27 +307,45 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     'userProfile:',
     !!userProfile
   );
+
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = React.useMemo(
+    () => ({
+      session,
+      user,
+      isLoading,
+      authError,
+      signInWithEmail,
+      signOut,
+      userProfile: userProfile as UserProfile | null,
+      isUserProfileLoading,
+      userProfileError: userProfileError as Error | null,
+      login,
+      logout,
+      hasRole,
+      hasAnyRole,
+      isAdmin,
+    }),
+    [
+      session,
+      user,
+      isLoading,
+      authError,
+      signInWithEmail,
+      signOut,
+      userProfile,
+      isUserProfileLoading,
+      userProfileError,
+      login,
+      logout,
+      hasRole,
+      hasAnyRole,
+      isAdmin,
+    ]
+  );
+
   return (
-    <AuthContext.Provider
-      value={{
-        session,
-        user,
-        isLoading,
-        authError,
-        signInWithEmail,
-        signOut,
-        userProfile: userProfile ?? null,
-        isUserProfileLoading,
-        userProfileError: userProfileError as Error | null,
-        login,
-        logout,
-        hasRole,
-        hasAnyRole,
-        isAdmin,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 
