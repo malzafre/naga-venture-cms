@@ -1,6 +1,5 @@
 // filepath: constants/NavigationConfig.ts
 import { NavigationItem } from '@/types/navigation';
-
 /**
  * Tourism CMS Navigation Configuration
  * Based on NAGA VENTURE RBAC Documentation
@@ -25,14 +24,18 @@ export const tourismAdminNavigation: NavigationItem[] = [
     label: 'User Management',
     icon: 'users',
     type: 'dropdown',
-    permissions: ['tourism_admin'],
+    permissions: [
+      'tourism_admin',
+      'business_registration_manager',
+      'business_listing_manager',
+    ],
     subsections: [
       {
         id: 'staff-management',
         label: 'Staff Management',
         icon: 'user-shield',
         type: 'single',
-        path: '/TourismCMS/(admin)/user-management/staff-management',
+        path: '/(sidebar)/user-management/staff-management',
         permissions: ['tourism_admin'],
       },
       {
@@ -40,15 +43,19 @@ export const tourismAdminNavigation: NavigationItem[] = [
         label: 'Business Owners',
         icon: 'briefcase',
         type: 'single',
-        path: '/TourismCMS/(admin)/user-management/business-owners',
-        permissions: ['tourism_admin', 'business_registration_manager'],
+        path: '/(sidebar)/user-management/business-owners',
+        permissions: [
+          'tourism_admin',
+          'business_registration_manager',
+          'business_listing_manager',
+        ],
       },
       {
         id: 'tourist-accounts',
         label: 'Tourist Accounts',
         icon: 'user',
         type: 'single',
-        path: '/TourismCMS/(admin)/user-management/tourist-accounts',
+        path: '/(sidebar)/user-management/tourist-accounts',
         permissions: ['tourism_admin'],
       },
     ],
@@ -65,88 +72,29 @@ export const tourismAdminNavigation: NavigationItem[] = [
     ],
     subsections: [
       {
-        id: 'business-listings',
-        label: 'Business Listings',
-        icon: 'list',
-        type: 'dropdown',
+        id: 'all-businesses',
+        label: 'All Businesses',
+        icon: 'building',
+        type: 'single',
+        path: '/(sidebar)/business-management/business-listings/all-businesses',
         permissions: ['tourism_admin', 'business_listing_manager'],
-        subsections: [
-          {
-            id: 'all-businesses',
-            label: 'All Businesses',
-            icon: 'building',
-            type: 'single',
-            path: '/TourismCMS/(admin)/business-management/business-listings/all-businesses',
-            permissions: ['tourism_admin', 'business_listing_manager'],
-          },
-          {
-            id: 'accommodations',
-            label: 'Accommodations',
-            icon: 'bed',
-            type: 'single',
-            path: '/TourismCMS/(admin)/business-management/business-listings/accommodations',
-            permissions: ['tourism_admin', 'business_listing_manager'],
-          },
-          {
-            id: 'shops-services',
-            label: 'Shops & Services',
-            icon: 'shopping-bag',
-            type: 'single',
-            path: '/TourismCMS/(admin)/business-management/business-listings/shops-services',
-            permissions: ['tourism_admin', 'business_listing_manager'],
-          },
-          {
-            id: 'featured-businesses',
-            label: 'Featured Businesses',
-            icon: 'star',
-            type: 'single',
-            path: '/TourismCMS/(admin)/business-management/business-listings/featured-businesses',
-            permissions: ['tourism_admin', 'business_listing_manager'],
-          },
-        ],
-      },
-      {
-        id: 'business-registrations',
-        label: 'Business Registrations',
-        icon: 'file-plus',
-        type: 'dropdown',
-        permissions: ['tourism_admin', 'business_registration_manager'],
-        badge: { count: 8, type: 'warning' },
-        subsections: [
-          {
-            id: 'pending-registrations',
-            label: 'Pending Approvals',
-            icon: 'clock',
-            type: 'single',
-            path: '/TourismCMS/(admin)/business-management/business-registrations/pending-approvals',
-            permissions: ['tourism_admin', 'business_registration_manager'],
-            badge: { count: 8, type: 'warning' },
-          },
-          {
-            id: 'registration-history',
-            label: 'Registration History',
-            icon: 'history',
-            type: 'single',
-            path: '/TourismCMS/(admin)/business-management/business-registrations/registration-history',
-            permissions: ['tourism_admin', 'business_registration_manager'],
-          },
-          {
-            id: 'rejected-applications',
-            label: 'Rejected Applications',
-            icon: 'x-circle',
-            type: 'single',
-            path: '/TourismCMS/(admin)/business-management/business-registrations/rejected-applications',
-            permissions: ['tourism_admin', 'business_registration_manager'],
-          },
-        ],
       },
       {
         id: 'business-analytics',
         label: 'Business Analytics',
-        icon: 'trending-up',
+        icon: 'chart-bar',
         type: 'single',
-        path: '/TourismCMS/(admin)/business-management/business-analytics',
+        path: '/(sidebar)/business-management/business-analytics',
         permissions: ['tourism_admin', 'business_listing_manager'],
+      },
+      {
+        id: 'business-registrations',
+        label: 'Business Registrations',
+        icon: 'clipboard-check',
+        type: 'single',
+        path: '/(sidebar)/business-management/business-registrations',
+        permissions: ['tourism_admin', 'business_registration_manager'],
+        badge: { count: 8, type: 'warning' },
       },
     ],
   },
@@ -162,7 +110,7 @@ export const tourismAdminNavigation: NavigationItem[] = [
         label: 'Tourist Spots',
         icon: 'map-pin',
         type: 'single',
-        path: '/TourismCMS/(admin)/tourism-content/tourist-spots',
+        path: '/(sidebar)/tourism-content/tourist-spots',
         permissions: ['tourism_admin', 'tourism_content_manager'],
       },
       {
@@ -170,7 +118,7 @@ export const tourismAdminNavigation: NavigationItem[] = [
         label: 'Events Management',
         icon: 'calendar',
         type: 'single',
-        path: '/TourismCMS/(admin)/tourism-content/events-management',
+        path: '/(sidebar)/tourism-content/events-management',
         permissions: ['tourism_admin', 'tourism_content_manager'],
       },
       {
@@ -178,7 +126,7 @@ export const tourismAdminNavigation: NavigationItem[] = [
         label: 'Promotions',
         icon: 'gift',
         type: 'single',
-        path: '/TourismCMS/(admin)/tourism-content/promotions',
+        path: '/(sidebar)/tourism-content/promotions',
         permissions: ['tourism_admin', 'tourism_content_manager'],
       },
     ],
@@ -190,8 +138,8 @@ export const tourismAdminNavigation: NavigationItem[] = [
     type: 'dropdown',
     permissions: [
       'tourism_admin',
-      'business_listing_manager',
       'tourism_content_manager',
+      'business_listing_manager',
     ],
     subsections: [
       {
@@ -199,55 +147,49 @@ export const tourismAdminNavigation: NavigationItem[] = [
         label: 'Content Approval',
         icon: 'check-circle',
         type: 'single',
-        path: '/TourismCMS/(admin)/content-management/content-approval',
+        path: '/(sidebar)/content-management/content-approval',
         permissions: [
           'tourism_admin',
-          'business_listing_manager',
           'tourism_content_manager',
+          'business_listing_manager',
         ],
-        badge: { count: 12, type: 'info' },
       },
       {
         id: 'reviews-ratings',
         label: 'Reviews & Ratings',
         icon: 'star',
         type: 'single',
-        path: '/TourismCMS/(admin)/content-management/reviews-ratings',
+        path: '/(sidebar)/content-management/reviews-ratings',
         permissions: [
           'tourism_admin',
-          'business_listing_manager',
           'tourism_content_manager',
+          'business_listing_manager',
         ],
-        badge: { count: 4, type: 'error' },
       },
     ],
   },
   {
     id: 'categories',
-    label: 'Categories & Organization',
-    icon: 'folder',
+    label: 'Categories',
+    icon: 'tag',
     type: 'dropdown',
     permissions: [
       'tourism_admin',
-      'business_listing_manager',
       'tourism_content_manager',
+      'business_listing_manager',
     ],
     subsections: [
       {
-        id: 'business-categories',
-        label: 'Business Categories',
+        id: 'category-management',
+        label: 'Category Management',
         icon: 'tag',
         type: 'single',
-        path: '/TourismCMS/(admin)/categories-organization/business-categories',
-        permissions: ['tourism_admin', 'business_listing_manager'],
-      },
-      {
-        id: 'tourism-categories',
-        label: 'Tourism Categories',
-        icon: 'compass',
-        type: 'single',
-        path: '/TourismCMS/(admin)/categories-organization/tourism-categories',
-        permissions: ['tourism_admin', 'tourism_content_manager'],
+        path: '/(sidebar)/categories/category-management',
+        permissions: [
+          'tourism_admin',
+          'tourism_content_manager',
+          'business_listing_manager',
+        ],
       },
     ],
   },
@@ -263,7 +205,7 @@ export const tourismAdminNavigation: NavigationItem[] = [
         label: 'Booking Management',
         icon: 'calendar-check',
         type: 'single',
-        path: '/TourismCMS/(admin)/bookings-finance/booking-management',
+        path: '/(sidebar)/bookings-finance/booking-management',
         permissions: ['tourism_admin'],
       },
       {
@@ -271,7 +213,7 @@ export const tourismAdminNavigation: NavigationItem[] = [
         label: 'Financial Overview',
         icon: 'dollar-sign',
         type: 'single',
-        path: '/TourismCMS/(admin)/bookings-finance/financial-overview',
+        path: '/(sidebar)/bookings-finance/financial-overview',
         permissions: ['tourism_admin'],
       },
     ],
@@ -284,41 +226,40 @@ export const tourismAdminNavigation: NavigationItem[] = [
     permissions: [
       'tourism_admin',
       'business_listing_manager',
-      'tourism_content_manager',
       'business_registration_manager',
     ],
     subsections: [
       {
         id: 'platform-analytics',
         label: 'Platform Analytics',
-        icon: 'activity',
-        type: 'single',
-        path: '/TourismCMS/(admin)/analytics-reporting/platform-analytics',
-        permissions: ['tourism_admin'],
-      },
-      {
-        id: 'business-analytics-detail',
-        label: 'Business Performance',
         icon: 'trending-up',
         type: 'single',
-        path: '/TourismCMS/(admin)/analytics-reporting/business-analytics-detail',
-        permissions: ['tourism_admin', 'business_listing_manager'],
+        path: '/(sidebar)/analytics-reporting/platform-analytics',
+        permissions: ['tourism_admin'],
       },
       {
         id: 'tourism-analytics',
         label: 'Tourism Analytics',
-        icon: 'map',
+        icon: 'map-pin',
         type: 'single',
-        path: '/TourismCMS/(admin)/analytics-reporting/tourism-analytics',
-        permissions: ['tourism_admin', 'tourism_content_manager'],
+        path: '/(sidebar)/analytics-reporting/tourism-analytics',
+        permissions: ['tourism_admin'],
       },
       {
         id: 'registration-analytics',
-        label: 'Registration Metrics',
+        label: 'Registration Analytics',
         icon: 'user-plus',
         type: 'single',
-        path: '/TourismCMS/(admin)/analytics-reporting/registration-analytics',
+        path: '/(sidebar)/analytics-reporting/registration-analytics',
         permissions: ['tourism_admin', 'business_registration_manager'],
+      },
+      {
+        id: 'business-analytics-detail',
+        label: 'Business Analytics Detail',
+        icon: 'bar-chart-2',
+        type: 'single',
+        path: '/(sidebar)/analytics-reporting/business-analytics-detail',
+        permissions: ['tourism_admin', 'business_listing_manager'],
       },
     ],
   },
@@ -334,15 +275,15 @@ export const tourismAdminNavigation: NavigationItem[] = [
         label: 'System Settings',
         icon: 'sliders',
         type: 'single',
-        path: '/TourismCMS/(admin)/system-administration/system-settings',
+        path: '/(sidebar)/system-administration/system-settings',
         permissions: ['tourism_admin'],
       },
       {
         id: 'api-management',
         label: 'API Management',
-        icon: 'link',
+        icon: 'server',
         type: 'single',
-        path: '/TourismCMS/(admin)/system-administration/api-management',
+        path: '/(sidebar)/system-administration/api-management',
         permissions: ['tourism_admin'],
       },
       {
@@ -350,25 +291,9 @@ export const tourismAdminNavigation: NavigationItem[] = [
         label: 'Security & Backup',
         icon: 'shield',
         type: 'single',
-        path: '/TourismCMS/(admin)/system-administration/security-backup',
+        path: '/(sidebar)/system-administration/security-backup',
         permissions: ['tourism_admin'],
       },
     ],
   },
 ];
-
-// Navigation configurations for other roles
-export const businessListingManagerNavigation: NavigationItem[] =
-  tourismAdminNavigation.filter((item) =>
-    item.permissions.includes('business_listing_manager')
-  );
-
-export const tourismContentManagerNavigation: NavigationItem[] =
-  tourismAdminNavigation.filter((item) =>
-    item.permissions.includes('tourism_content_manager')
-  );
-
-export const businessRegistrationManagerNavigation: NavigationItem[] =
-  tourismAdminNavigation.filter((item) =>
-    item.permissions.includes('business_registration_manager')
-  );

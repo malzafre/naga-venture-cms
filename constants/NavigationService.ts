@@ -1,6 +1,7 @@
 // filepath: constants/NavigationService.ts
 // Enhanced Navigation Service with validation, analytics, and error handling
 import { router } from 'expo-router';
+
 import { ROUTE_CONSTANTS } from './RouteConstants';
 
 /**
@@ -135,7 +136,6 @@ export class NavigationService {
 
     // Log navigation for debugging (in development)
     if (__DEV__) {
-      // eslint-disable-next-line no-console
       console.log('🧭 [NavigationService] Navigation:', {
         to: route,
         from: event.previousRoute,
@@ -150,7 +150,6 @@ export class NavigationService {
    */
   private static validateRoute(route: string): boolean {
     if (!RouteValidator.isValidRoute(route)) {
-      // eslint-disable-next-line no-console
       console.error('❌ [NavigationService] Invalid route:', route);
       return false;
     }
@@ -184,13 +183,11 @@ export class NavigationService {
       this.trackNavigation(route, { replace, validated: validate });
 
       if (__DEV__) {
-        // eslint-disable-next-line no-console
         console.log(`✅ [NavigationService] Navigation successful: ${route}`);
       }
 
       return true;
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error('❌ [NavigationService] Navigation failed:', error);
       this.navigateToFallback();
       return false;
@@ -207,7 +204,6 @@ export class NavigationService {
           .ALL_BUSINESSES as any
       );
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error(
         '❌ [NavigationService] Fallback navigation failed:',
         error
@@ -241,7 +237,6 @@ export class NavigationService {
    */
   static toEditBusiness(businessId: string) {
     if (!businessId || businessId.trim() === '') {
-      // eslint-disable-next-line no-console
       console.error(
         '❌ [NavigationService] Invalid business ID for edit:',
         businessId
@@ -259,7 +254,6 @@ export class NavigationService {
    */
   static toViewBusiness(businessId: string) {
     if (!businessId || businessId.trim() === '') {
-      // eslint-disable-next-line no-console
       console.error(
         '❌ [NavigationService] Invalid business ID for view:',
         businessId
@@ -302,9 +296,8 @@ export class NavigationService {
    */
   static goBack() {
     if (__DEV__) {
-      // eslint-disable-next-line no-console
       console.log('🧭 [NavigationService] Go back requested');
-      // eslint-disable-next-line no-console
+
       console.log('🧭 [NavigationService] Can go back:', router.canGoBack());
     }
 
@@ -314,19 +307,16 @@ export class NavigationService {
         this.trackNavigation('[BACK]', { action: 'back' });
 
         if (__DEV__) {
-          // eslint-disable-next-line no-console
           console.log('✅ [NavigationService] Go back successful');
         }
         return true;
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error('❌ [NavigationService] Go back failed:', error);
         this.toAllBusinesses();
         return false;
       }
     } else {
       if (__DEV__) {
-        // eslint-disable-next-line no-console
         console.log(
           '🔄 [NavigationService] Cannot go back - navigating to fallback'
         );

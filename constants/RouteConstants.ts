@@ -82,13 +82,10 @@ export const ROUTE_CONSTANTS = {
     CONTENT_APPROVAL: '/(sidebar)/content-management/content-approval',
     REVIEWS_RATINGS: '/(sidebar)/content-management/reviews-ratings',
   },
-
   // Categories & Organization
-  CATEGORIES_ORGANIZATION: {
-    BASE: '/(sidebar)/categories-organization',
-    BUSINESS_CATEGORIES:
-      '/(sidebar)/categories-organization/business-categories',
-    TOURISM_CATEGORIES: '/(sidebar)/categories-organization/tourism-categories',
+  CATEGORIES: {
+    BASE: '/(sidebar)/categories',
+    CATEGORY_MANAGEMENT: '/(sidebar)/categories/category-management',
   },
 
   // Bookings & Finance

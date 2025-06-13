@@ -1,4 +1,3 @@
-import { usePathname, useRouter } from 'expo-router';
 import { Bell, SignOut, User } from 'phosphor-react-native';
 import React from 'react';
 import {
@@ -11,10 +10,7 @@ import {
   View,
 } from 'react-native';
 
-import { tourismAdminNavigation } from '@/constants/NavigationConfig';
-import { useAuth } from '@/context/AuthContext';
-import { useSidebarActions, useSidebarStore } from '@/stores';
-import { NavigationItem } from '@/types/navigation';
+import { useSidebarLogic } from '@/hooks/useSidebarLogic';
 import { UserRole } from '@/types/supabase';
 
 import { CMSText } from '../atoms';
@@ -36,14 +32,15 @@ const SIDEBAR_WIDTH = Platform.select({
  * CMSSidebar - Organism Component
  *
  * Main hierarchical sidebar navigation for Tourism CMS.
+ * Following "Smart Hook, Dumb Component" pattern from coding guidelines.
+ *
  * Features:
+ * - Purely presentational (all logic in useSidebarLogic hook)
  * - Role-based navigation filtering
- * - Persistent expand/collapse state (via usePersistentState)
+ * - Persistent expand/collapse state
  * - Active route highlighting
- * - Smooth animations
  * - Responsive design
- * - Centralized state management (via useReducer)
- * - Clean custom hooks for state management and persistence
+ * - Centralized NavigationService usage
  *
  * @param userRole - Current user's role for permission filtering
  * @param isVisible - Whether sidebar is visible (mobile responsive)
@@ -54,120 +51,18 @@ export const CMSSidebar: React.FC<CMSSidebarProps> = ({
   isVisible = true,
   onNavigate,
 }) => {
-  const { signOut, user, userProfile } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
+  // Smart Hook contains ALL business logic - following coding guidelines
+  const {
+    sidebarState,
+    filteredNavigation,
+    user,
+    userProfile,
+    handleNavigate,
+    handleToggleExpand,
+    handleSignOut,
+  } = useSidebarLogic(userRole);
 
-  // Filter navigation items based on user role
-  const filteredNavigation = React.useMemo(() => {
-    if (!userRole) return [];
-
-    const filterByPermissions = (items: NavigationItem[]): NavigationItem[] => {
-      return items
-        .filter((item) => item.permissions.includes(userRole))
-        .map((item) => ({
-          ...item,
-          subsections: item.subsections
-            ? filterByPermissions(item.subsections)
-            : undefined,
-        }))
-        .filter((item) => !item.subsections || item.subsections.length > 0);
-    };
-
-    return filterByPermissions(tourismAdminNavigation);
-  }, [userRole]); // === PROPER ZUSTAND SOLUTION ===
-  // Get state from Zustand store with optimized selectors
-  const expandedSections = useSidebarStore((state) => state.expandedSections);
-  const activeSection = useSidebarStore((state) => state.activeSection);
-
-  // Get stable actions
-  const actions = useSidebarActions();
-
-  // Create stable state object
-  const sidebarState = React.useMemo(
-    () => ({
-      expandedSections,
-      activeSection,
-      userRole,
-    }),
-    [expandedSections, activeSection, userRole]
-  );
-
-  // Stable toggle function using Zustand actions
-  const handleToggleExpand = React.useCallback(
-    (sectionId: string) => {
-      actions.toggleSection(sectionId);
-    },
-    [actions]
-  );
-
-  // Auto-expand and set active section based on current route
-  React.useEffect(() => {
-    const findActiveSection = (
-      items: NavigationItem[],
-      path: string
-    ): string => {
-      for (const item of items) {
-        if (item.path === path) {
-          actions.setActiveSection(item.id);
-          if (!actions.isSectionExpanded(item.id)) {
-            actions.autoExpandSection(item.id);
-          }
-          return item.id;
-        }
-        if (item.subsections) {
-          const found = findActiveSection(item.subsections, path);
-          if (found) {
-            actions.setActiveSection(found);
-            if (!actions.isSectionExpanded(item.id)) {
-              actions.autoExpandSection(item.id);
-            }
-            return found;
-          }
-        }
-      }
-      return '';
-    };
-
-    findActiveSection(filteredNavigation, pathname);
-  }, [pathname, filteredNavigation, actions]);
-
-  // Track user ID in the sidebar store - FIXED
-  React.useEffect(() => {
-    if (user?.id) {
-      // This properly links the current user ID to the sidebar store
-      useSidebarStore.getState().setCurrentUserId(user.id);
-    }
-  }, [user?.id]);
-
-  // Update user role in store
-  React.useEffect(() => {
-    actions.setUserRole(userRole);
-  }, [userRole, actions]);
-  // ============================
-
-  // Handle navigation
-  const handleNavigate = React.useCallback(
-    (path: string) => {
-      if (onNavigate) {
-        onNavigate(path);
-      } else {
-        // Use router.push directly - router is stable from the hook
-        router.push(path as any);
-      }
-    },
-    [router, onNavigate] // This dependency array is correct
-  ); // Handle sign out
-  const handleSignOut = React.useCallback(async () => {
-    try {
-      await signOut();
-      router.replace('/login' as any);
-    } catch (error) {
-      if (__DEV__) {
-        console.error('Sign out error:', error);
-      }
-    }
-  }, [signOut, router]);
+  // Render functions (purely presentational)
   const renderHeader = () => (
     <View
       style={[styles.header, { borderBottomColor: 'rgba(255, 255, 255, 0.1)' }]}
@@ -185,13 +80,14 @@ export const CMSSidebar: React.FC<CMSSidebarProps> = ({
       )}
     </View>
   );
+
   const renderNavigation = () => (
     <ScrollView
       style={styles.navigationContainer}
       showsVerticalScrollIndicator={false}
       bounces={false}
     >
-      {filteredNavigation.map((section, index) => {
+      {filteredNavigation.map((section) => {
         const isExpanded = sidebarState.expandedSections.includes(section.id);
         const isActive =
           sidebarState.activeSection === section.id ||
@@ -199,91 +95,55 @@ export const CMSSidebar: React.FC<CMSSidebarProps> = ({
             section.subsections.some(
               (sub) => sidebarState.activeSection === sub.id
             ));
-
         return (
-          <React.Fragment key={section.id}>
-            {/* Add separator line before each section (except the first one) */}
-            {index > 0 && <View style={styles.sectionSeparator} />}
-            <CMSNavigationSection
-              section={section}
-              isExpanded={isExpanded}
-              isActive={isActive}
-              activeSubsection={sidebarState.activeSection}
-              expandedSections={sidebarState.expandedSections}
-              onToggleExpand={handleToggleExpand}
-              onNavigate={handleNavigate}
-            />
-          </React.Fragment>
+          <CMSNavigationSection
+            key={section.id}
+            section={section}
+            isExpanded={isExpanded}
+            isActive={isActive}
+            onToggleExpand={handleToggleExpand}
+            onNavigate={(path: string) => handleNavigate(path, onNavigate)}
+            expandedSections={sidebarState.expandedSections}
+            level={0}
+          />
         );
       })}
     </ScrollView>
   );
-  const renderProfileSection = () => {
-    // Get user display information
-    const displayName = userProfile
-      ? `${userProfile.first_name || ''} ${
-          userProfile.last_name || ''
-        }`.trim() || 'Admin User'
-      : user?.email?.split('@')[0] || 'Admin User';
 
-    const displayRole = userRole
-      ? userRole.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
-      : 'Admin';
-
-    return (
-      <View style={styles.profileContainer}>
-        {/* Profile Info */}
-        <View style={styles.profileInfo}>
-          <View style={styles.profileAvatarContainer}>
-            <User size={20} color="rgba(255, 255, 255, 0.9)" weight="bold" />
+  const renderFooter = () => (
+    <View style={styles.footer}>
+      <View style={styles.userSection}>
+        <View style={styles.userInfo}>
+          <View style={styles.userAvatar}>
+            <User size={16} color="#666" />
           </View>
-          <View style={styles.profileDetails}>
-            <CMSText type="body" style={styles.profileName}>
-              {displayName}
+          <View style={styles.userDetails}>
+            <CMSText type="body" style={styles.userName}>
+              {userProfile?.first_name && userProfile?.last_name
+                ? `${userProfile.first_name} ${userProfile.last_name}`
+                : user?.email || 'Admin User'}
             </CMSText>
-            <CMSText type="caption" style={styles.profileRole}>
-              {displayRole}
+            <CMSText type="caption" style={styles.userRole}>
+              {userRole
+                ?.replace(/_/g, ' ')
+                .replace(/\b\w/g, (l) => l.toUpperCase()) || 'Admin'}
             </CMSText>
-          </View>{' '}
-          <TouchableOpacity
-            style={styles.notificationButton}
-            onPress={() => {
-              if (__DEV__) {
-                console.log('Notification pressed');
-              }
-            }}
-            activeOpacity={0.7}
-          >
-            <Bell size={18} color="rgba(255, 255, 255, 0.7)" weight="bold" />
-            {/* Optional notification badge */}
-            <View style={styles.notificationBadge}>
-              <CMSText type="caption" style={styles.notificationBadgeText}>
-                3
-              </CMSText>
-            </View>
-          </TouchableOpacity>
+          </View>
         </View>
+        <TouchableOpacity style={styles.notificationButton}>
+          <Bell size={18} color="#666" />
+        </TouchableOpacity>
       </View>
-    );
-  };
 
-  const renderSignOutButton = () => (
-    <View style={styles.signOutContainer}>
       <TouchableOpacity
-        style={[
-          styles.signOutButton,
-          { borderTopColor: 'rgba(255, 255, 255, 0.1)' },
-        ]}
+        style={styles.signOutButton}
         onPress={handleSignOut}
-        activeOpacity={0.7}
+        accessibilityLabel="Sign Out"
+        accessibilityRole="button"
       >
-        <SignOut
-          size={18} // Reduced size
-          color="#FF6B6B" // Red color for sign out
-          weight="bold"
-          style={styles.signOutIcon}
-        />
-        <CMSText type="body" style={[styles.signOutText, { color: '#FF6B6B' }]}>
+        <SignOut size={16} color="#FFFFFF" style={styles.signOutIcon} />
+        <CMSText type="body" style={styles.signOutText}>
           Sign Out
         </CMSText>
       </TouchableOpacity>
@@ -293,137 +153,125 @@ export const CMSSidebar: React.FC<CMSSidebarProps> = ({
   if (!isVisible) {
     return null;
   }
+
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        {
-          backgroundColor: '#0A1B47', // Primary color background
-          borderRightColor: 'rgba(255, 255, 255, 0.1)', // Subtle white border
-          width: SIDEBAR_WIDTH,
-        },
-      ]}
-    >
-      {renderHeader()}
-      {renderNavigation()}
-      {renderProfileSection()}
-      {renderSignOutButton()}
+    <SafeAreaView style={styles.container}>
+      <View style={styles.sidebar}>
+        {renderHeader()}
+        {renderNavigation()}
+        {renderFooter()}
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    position: Platform.select({
+      web: 'fixed' as any,
+      default: 'absolute',
+    }),
+    top: 0,
+    left: 0,
+    height: '100%',
+    width: SIDEBAR_WIDTH,
+    zIndex: 1000,
+    backgroundColor: '#0A1B47',
+  },
+  sidebar: {
     flex: 1,
-    borderRightWidth: 1,
+    backgroundColor: '#0A1B47',
     ...Platform.select({
       web: {
-        position: 'fixed' as any,
-        left: 0,
-        top: 0,
-        bottom: 0,
-        zIndex: 1000,
+        boxShadow: '2px 0 10px rgba(0, 0, 0, 0.1)',
+      },
+      default: {
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 2, height: 0 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
       },
     }),
   },
   header: {
-    padding: 16, // Reduced from 20
+    padding: 20,
+    paddingBottom: 16,
     borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
   },
   headerTitle: {
-    fontWeight: '700',
-    marginBottom: 2, // Reduced from 4
-    fontSize: 16, // Slightly smaller
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 4,
   },
   headerSubtitle: {
-    fontSize: 11, // Reduced from 12
-    textTransform: 'capitalize',
-    fontWeight: '500',
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.7)',
   },
   navigationContainer: {
     flex: 1,
-    paddingVertical: 4, // Reduced from 8
+    paddingVertical: 8,
   },
-  sectionSeparator: {
-    height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)', // Subtle separator line
-    marginVertical: 8, // Space around the separator
-    marginHorizontal: 12, // Inset from sides
+  footer: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
   },
-  signOutContainer: {
-    padding: 12, // Reduced from 16
+  userSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  userAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  userDetails: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#FFFFFF',
+    marginBottom: 2,
+  },
+  userRole: {
+    fontSize: 11,
+    color: 'rgba(255, 255, 255, 0.6)',
+  },
+  notificationButton: {
+    padding: 6,
+    borderRadius: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   signOutButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10, // Reduced from 12
-    paddingHorizontal: 12, // Reduced from 16
-    borderTopWidth: 1,
-    borderRadius: 6, // Reduced from 8
-    backgroundColor: 'rgba(255, 107, 107, 0.1)', // Subtle red background
+    justifyContent: 'center',
+    backgroundColor: 'rgba(220, 53, 69, 0.8)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
   },
   signOutIcon: {
-    marginRight: 8, // Reduced from 12
+    marginRight: 6,
   },
   signOutText: {
-    fontSize: 13, // Reduced from 15
+    fontSize: 13,
     fontWeight: '500',
-  },
-  // Profile section styles
-  profileContainer: {
-    padding: 12,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  profileInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  profileAvatarContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  profileDetails: {
-    flex: 1,
-  },
-  profileName: {
-    color: 'rgba(255, 255, 255, 0.9)',
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 2,
-  },
-  profileRole: {
-    color: 'rgba(255, 255, 255, 0.6)',
-    fontSize: 11,
-    fontWeight: '500',
-    textTransform: 'capitalize',
-  },
-  notificationButton: {
-    position: 'relative',
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  notificationBadge: {
-    position: 'absolute',
-    top: 2,
-    right: 2,
-    backgroundColor: '#FF6B6B',
-    borderRadius: 8,
-    minWidth: 16,
-    height: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  notificationBadgeText: {
     color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: 'bold',
   },
 });
