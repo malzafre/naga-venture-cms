@@ -1,4 +1,3 @@
-// filepath: components/TourismCMS/molecules/CMSStatCard.tsx
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 

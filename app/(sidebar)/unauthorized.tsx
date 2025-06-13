@@ -48,14 +48,14 @@ export default function UnauthorizedScreen() {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => router.replace('/TourismCMS/(admin)/dashboard')}
+          onPress={() => router.replace('/dashboard')}
         >
           <Text style={styles.buttonText}>Go to Dashboard</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.button, styles.secondaryButton]}
-          onPress={() => router.replace('/TourismCMS/login')}
+          onPress={() => router.replace('/login')}
         >
           <Text style={[styles.buttonText, styles.secondaryButtonText]}>
             Switch Account

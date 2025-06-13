@@ -6,16 +6,16 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Hooks and types
-import { useBusiness, useUpdateBusiness } from '@/hooks/useBusinessManagement';
-import { BusinessUpdate } from '@/types/supabase';
 
 // Services
 
 // Components
-import { CMSButton } from '@/components/TourismCMS/atoms';
-import { ConfirmationModal } from '@/components/TourismCMS/molecules/ConfirmationModal';
-import { BusinessForm, CMSRouteGuard } from '@/components/TourismCMS/organisms';
-import { NavigationService } from '@/services/NavigationService';
+import { CMSButton } from '@/components/atoms';
+import { ConfirmationModal } from '@/components/molecules/ConfirmationModal';
+import { BusinessForm, CMSRouteGuard } from '@/components/organisms';
+import { NavigationService } from '@/constants/NavigationService';
+import { useBusiness, useUpdateBusiness } from '@/hooks/useBusinessManagement';
+import { BusinessUpdate } from '@/types/supabase';
 
 /**
  * Edit Business Page

@@ -1,10 +1,6 @@
 import React from 'react';
 
-import {
-  CMSDashboardLayout,
-  CMSRouteGuard,
-  StatData,
-} from '@/components/TourismCMS';
+import { CMSDashboardLayout, CMSRouteGuard, StatData } from '@/components';
 
 const Dashboard = () => {
   const dashboardStats: StatData[] = [

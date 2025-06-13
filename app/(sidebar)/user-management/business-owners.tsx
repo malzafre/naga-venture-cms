@@ -2,7 +2,7 @@
 // filepath: app/TourismCMS/(admin)/user-management/business-owners/index.tsx
 import React from 'react';
 
-import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
+import { CMSPlaceholderPage } from '@/components/organisms';
 
 /**
  * Business Owners Management Page

@@ -5,15 +5,15 @@ import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Hooks and types
-import { useCreateBusiness } from '@/hooks/useBusinessManagement';
-import { BusinessInsert } from '@/types/supabase';
 
 // Services
 
 // Components
-import { ConfirmationModal } from '@/components/TourismCMS/molecules/ConfirmationModal';
-import { BusinessForm, CMSRouteGuard } from '@/components/TourismCMS/organisms';
-import { NavigationService } from '@/services/NavigationService';
+import { ConfirmationModal } from '@/components/molecules/ConfirmationModal';
+import { BusinessForm, CMSRouteGuard } from '@/components/organisms';
+import { NavigationService } from '@/constants/NavigationService';
+import { useCreateBusiness } from '@/hooks/useBusinessManagement';
+import { BusinessInsert } from '@/types/supabase';
 
 /**
  * Create Business Page

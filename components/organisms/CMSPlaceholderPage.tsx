@@ -1,4 +1,3 @@
-// filepath: components/TourismCMS/organisms/CMSPlaceholderPage.tsx
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 

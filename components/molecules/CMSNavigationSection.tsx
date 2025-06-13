@@ -1,4 +1,3 @@
-// filepath: components/TourismCMS/molecules/CMSNavigationSection.tsx
 import React from 'react';
 import {
   Animated,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, StyleSheet, Text, View } from 'react-native';
 
-import { CMSButton } from '@/components/TourismCMS/atoms';
+import { CMSButton } from '@/components/atoms';
 
 interface ConfirmationModalProps {
   visible: boolean;

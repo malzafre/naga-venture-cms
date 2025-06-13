@@ -8,18 +8,18 @@
     {
       "file": "./github/copilot-instructions.md"
     },
-    {
-      "file": "./db/naga-venture-schema.sql"
-    },
-    {
-      "file": "./docs/requirement-analysis.md"
-    },
-    {
-      "file": ".docs/naga-venture-rbac-documentation.md"
-    },
-    {
-      "file": "./docs/naga-venture-tourismcms-development-roadmap.md"
-    }
+    // {
+    //   "file": "./db/naga-venture-schema.sql"
+    // },
+    // {
+    //   "file": "./docs/requirement-analysis.md"
+    // },
+    // {
+    //   "file": ".docs/naga-venture-rbac-documentation.md"
+    // },
+    // {
+    //   "file": "./docs/naga-venture-tourismcms-development-roadmap.md"
+    // }
   ],
   "github.copilot.chat.reviewSelection.instructions": [
     {

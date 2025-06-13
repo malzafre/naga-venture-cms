@@ -8,7 +8,6 @@ import {
   Trash,
 } from 'phosphor-react-native';
 import React, { useMemo, useState } from 'react';
-
 // Hooks and types
 import {
   Dimensions,
@@ -445,7 +444,7 @@ const styles = StyleSheet.create({
     color: '#374151',
     ...Platform.select({
       web: {
-        outline: 'none',
+        outlineStyle: 'none', // Changed from outline: 'none'
       } as any,
     }),
   },

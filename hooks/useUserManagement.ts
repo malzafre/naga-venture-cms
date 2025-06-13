@@ -1,59 +1,80 @@
 /**
- * Enhanced User Management Hooks - Phase 3 Optimization
+ * Enhanced User Management Hooks - Phase 5 Implementation
  *
- * Production-grade smart hooks for user management operations:
- * - Role-based user filtering and management
- * - Staff permission management
+ * Production-grade smart hooks for user management operations with comprehensive validation:
+ * - Role-based user filtering and management with Zod validation
+ * - Staff permission management with type safety
  * - Optimistic updates for user operations
  * - Real-time user status tracking
  * - Parallel loading of user profiles and permissions
+ * - Complete API response validation
  */
 
-import { DOMAIN_CACHE_CONFIG, cacheUtils } from '@/constants/CacheConstants';
-import queryKeys from '@/lib/queryKeys';
-import { supabase } from '@/lib/supabaseClient';
 import {
   keepPreviousData,
   useMutation,
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import { z } from 'zod';
 
-// Types for user management
-export interface UserProfile {
-  id: string;
-  email: string;
-  first_name?: string;
-  last_name?: string;
-  phone_number?: string;
-  profile_image_url?: string;
-  role:
-    | 'tourism_admin'
-    | 'business_listing_manager'
-    | 'tourism_content_manager'
-    | 'business_registration_manager'
-    | 'business_owner'
-    | 'tourist';
-  is_verified: boolean;
-  created_at: string;
-  updated_at: string;
-}
+import { DOMAIN_CACHE_CONFIG, cacheUtils } from '@/constants/CacheConstants';
+import queryKeys from '@/lib/queryKeys';
+import { supabase } from '@/lib/supabaseClient';
+import {
+  ProfileSchema,
+  StaffPermissionsSchema,
+  UserRoleSchema,
+  validateSupabaseListResponse,
+  validateSupabaseResponse,
+  type Profile,
+  type StaffPermissions,
+  type UserRole,
+} from '@/schemas';
 
-export interface StaffPermissions {
-  id: string;
-  profile_id: string;
-  can_manage_users: boolean;
-  can_manage_businesses: boolean;
-  can_manage_tourist_spots: boolean;
-  can_manage_events: boolean;
-  can_approve_content: boolean;
-  can_manage_categories: boolean;
-  created_at: string;
-  updated_at: string;
-}
+// ============================================================================
+// ERROR HANDLING
+// ============================================================================
+
+/**
+ * Enhanced error handling for user operations with contextual logging
+ */
+const handleUserError = (
+  error: any,
+  operation: string,
+  context?: Record<string, any>
+) => {
+  // Log error with context for debugging
+  console.error(`[UserManagement] ${operation}:`, error, context);
+
+  // Enhance error message for specific error types
+  if (error.code === 'PGRST301') {
+    throw new Error('User not found or access denied');
+  } else if (error.code === 'PGRST204') {
+    throw new Error('User data is empty or invalid');
+  } else if (error.message?.includes('duplicate key')) {
+    throw new Error('A user with this email already exists');
+  } else if (error.message?.includes('foreign key')) {
+    throw new Error('Related data is missing or invalid');
+  } else if (error.message?.includes('permission denied')) {
+    throw new Error('You do not have permission to perform this action');
+  }
+
+  // Default enhanced error message
+  throw new Error(
+    `Failed to ${operation}: ${error.message || 'Unknown error'}`
+  );
+};
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+// Use schema-generated types
+export type UserProfile = Profile;
 
 export interface UserFilters extends Record<string, unknown> {
-  role?: UserProfile['role'];
+  role?: UserRole;
   is_verified?: boolean;
   searchQuery?: string;
   page?: number;
@@ -69,11 +90,28 @@ export interface UserListResponse {
 }
 
 /**
- * Enhanced User Listings Hook
+ * Enhanced User Listings Hook - Phase 5 Enhanced
  *
- * Features optimized user fetching with role-based filtering and search.
+ * Features optimized user fetching with role-based filtering and comprehensive validation.
  */
 export function useUserListings(filters: UserFilters = {}) {
+  // Phase 5: Validate input filters with defaults
+  const defaultFilters: UserFilters = {
+    page: 1,
+    limit: 20,
+    sortBy: 'created_at',
+    sortOrder: 'desc',
+    ...filters,
+  };
+
+  // Validate role if provided
+  const validatedFilters = {
+    ...defaultFilters,
+    role: defaultFilters.role
+      ? UserRoleSchema.parse(defaultFilters.role)
+      : undefined,
+  };
+
   const {
     role,
     is_verified,
@@ -82,12 +120,12 @@ export function useUserListings(filters: UserFilters = {}) {
     limit = 20,
     sortBy = 'created_at',
     sortOrder = 'desc',
-  } = filters;
+  } = validatedFilters;
 
   const cacheConfig = DOMAIN_CACHE_CONFIG.users;
 
   return useQuery({
-    queryKey: queryKeys.users.list(filters),
+    queryKey: queryKeys.users.list(validatedFilters),
     queryFn: async (): Promise<UserListResponse> => {
       let query = supabase.from('profiles').select('*', { count: 'exact' });
 
@@ -112,17 +150,28 @@ export function useUserListings(filters: UserFilters = {}) {
       const to = from + limit - 1;
       query = query.range(from, to);
 
-      const { data, error, count } = await query;
+      const response = await query;
 
-      if (error) {
-        console.error('[useUserListings] Query error:', error);
-        throw new Error(`Failed to fetch users: ${error.message}`);
+      if (response.error) {
+        handleUserError(response.error, 'fetch user listings', {
+          filters: validatedFilters,
+        });
       }
 
+      // Phase 5: Validate API response with Zod
+      const validatedResponse = validateSupabaseListResponse(
+        ProfileSchema,
+        response
+      );
+
+      const hasMore = validatedResponse.count
+        ? from + limit < validatedResponse.count
+        : false;
+
       return {
-        data: data || [],
-        count,
-        hasMore: count ? from + limit < count : false,
+        data: validatedResponse.data,
+        count: validatedResponse.count,
+        hasMore,
       };
     },
     ...cacheConfig,
@@ -132,9 +181,9 @@ export function useUserListings(filters: UserFilters = {}) {
 }
 
 /**
- * User Detail Hook with Permissions
+ * User Detail Hook with Permissions - Phase 5 Enhanced
  *
- * Fetches detailed user information including staff permissions.
+ * Fetches detailed user information including staff permissions with comprehensive validation.
  */
 export function useUser(userId: string | undefined) {
   const cacheConfig = DOMAIN_CACHE_CONFIG.users;
@@ -144,7 +193,10 @@ export function useUser(userId: string | undefined) {
     queryFn: async () => {
       if (!userId) return null;
 
-      const { data, error } = await supabase
+      // Phase 5: Validate userId input
+      const validatedId = z.string().uuid().parse(userId);
+
+      const response = await supabase
         .from('profiles')
         .select(
           `
@@ -152,15 +204,19 @@ export function useUser(userId: string | undefined) {
           staff_permissions(*)
         `
         )
-        .eq('id', userId)
+        .eq('id', validatedId)
         .single();
 
-      if (error) {
-        console.error('[useUser] Query error:', error);
-        throw new Error(`Failed to fetch user: ${error.message}`);
+      if (response.error) {
+        handleUserError(response.error, 'fetch user details', {
+          userId: validatedId,
+        });
       }
 
-      return data;
+      // Phase 5: Validate API response with Zod
+      const validatedData = validateSupabaseResponse(ProfileSchema, response);
+
+      return validatedData;
     },
     enabled: !!userId,
     ...cacheConfig,
@@ -181,9 +237,9 @@ export function useStaffMembers() {
 }
 
 /**
- * User Role Statistics Hook
+ * User Role Statistics Hook - Phase 5 Enhanced
  *
- * Provides analytics on user distribution by roles.
+ * Provides analytics on user distribution by roles with comprehensive validation.
  */
 export function useUserRoleStats() {
   const cacheConfig = DOMAIN_CACHE_CONFIG.analytics;
@@ -191,15 +247,22 @@ export function useUserRoleStats() {
   return useQuery({
     queryKey: queryKeys.analytics.userStats(),
     queryFn: async () => {
-      const { data, error } = await supabase
+      const response = await supabase
         .from('profiles')
         .select('role')
         .neq('role', null);
 
-      if (error) {
-        console.error('[useUserRoleStats] Query error:', error);
-        throw new Error(`Failed to fetch user statistics: ${error.message}`);
+      if (response.error) {
+        handleUserError(response.error, 'fetch user statistics');
       }
+
+      // Phase 5: Validate API response with Zod
+      const validatedResponse = validateSupabaseListResponse(
+        z.object({ role: UserRoleSchema }),
+        response
+      );
+
+      const data = validatedResponse.data;
 
       // Count users by role
       const roleCounts = data.reduce((acc: Record<string, number>, user) => {
@@ -228,9 +291,9 @@ export function useUserRoleStats() {
 }
 
 /**
- * User Profile Update Hook with Optimistic Updates
+ * User Profile Update Hook with Optimistic Updates - Phase 5 Enhanced
  *
- * Handles user profile updates with instant UI feedback.
+ * Handles user profile updates with instant UI feedback and comprehensive validation.
  */
 export function useUpdateUserProfile() {
   const queryClient = useQueryClient();
@@ -243,19 +306,35 @@ export function useUpdateUserProfile() {
       userId: string;
       updateData: Partial<UserProfile>;
     }) => {
-      const { data, error } = await supabase
+      // Phase 5: Validate input data
+      const validatedId = z.string().uuid().parse(userId);
+      const validatedUpdateData = ProfileSchema.partial().parse(updateData);
+
+      const response = await supabase
         .from('profiles')
-        .update(updateData)
-        .eq('id', userId)
+        .update(validatedUpdateData)
+        .eq('id', validatedId)
         .select()
         .single();
 
-      if (error) {
-        console.error('[useUpdateUserProfile] Mutation error:', error);
-        throw new Error(`Failed to update user profile: ${error.message}`);
+      if (response.error) {
+        handleUserError(response.error, 'update user profile', {
+          userId: validatedId,
+          updateData: validatedUpdateData,
+        });
       }
 
-      return data;
+      // Phase 5: Validate API response
+      const validatedProfileData = validateSupabaseResponse(
+        ProfileSchema,
+        response
+      );
+
+      if (!validatedProfileData) {
+        throw new Error('Failed to update user profile - invalid response');
+      }
+
+      return validatedProfileData;
     },
 
     onMutate: async ({ userId, updateData }) => {
@@ -341,9 +420,9 @@ export function useUpdateUserProfile() {
 }
 
 /**
- * Staff Permissions Update Hook
+ * Staff Permissions Update Hook - Phase 5 Enhanced
  *
- * Manages staff permission updates with role validation.
+ * Manages staff permission updates with role validation and comprehensive data validation.
  */
 export function useUpdateStaffPermissions() {
   const queryClient = useQueryClient();
@@ -356,18 +435,40 @@ export function useUpdateStaffPermissions() {
       userId: string;
       permissions: Partial<StaffPermissions>;
     }) => {
-      const { data, error } = await supabase
+      // Phase 5: Validate input data
+      const validatedId = z.string().uuid().parse(userId);
+      const validatedPermissions =
+        StaffPermissionsSchema.partial().parse(permissions);
+
+      const response = await supabase
         .from('staff_permissions')
-        .upsert({ profile_id: userId, ...permissions })
+        .upsert({
+          profile_id: validatedId,
+          ...validatedPermissions,
+        })
         .select()
         .single();
 
-      if (error) {
-        console.error('[useUpdateStaffPermissions] Mutation error:', error);
-        throw new Error(`Failed to update staff permissions: ${error.message}`);
+      if (response.error) {
+        handleUserError(response.error, 'update staff permissions', {
+          userId: validatedId,
+          permissions: validatedPermissions,
+        });
       }
 
-      return data;
+      // Phase 5: Validate API response
+      const validatedStaffData = validateSupabaseResponse(
+        StaffPermissionsSchema,
+        response
+      );
+
+      if (!validatedStaffData) {
+        throw new Error(
+          'Failed to update staff permissions - invalid response'
+        );
+      }
+
+      return validatedStaffData;
     },
 
     onSuccess: (updatedPermissions, { userId }) => {
@@ -389,9 +490,9 @@ export function useUpdateStaffPermissions() {
 }
 
 /**
- * User Verification Hook
+ * User Verification Hook - Phase 5 Enhanced
  *
- * Handles user verification status changes.
+ * Handles user verification status changes with comprehensive validation.
  */
 export function useVerifyUser() {
   const queryClient = useQueryClient();
@@ -404,19 +505,35 @@ export function useVerifyUser() {
       userId: string;
       isVerified: boolean;
     }) => {
-      const { data, error } = await supabase
+      // Phase 5: Validate input data
+      const validatedId = z.string().uuid().parse(userId);
+      const validatedVerification = z.boolean().parse(isVerified);
+
+      const response = await supabase
         .from('profiles')
-        .update({ is_verified: isVerified })
-        .eq('id', userId)
+        .update({ is_verified: validatedVerification })
+        .eq('id', validatedId)
         .select()
         .single();
 
-      if (error) {
-        console.error('[useVerifyUser] Mutation error:', error);
-        throw new Error(`Failed to verify user: ${error.message}`);
+      if (response.error) {
+        handleUserError(response.error, 'verify user', {
+          userId: validatedId,
+          isVerified: validatedVerification,
+        });
       }
 
-      return data;
+      // Phase 5: Validate API response
+      const validatedUserData = validateSupabaseResponse(
+        ProfileSchema,
+        response
+      );
+
+      if (!validatedUserData) {
+        throw new Error('Failed to verify user - invalid response');
+      }
+
+      return validatedUserData;
     },
 
     onSuccess: (updatedUser, { userId, isVerified }) => {

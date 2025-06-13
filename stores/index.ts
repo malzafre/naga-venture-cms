@@ -22,7 +22,6 @@ export {
   useActiveSection,
   useExpandedSections,
   useSidebarActions,
-  useSidebarState,
   useSidebarStore,
   type SidebarStore,
 } from './sidebarStore';
@@ -80,10 +79,8 @@ export const initializeStores = async (userId?: string | null) => {
     // Initialize theme store
     await useThemeStore.getState()._loadPersistedPreferences();
 
-    // eslint-disable-next-line no-console
     console.log('[Stores] Successfully initialized all stores');
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('[Stores] Failed to initialize stores:', error);
   }
 };
@@ -100,10 +97,8 @@ export const cleanupStores = async () => {
     // Clear any pending debounce timers in business filter store
     useBusinessFilterStore.getState()._clearDebounceTimer();
 
-    // eslint-disable-next-line no-console
     console.log('[Stores] Successfully cleaned up stores');
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('[Stores] Failed to cleanup stores:', error);
   }
 };
@@ -133,10 +128,8 @@ export const resetUserStores = async () => {
     useNavigationStore.getState().setFilteredNavigation([]);
     useNavigationStore.getState().setLoading(true);
 
-    // eslint-disable-next-line no-console
     console.log('[Stores] Successfully reset user-specific stores');
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('[Stores] Failed to reset user stores:', error);
   }
 };

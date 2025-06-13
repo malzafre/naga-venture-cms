@@ -5,13 +5,12 @@ import { Controller } from 'react-hook-form';
 import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 // Smart hook
+import { CMSButton, CMSInput } from '@/components/atoms';
 import { useBusinessForm } from '@/hooks/useBusinessForm';
-
 // Types
 import { Business } from '@/types/supabase';
 
 // Components
-import { CMSButton, CMSInput } from '@/components/TourismCMS/atoms';
 
 interface BusinessFormProps {
   initialData?: Business;

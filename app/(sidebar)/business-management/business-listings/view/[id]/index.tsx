@@ -23,15 +23,15 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Hooks and types
-import { useBusiness } from '@/hooks/useBusinessManagement';
 
 // Services
 
 // Components
-import { CMSButton } from '@/components/TourismCMS/atoms';
-import { StatusBadge } from '@/components/TourismCMS/molecules';
-import { CMSRouteGuard } from '@/components/TourismCMS/organisms';
-import { NavigationService } from '@/services/NavigationService';
+import { CMSButton } from '@/components/atoms';
+import { StatusBadge } from '@/components/molecules';
+import { CMSRouteGuard } from '@/components/organisms';
+import { NavigationService } from '@/constants/NavigationService';
+import { useBusiness } from '@/hooks/useBusinessManagement';
 
 /**
  * View Business Page

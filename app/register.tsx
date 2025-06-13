@@ -5,10 +5,9 @@ import { Alert, StyleSheet, Text, View } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useAuth } from '@/context/AuthContext';
-
 import logo from '@/assets/images/logo.png';
-import { CMSButton, CMSText } from '@/components/TourismCMS';
+import { CMSButton, CMSText } from '@/components';
+import { useAuth } from '@/context/AuthContext';
 
 const RegisterWeb = () => {
   const [email, setEmail] = useState('');
@@ -55,7 +54,7 @@ const RegisterWeb = () => {
           [
             {
               text: 'OK',
-              onPress: () => router.replace('/TourismCMS/login'),
+              onPress: () => router.replace('/login'),
             },
           ]
         );

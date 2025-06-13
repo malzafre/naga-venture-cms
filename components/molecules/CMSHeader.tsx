@@ -1,4 +1,3 @@
-// filepath: components/TourismCMS/molecules/CMSHeader.tsx
 import { FontAwesome } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';

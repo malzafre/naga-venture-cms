@@ -2,7 +2,7 @@
 // filepath: app/TourismCMS/(admin)/analytics-reporting/registration-analytics/index.tsx
 import React from 'react';
 
-import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
+import { CMSPlaceholderPage } from '@/components/organisms';
 
 export default function RegistrationAnalyticsScreen() {
   const features = [

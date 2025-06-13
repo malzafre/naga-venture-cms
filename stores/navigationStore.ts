@@ -1,9 +1,10 @@
 // filepath: stores/navigationStore.ts
-import { NavigationItem } from '@/types/navigation';
-import { UserRole } from '@/types/supabase';
 import React from 'react';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
+
+import { NavigationItem } from '@/types/navigation';
+import { UserRole } from '@/types/supabase';
 
 export interface NavigationStore {
   // State
@@ -42,7 +43,6 @@ export const useNavigationStore = create<NavigationStore>()(
     // Actions
     setLoading: (loading: boolean) => {
       if (__DEV__) {
-        // eslint-disable-next-line no-console
         console.log('[NavigationStore] Setting loading:', loading);
       }
       set({ isLoading: loading });
@@ -50,7 +50,6 @@ export const useNavigationStore = create<NavigationStore>()(
 
     setFilteredNavigation: (navigation: NavigationItem[]) => {
       if (__DEV__) {
-        // eslint-disable-next-line no-console
         console.log(
           '[NavigationStore] Setting filtered navigation:',
           navigation.length,

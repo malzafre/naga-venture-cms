@@ -1,86 +1,16 @@
 // filepath: hooks/useBusinessForm.ts
-import { Business } from '@/types/supabase';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
-// Validation schema with proper step-based validation
-const businessFormSchema = z.object({
-  // Step 1: Basic Information
-  business_name: z
-    .string()
-    .min(3, 'Business name must be at least 3 characters')
-    .max(100, 'Business name must be less than 100 characters'),
-  business_type: z.enum(['accommodation', 'shop', 'service'], {
-    required_error: 'Please select a business type',
-  }),
-  description: z
-    .string()
-    .min(200, 'Description must be at least 200 characters')
-    .max(1000, 'Description must be less than 1000 characters'),
+import {
+  BusinessCreateFormSchema,
+  type BusinessCreateForm,
+} from '@/schemas/business/businessSchemas';
+import { Business } from '@/types/supabase';
 
-  // Step 2: Location Information
-  address: z
-    .string()
-    .min(10, 'A complete address is required')
-    .max(200, 'Address must be less than 200 characters'),
-  city: z
-    .string()
-    .min(2, 'City is required')
-    .max(50, 'City must be less than 50 characters'),
-  province: z
-    .string()
-    .min(2, 'Province is required')
-    .max(50, 'Province must be less than 50 characters'),
-  postal_code: z
-    .string()
-    .max(20, 'Postal code must be less than 20 characters')
-    .optional(),
-  latitude: z.number().min(-90, 'Invalid latitude').max(90, 'Invalid latitude'),
-  longitude: z
-    .number()
-    .min(-180, 'Invalid longitude')
-    .max(180, 'Invalid longitude'),
-
-  // Step 3: Contact Information
-  phone: z
-    .string()
-    .max(20, 'Phone number must be less than 20 characters')
-    .optional(),
-  email: z
-    .string()
-    .email('Invalid email format')
-    .max(100, 'Email must be less than 100 characters')
-    .optional()
-    .or(z.literal('')),
-  website: z
-    .string()
-    .url('Invalid website URL')
-    .max(200, 'Website URL must be less than 200 characters')
-    .optional()
-    .or(z.literal('')),
-  facebook_url: z
-    .string()
-    .url('Invalid Facebook URL')
-    .max(200, 'Facebook URL must be less than 200 characters')
-    .optional()
-    .or(z.literal('')),
-  instagram_url: z
-    .string()
-    .url('Invalid Instagram URL')
-    .max(200, 'Instagram URL must be less than 200 characters')
-    .optional()
-    .or(z.literal('')),
-  twitter_url: z
-    .string()
-    .url('Invalid Twitter URL')
-    .max(200, 'Twitter URL must be less than 200 characters')
-    .optional()
-    .or(z.literal('')),
-});
-
-export type BusinessFormData = z.infer<typeof businessFormSchema>;
+// Use the new type alias for better consistency
+export type BusinessFormData = BusinessCreateForm;
 
 // Step field mappings for validation
 const STEP_FIELDS = {
@@ -154,10 +84,9 @@ export function useBusinessForm({
   const initialCoords = extractCoordinates(
     (initialData?.location as string) || null
   );
-
   // Form setup with React Hook Form
   const form = useForm<BusinessFormData>({
-    resolver: zodResolver(businessFormSchema),
+    resolver: zodResolver(BusinessCreateFormSchema),
     mode: 'onChange',
     defaultValues: {
       business_name: initialData?.business_name || '',

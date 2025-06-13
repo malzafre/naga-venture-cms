@@ -10,10 +10,8 @@ import {
   View,
 } from 'react-native';
 
+import { CMSSidebar } from '@/components';
 import { useAuth } from '@/context/AuthContext';
-
-import { CMSSidebar } from '@/components/TourismCMS';
-import { AccommodationProvider } from '@/context/AccommodationContext';
 
 const { width: screenWidth } = Dimensions.get('window');
 const SIDEBAR_WIDTH = Platform.select({
@@ -29,7 +27,7 @@ export default function AdminLayout() {
     if (!isLoading && !isUserProfileLoading) {
       if (!user) {
         // If user is not authenticated, redirect to CMS login
-        router.replace('/TourismCMS/login');
+        router.replace('/login');
       } else if (
         userProfile &&
         userProfile.role &&
@@ -41,7 +39,7 @@ export default function AdminLayout() {
         ].includes(userProfile.role)
       ) {
         // If user doesn't have a valid role, redirect to unauthorized
-        router.replace('/TourismCMS/(admin)/unauthorized');
+        router.replace('/unauthorized');
       }
     }
   }, [user, userProfile, isLoading, isUserProfileLoading]);
@@ -66,20 +64,18 @@ export default function AdminLayout() {
     );
   }
   return (
-    <AccommodationProvider>
-      <ThemeProvider value={DefaultTheme}>
-        <View style={styles.container}>
-          {/* New Hierarchical Sidebar */}
-          <CMSSidebar userRole={userProfile?.role} />
-          {/* Main Content Area */}
-          <View style={styles.content}>
-            <Stack
-              screenOptions={{ headerShown: false, headerBackVisible: false }}
-            />
-          </View>
+    <ThemeProvider value={DefaultTheme}>
+      <View style={styles.container}>
+        {/* New Hierarchical Sidebar */}
+        <CMSSidebar userRole={userProfile?.role} />
+        {/* Main Content Area */}
+        <View style={styles.content}>
+          <Stack
+            screenOptions={{ headerShown: false, headerBackVisible: false }}
+          />
         </View>
-      </ThemeProvider>
-    </AccommodationProvider>
+      </View>
+    </ThemeProvider>
   );
 }
 

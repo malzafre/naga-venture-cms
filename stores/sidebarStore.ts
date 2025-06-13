@@ -1,16 +1,19 @@
 // filepath: stores/sidebarStore.ts
-import { SidebarState } from '@/types/navigation';
-import { UserRole } from '@/types/supabase';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 
+import { SidebarState } from '@/types/navigation';
+import { UserRole } from '@/types/supabase';
+
 export interface SidebarStore extends SidebarState {
+  currentUserId: string | null | undefined; // Added
   // Actions
   setActiveSection: (section: string) => void;
   toggleSection: (sectionId: string) => void;
   setExpandedSections: (sections: string[]) => void;
   autoExpandSection: (sectionId: string) => void;
   setUserRole: (role: UserRole | undefined) => void;
+  setCurrentUserId: (userId: string | null | undefined) => void; // Added
 
   // Utils
   isSectionExpanded: (sectionId: string) => boolean;
@@ -22,10 +25,14 @@ export interface SidebarStore extends SidebarState {
 }
 
 // Initial state
-const initialState: SidebarState = {
+const initialState: SidebarState & {
+  currentUserId: string | null | undefined;
+} = {
+  // Modified to include currentUserId and corrected type
   expandedSections: [],
   activeSection: '',
   userRole: undefined,
+  currentUserId: undefined, // Added
 };
 
 /**
@@ -51,7 +58,6 @@ export const useSidebarStore = create<SidebarStore>()(
         activeSection: section,
       }));
     },
-
     toggleSection: (sectionId: string) => {
       set((state) => {
         const isExpanded = state.expandedSections.includes(sectionId);
@@ -59,11 +65,20 @@ export const useSidebarStore = create<SidebarStore>()(
           ? state.expandedSections.filter((id) => id !== sectionId)
           : [...state.expandedSections, sectionId];
 
+        console.log(
+          `[SidebarStore] Toggle section: ${sectionId}, was ${isExpanded ? 'expanded' : 'collapsed'}, now ${!isExpanded ? 'expanded' : 'collapsed'}`
+        );
+        console.log(
+          '[SidebarStore] New expanded sections:',
+          newExpandedSections
+        );
+
         return {
           ...state,
           expandedSections: newExpandedSections,
         };
       });
+      get()._persistState(get().currentUserId); // Added: Persist after state update
     },
 
     setExpandedSections: (sections: string[]) => {
@@ -71,6 +86,7 @@ export const useSidebarStore = create<SidebarStore>()(
         ...state,
         expandedSections: [...sections],
       }));
+      get()._persistState(get().currentUserId); // Added: Persist after state update
     },
 
     autoExpandSection: (sectionId: string) => {
@@ -84,6 +100,7 @@ export const useSidebarStore = create<SidebarStore>()(
           expandedSections: [...state.expandedSections, sectionId],
         };
       });
+      get()._persistState(get().currentUserId); // Also persist on auto-expand
     },
 
     setUserRole: (role: UserRole | undefined) => {
@@ -93,6 +110,30 @@ export const useSidebarStore = create<SidebarStore>()(
       }));
     },
 
+    setCurrentUserId: (userId: string | null | undefined) => {
+      set({ currentUserId: userId });
+      if (userId) {
+        // User logged in
+        console.log(
+          `[SidebarStore] setCurrentUserId: User logged in - ${userId}. Loading persisted state.`
+        );
+        get()._loadPersistedState(userId);
+      } else {
+        // User logged out or no user
+        console.log(
+          '[SidebarStore] setCurrentUserId: User logged out or no user. Resetting store.'
+        );
+        set({
+          expandedSections: initialState.expandedSections,
+          activeSection: initialState.activeSection,
+          userRole: initialState.userRole, // Reset userRole as well
+        });
+        // Optionally, persist this reset state for an 'anonymous' key or clear it.
+        // For now, resetting in-memory is the primary goal. The next anonymous load
+        // will find nothing if the specific anonymous key isn't explicitly cleared or set to [].
+      }
+    },
+
     // Utils
     isSectionExpanded: (sectionId: string) => {
       return get().expandedSections.includes(sectionId);
@@ -100,23 +141,39 @@ export const useSidebarStore = create<SidebarStore>()(
 
     isSectionActive: (sectionId: string) => {
       return get().activeSection === sectionId;
-    },
-
-    // Internal persistence methods
+    }, // Internal persistence methods - FIXED
     _loadPersistedState: async (userId: string | null | undefined) => {
       try {
         const AsyncStorage = await import(
           '@react-native-async-storage/async-storage'
         );
-        const key = `@TourismCMS:ExpandedSections:${userId || 'guest'}`;
+        const key = `@TourismCMS:ExpandedSections:${userId || 'anonymous'}`;
         const stored = await AsyncStorage.default.getItem(key);
+
+        console.log(
+          `[SidebarStore] Loading state for user: ${userId || 'anonymous'}, stored:`,
+          stored
+        );
 
         if (stored !== null) {
           const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            set((state) => ({
+              ...state,
+              expandedSections: parsed,
+            }));
+            console.log(
+              `[SidebarStore] Loaded ${parsed.length} expanded sections:`,
+              parsed
+            );
+          }
+        } else {
+          // FIX: Reset to empty if no stored state
           set((state) => ({
             ...state,
-            expandedSections: Array.isArray(parsed) ? parsed : [],
+            expandedSections: [],
           }));
+          console.log('[SidebarStore] No stored state found, reset to empty');
         }
       } catch (error) {
         console.warn('[SidebarStore] Failed to load persisted state:', error);
@@ -128,11 +185,17 @@ export const useSidebarStore = create<SidebarStore>()(
         const AsyncStorage = await import(
           '@react-native-async-storage/async-storage'
         );
-        const key = `@TourismCMS:ExpandedSections:${userId || 'guest'}`;
+        const key = `@TourismCMS:ExpandedSections:${userId || 'anonymous'}`;
         const { expandedSections } = get();
+
         await AsyncStorage.default.setItem(
           key,
           JSON.stringify(expandedSections)
+        );
+
+        console.log(
+          `[SidebarStore] Persisted state for user: ${userId || 'anonymous'}, sections:`,
+          expandedSections
         );
       } catch (error) {
         console.warn('[SidebarStore] Failed to persist state:', error);
@@ -142,7 +205,7 @@ export const useSidebarStore = create<SidebarStore>()(
 );
 
 /**
- * Selector hooks for optimized component subscriptions
+ * ✅ FIXED SELECTOR HOOKS - Prevent infinite loops with stable references
  */
 
 // Get only expanded sections (most commonly used)
@@ -153,9 +216,22 @@ export const useExpandedSections = () =>
 export const useActiveSection = () =>
   useSidebarStore((state) => state.activeSection);
 
-// Get sidebar actions (stable reference)
-export const useSidebarActions = () =>
-  useSidebarStore((state) => ({
+// ✅ FIXED: Create stable action references using a proper cached approach
+let cachedActions: {
+  setActiveSection: (section: string) => void;
+  toggleSection: (sectionId: string) => void;
+  setExpandedSections: (sections: string[]) => void;
+  autoExpandSection: (sectionId: string) => void;
+  setUserRole: (role: UserRole | undefined) => void;
+  isSectionExpanded: (sectionId: string) => boolean;
+  isSectionActive: (sectionId: string) => boolean;
+  _loadPersistedState: (userId: string | null | undefined) => Promise<void>;
+  _persistState: (userId: string | null | undefined) => Promise<void>;
+} | null = null;
+
+function createStableActions() {
+  const state = useSidebarStore.getState();
+  return {
     setActiveSection: state.setActiveSection,
     toggleSection: state.toggleSection,
     setExpandedSections: state.setExpandedSections,
@@ -163,12 +239,15 @@ export const useSidebarActions = () =>
     setUserRole: state.setUserRole,
     isSectionExpanded: state.isSectionExpanded,
     isSectionActive: state.isSectionActive,
-  }));
+    _loadPersistedState: state._loadPersistedState,
+    _persistState: state._persistState,
+  };
+}
 
-// Get complete sidebar state (use sparingly)
-export const useSidebarState = () =>
-  useSidebarStore((state) => ({
-    expandedSections: state.expandedSections,
-    activeSection: state.activeSection,
-    userRole: state.userRole,
-  }));
+// Get sidebar actions (stable reference) - FIXED: Use cached actions to prevent infinite loops
+export const useSidebarActions = () => {
+  if (!cachedActions) {
+    cachedActions = createStableActions();
+  }
+  return cachedActions;
+};

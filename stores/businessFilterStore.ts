@@ -1,7 +1,8 @@
 // filepath: stores/businessFilterStore.ts
-import { BusinessFilters } from '@/hooks/useBusinessManagement';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
+
+import { BusinessFilters } from '@/hooks/useBusinessManagement';
 
 export interface BusinessFilterState {
   // Filter values

@@ -2,7 +2,7 @@
 // filepath: app/TourismCMS/(admin)/business-management/business-listings/shops-services/index.tsx
 import React from 'react';
 
-import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
+import { CMSPlaceholderPage } from '@/components/organisms';
 
 /**
  * Shops & Services Management Page

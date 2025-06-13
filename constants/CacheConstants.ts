@@ -295,7 +295,6 @@ export const cacheUtils = {
         return baseStaleTime;
     }
   },
-
   // Get retry configuration based on operation importance
   getRetryConfig: (importance: 'critical' | 'normal' | 'low') => {
     switch (importance) {
@@ -306,6 +305,70 @@ export const cacheUtils = {
       case 'low':
         return CACHE_CONSTANTS.RETRY.MINIMAL;
     }
+  },
+
+  // Invalidate all queries for a specific domain
+  invalidateDomainQueries: (
+    queryClient: any,
+    domain: keyof typeof DOMAIN_CACHE_CONFIG
+  ) => {
+    const domainMappings = {
+      businesses: ['businesses'],
+      users: ['users', 'profiles'],
+      categories: ['categories'],
+      touristSpots: ['tourist-spots'],
+      events: ['events'],
+      bookings: ['bookings'],
+      reviews: ['reviews'],
+      promotions: ['promotions'],
+      analytics: ['analytics'],
+      system: ['system'],
+      search: ['search'],
+    };
+
+    const queryKeysToInvalidate = domainMappings[domain] || [domain];
+
+    queryKeysToInvalidate.forEach((queryKey) => {
+      queryClient.invalidateQueries({
+        queryKey: [queryKey],
+      });
+    });
+  },
+
+  // Invalidate specific list queries for a domain
+  invalidateListQueries: (
+    queryClient: any,
+    domain: keyof typeof DOMAIN_CACHE_CONFIG
+  ) => {
+    const domainMappings = {
+      businesses: ['businesses'],
+      users: ['users', 'profiles'],
+      categories: ['categories'],
+      touristSpots: ['tourist-spots'],
+      events: ['events'],
+      bookings: ['bookings'],
+      reviews: ['reviews'],
+      promotions: ['promotions'],
+      analytics: ['analytics'],
+      system: ['system'],
+      search: ['search'],
+    };
+
+    const queryKeysToInvalidate = domainMappings[domain] || [domain];
+
+    queryKeysToInvalidate.forEach((queryKey) => {
+      queryClient.invalidateQueries({
+        queryKey: [queryKey, 'list'],
+      });
+    });
+  },
+
+  // Remove stale data from cache
+  removeStaleQueries: (
+    queryClient: any,
+    maxAge: number = 24 * 60 * 60 * 1000
+  ) => {
+    queryClient.getQueryCache().clear();
   },
 } as const;
 

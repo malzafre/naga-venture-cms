@@ -12,7 +12,7 @@ export const tourismAdminNavigation: NavigationItem[] = [
     label: 'Dashboard',
     icon: 'dashboard',
     type: 'single',
-    path: '/TourismCMS/(admin)/dashboard',
+    path: '/(sidebar)/dashboard',
     permissions: [
       'tourism_admin',
       'business_listing_manager',

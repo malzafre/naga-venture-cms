@@ -1,4 +1,3 @@
-// filepath: components/TourismCMS/molecules/DataTable.tsx
 import React, { memo } from 'react';
 import {
   ActivityIndicator,

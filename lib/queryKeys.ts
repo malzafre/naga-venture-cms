@@ -144,6 +144,12 @@ const queryKeys = {
         ...queryKeys.touristSpots.lists(),
         { location: { lat, lng, radius } },
       ] as const,
+
+    // Tourist spot analytics
+    analytics: () => [...queryKeys.touristSpots.all, 'analytics'] as const,
+    dashboard: () => [...queryKeys.touristSpots.all, 'dashboard'] as const,
+    filtered: (filters: Record<string, unknown>) =>
+      [...queryKeys.touristSpots.lists(), { ...filters }] as const,
   },
 
   // Events Domain
@@ -174,6 +180,14 @@ const queryKeys = {
     ongoing: () =>
       [...queryKeys.events.lists(), { status: 'ongoing' }] as const,
     featured: () => [...queryKeys.events.lists(), { featured: true }] as const,
+
+    // Event analytics
+    analytics: () => [...queryKeys.events.all, 'analytics'] as const,
+    dashboard: () => [...queryKeys.events.all, 'dashboard'] as const,
+    calendar: (filters: Record<string, unknown>) =>
+      [...queryKeys.events.lists(), 'calendar', { ...filters }] as const,
+    filtered: (filters: Record<string, unknown>) =>
+      [...queryKeys.events.lists(), { ...filters }] as const,
   },
 
   // Bookings Domain

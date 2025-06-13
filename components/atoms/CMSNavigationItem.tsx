@@ -45,9 +45,8 @@ import {
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import { useTheme } from '@/constants/useTheme';
 import { NavigationBadge, NavigationItem } from '@/types/navigation';
-
-import { useTheme } from '@/hooks/useTheme';
 
 interface CMSNavigationItemProps {
   item: NavigationItem;

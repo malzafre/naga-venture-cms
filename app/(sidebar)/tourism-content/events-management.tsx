@@ -2,7 +2,7 @@
 // filepath: app/TourismCMS/(admin)/tourism-content/events-management/index.tsx
 import React from 'react';
 
-import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
+import { CMSPlaceholderPage } from '@/components/organisms';
 
 /**
  * Events Management Page

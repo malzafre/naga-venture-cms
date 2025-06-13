@@ -2,7 +2,7 @@
 import React from 'react';
 import { StyleSheet, Text, TextProps } from 'react-native';
 
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from '@/constants/useTheme';
 
 export type CMSTextType =
   | 'default'

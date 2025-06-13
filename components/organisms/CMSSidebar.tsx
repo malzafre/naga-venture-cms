@@ -1,4 +1,3 @@
-// filepath: components/TourismCMS/organisms/CMSSidebar.tsx
 import { usePathname, useRouter } from 'expo-router';
 import { Bell, SignOut, User } from 'phosphor-react-native';
 import React from 'react';
@@ -14,7 +13,7 @@ import {
 
 import { tourismAdminNavigation } from '@/constants/NavigationConfig';
 import { useAuth } from '@/context/AuthContext';
-import { useSidebarNavigation } from '@/hooks/useSidebarNavigation';
+import { useSidebarActions, useSidebarStore } from '@/stores';
 import { NavigationItem } from '@/types/navigation';
 import { UserRole } from '@/types/supabase';
 
@@ -76,15 +75,75 @@ export const CMSSidebar: React.FC<CMSSidebarProps> = ({
     };
 
     return filterByPermissions(tourismAdminNavigation);
-  }, [userRole]);
+  }, [userRole]); // === PROPER ZUSTAND SOLUTION ===
+  // Get state from Zustand store with optimized selectors
+  const expandedSections = useSidebarStore((state) => state.expandedSections);
+  const activeSection = useSidebarStore((state) => state.activeSection);
 
-  // === ZUSTAND INTEGRATION ===
-  // Replaced complex useState/useEffect logic with Zustand-based smart hook
-  const { sidebarState, handleToggleExpand } = useSidebarNavigation(
-    userRole,
-    pathname,
-    filteredNavigation
+  // Get stable actions
+  const actions = useSidebarActions();
+
+  // Create stable state object
+  const sidebarState = React.useMemo(
+    () => ({
+      expandedSections,
+      activeSection,
+      userRole,
+    }),
+    [expandedSections, activeSection, userRole]
   );
+
+  // Stable toggle function using Zustand actions
+  const handleToggleExpand = React.useCallback(
+    (sectionId: string) => {
+      actions.toggleSection(sectionId);
+    },
+    [actions]
+  );
+
+  // Auto-expand and set active section based on current route
+  React.useEffect(() => {
+    const findActiveSection = (
+      items: NavigationItem[],
+      path: string
+    ): string => {
+      for (const item of items) {
+        if (item.path === path) {
+          actions.setActiveSection(item.id);
+          if (!actions.isSectionExpanded(item.id)) {
+            actions.autoExpandSection(item.id);
+          }
+          return item.id;
+        }
+        if (item.subsections) {
+          const found = findActiveSection(item.subsections, path);
+          if (found) {
+            actions.setActiveSection(found);
+            if (!actions.isSectionExpanded(item.id)) {
+              actions.autoExpandSection(item.id);
+            }
+            return found;
+          }
+        }
+      }
+      return '';
+    };
+
+    findActiveSection(filteredNavigation, pathname);
+  }, [pathname, filteredNavigation, actions]);
+
+  // Track user ID in the sidebar store - FIXED
+  React.useEffect(() => {
+    if (user?.id) {
+      // This properly links the current user ID to the sidebar store
+      useSidebarStore.getState().setCurrentUserId(user.id);
+    }
+  }, [user?.id]);
+
+  // Update user role in store
+  React.useEffect(() => {
+    actions.setUserRole(userRole);
+  }, [userRole, actions]);
   // ============================
 
   // Handle navigation

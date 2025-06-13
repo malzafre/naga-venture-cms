@@ -1,4 +1,3 @@
-// filepath: components/TourismCMS/organisms/CMSRouteGuard.tsx
 import { FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
@@ -62,7 +61,7 @@ const CMSRouteGuard: React.FC<CMSRouteGuardProps> = ({
         <CMSButton
           title="Go to Login"
           variant="primary"
-          onPress={() => router.push('/TourismCMS/login')}
+          onPress={() => router.push('/login')}
           style={styles.actionButton}
         />
       </View>
@@ -90,7 +89,7 @@ const CMSRouteGuard: React.FC<CMSRouteGuardProps> = ({
         <CMSButton
           title="Go to Dashboard"
           variant="secondary"
-          onPress={() => router.push('/TourismCMS/(admin)/dashboard')}
+          onPress={() => router.push('/dashboard')}
           style={styles.actionButton}
         />
       </View>

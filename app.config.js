@@ -1,6 +1,4 @@
-import 'dotenv/config';
-
-export default {
+module.exports = {
   expo: {
     name: 'naga-venture-cms',
     slug: 'naga-venture-cms',

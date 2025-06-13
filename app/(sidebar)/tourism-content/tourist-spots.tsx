@@ -2,7 +2,7 @@
 // filepath: app/TourismCMS/(admin)/tourism-content/tourist-spots/index.tsx
 import React from 'react';
 
-import { CMSPlaceholderPage } from '@/components/TourismCMS/organisms';
+import { CMSPlaceholderPage } from '@/components/organisms';
 
 /**
  * Tourist Spots Management Page

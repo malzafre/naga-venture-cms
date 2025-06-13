@@ -1,7 +1,8 @@
 // filepath: hooks/useSupabaseSubscription.ts
-import { supabase } from '@/lib/supabase';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef } from 'react';
+
+import { supabase } from '@/lib/supabaseClient';
 
 export interface SupabaseSubscriptionConfig {
   table: string;
@@ -94,7 +95,7 @@ export function useSupabaseSubscription(
       // Create the channel
       const channel = supabase.channel(channelName);
       channelRef.current = channel; // Configure the subscription
-      let subscription = channel.on(
+      const subscription = channel.on(
         'postgres_changes' as any,
         {
           event,

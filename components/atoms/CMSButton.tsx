@@ -1,6 +1,6 @@
 // filepath: c:\Users\Hans Candor\Documents\capstone-NV\naga-venture\components\TourismCMS\atoms\CMSButton.tsx
 import { FontAwesome } from '@expo/vector-icons';
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import {
   ActivityIndicator,
   Platform,
@@ -45,12 +45,20 @@ const CMSButton: React.FC<CMSButtonProps> = memo(
     fullWidth = false,
     style,
   }) => {
+    const [isHovered, setIsHovered] = useState(false);
+
     const buttonStyles = [
       styles.base,
       styles[variant],
       styles[size],
       fullWidth && styles.fullWidth,
       (disabled || loading) && styles.disabled,
+      // Web hover effect
+      Platform.OS === 'web' &&
+        isHovered &&
+        !disabled &&
+        !loading &&
+        styles.webHover,
       style,
     ];
 
@@ -76,6 +84,27 @@ const CMSButton: React.FC<CMSButtonProps> = memo(
       }
     };
 
+    // Web-specific event handlers
+    const handleMouseEnter = () => {
+      if (Platform.OS === 'web') {
+        setIsHovered(true);
+      }
+    };
+
+    const handleMouseLeave = () => {
+      if (Platform.OS === 'web') {
+        setIsHovered(false);
+      }
+    };
+
+    const webProps =
+      Platform.OS === 'web'
+        ? {
+            onMouseEnter: handleMouseEnter,
+            onMouseLeave: handleMouseLeave,
+          }
+        : {};
+
     return (
       <Pressable
         style={({ pressed }) => [
@@ -84,6 +113,7 @@ const CMSButton: React.FC<CMSButtonProps> = memo(
         ]}
         onPress={onPress}
         disabled={disabled || loading}
+        {...webProps}
       >
         {loading ? (
           <ActivityIndicator
@@ -206,9 +236,20 @@ const styles = StyleSheet.create({
   disabledText: {
     opacity: 0.7,
   },
-
   icon: {
     marginRight: 8,
+  },
+
+  // Web-specific hover effects
+  webHover: {
+    opacity: 0.9,
+    transform: [{ scale: 1.02 }],
+    ...Platform.select({
+      web: {
+        pointerEvents: 'auto',
+        userSelect: 'none',
+      },
+    }),
   },
 });
 

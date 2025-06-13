@@ -8,10 +8,9 @@ import { TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
 
-import { useAuth } from '@/context/AuthContext';
-
 import logo from '@/assets/images/logo.png';
-import { CMSButton, CMSText } from '@/components/TourismCMS';
+import { CMSButton, CMSText } from '@/components/';
+import { useAuth } from '@/context/AuthContext';
 
 // Zod schema for login form validation
 const LoginSchema = z.object({
@@ -65,8 +64,7 @@ const LoginWeb = () => {
         authError.message || 'Authentication failed.'
       );
     }
-  }, [authError]);
-  // Navigate to admin panel when user is successfully authenticated
+  }, [authError]); // Navigate to admin panel when user is successfully authenticated
   React.useEffect(() => {
     if (
       user &&
@@ -76,9 +74,9 @@ const LoginWeb = () => {
       !authError
     ) {
       console.log(
-        '[Login] User authenticated with profile, navigating to admin panel'
+        '[Login] User authenticated with profile, navigating to dashboard'
       );
-      router.replace('/TourismCMS/(admin)');
+      router.replace('/(sidebar)/dashboard');
     }
   }, [user, userProfile, isLoading, isUserProfileLoading, authError]);
 
@@ -191,7 +189,7 @@ const LoginWeb = () => {
               {/* Temporary link to create admin user */}
               <Text
                 style={{ color: '#007AFF', fontSize: 14, marginLeft: 10 }}
-                onPress={() => router.push('/TourismCMS/register')}
+                onPress={() => router.push('/register')}
               >
                 Setup Admin
               </Text>
