@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/hooks/useAuthModern';
 import { useRouteGuard } from '@/hooks/useRouteGuard';
 
 import { CMSButton, CMSText } from '../atoms';

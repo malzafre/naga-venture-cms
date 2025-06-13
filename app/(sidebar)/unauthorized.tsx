@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/hooks/useAuthModern';
 
 export default function UnauthorizedScreen() {
   const { userProfile } = useAuth();

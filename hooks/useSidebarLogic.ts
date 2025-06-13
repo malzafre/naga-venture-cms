@@ -3,7 +3,7 @@ import React from 'react';
 
 import { tourismAdminNavigation } from '@/constants/NavigationConfig';
 import { NavigationService } from '@/constants/NavigationService';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/hooks/useAuthModern';
 import { useSidebarActions, useSidebarStore } from '@/stores';
 import { NavigationItem } from '@/types/navigation';
 import { UserRole } from '@/types/supabase';

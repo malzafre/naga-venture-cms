@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 
 import { CMSSidebar } from '@/components';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/hooks/useAuthModern';
 import { isAdminRole } from '@/hooks/useRouteGuard';
 
 const { width: screenWidth } = Dimensions.get('window');

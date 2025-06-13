@@ -5,24 +5,23 @@ import React from 'react';
 import 'react-native-reanimated';
 
 import { GlobalErrorBoundary } from '@/components/errorBoundaries';
-import { AuthProvider } from '@/context/AuthContext';
+import { AuthInitializer } from '@/components/providers/AuthInitializer';
 
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
   // Note: Loading state and error boundary integration can be expanded here
   // const [isLoading, setIsLoading] = useState(true);
-
   return (
     <QueryClientProvider client={queryClient}>
       <GlobalErrorBoundary>
-        <AuthProvider>
+        <AuthInitializer>
           <ThemeProvider value={DefaultTheme}>
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="index" options={{ headerShown: false }} />
             </Stack>
           </ThemeProvider>
-        </AuthProvider>
+        </AuthInitializer>
       </GlobalErrorBoundary>
     </QueryClientProvider>
   );

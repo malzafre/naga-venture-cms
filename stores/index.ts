@@ -19,6 +19,17 @@
 
 // Store exports
 export {
+  useAuthActions,
+  useAuthError,
+  useAuthIsLoading,
+  useAuthLoading,
+  useAuthSession,
+  useAuthStore,
+  type AuthState,
+  type AuthStore,
+} from './authStore';
+
+export {
   useActiveSection,
   useExpandedSections,
   useSidebarActions,

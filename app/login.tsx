@@ -10,7 +10,7 @@ import { z } from 'zod';
 
 import logo from '@/assets/images/logo.png';
 import { CMSButton, CMSText } from '@/components/';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/hooks/useAuthModern';
 
 // Zod schema for login form validation
 const LoginSchema = z.object({
@@ -186,13 +186,6 @@ const LoginWeb = () => {
               <CMSText type="body" darkColor="#666">
                 Tourism CMS - Admin Access Only
               </CMSText>
-              {/* Temporary link to create admin user */}
-              <Text
-                style={{ color: '#007AFF', fontSize: 14, marginLeft: 10 }}
-                onPress={() => router.push('/register')}
-              >
-                Setup Admin
-              </Text>
             </View>
           </View>
         </View>
