@@ -22,6 +22,17 @@ export const EmailSchema = z
   .max(255, 'Email must be less than 255 characters');
 
 /**
+ * Optional email validation (allows null, undefined, or empty string)
+ */
+export const OptionalEmailSchema = z
+  .string()
+  .email('Please enter a valid email address')
+  .max(255, 'Email must be less than 255 characters')
+  .nullable()
+  .optional()
+  .or(z.literal(''));
+
+/**
  * Password validation with security requirements
  */
 export const PasswordSchema = z
@@ -34,20 +45,23 @@ export const PasswordSchema = z
   );
 
 /**
- * Phone number validation (flexible format)
+ * Phone number validation (flexible format, allows null)
+ * More permissive regex to handle various phone number formats in the database
  */
 export const PhoneSchema = z
   .string()
-  .regex(/^[\+]?[1-9][\d]{0,15}$/, 'Please enter a valid phone number')
+  .regex(/^[\+]?[\d\s\-\(\)\.]{7,20}$/, 'Please enter a valid phone number')
+  .nullable()
   .optional()
   .or(z.literal(''));
 
 /**
- * URL validation (optional)
+ * URL validation (optional, allows null)
  */
 export const UrlSchema = z
   .string()
   .url('Please enter a valid URL')
+  .nullable()
   .optional()
   .or(z.literal(''));
 
@@ -71,12 +85,13 @@ export const UUIDSchema = UuidSchema;
 
 /**
  * Name validation (for names, titles, etc.)
+ * Very flexible regex to allow business names with various characters including accents, quotes, symbols
  */
 export const NameSchema = z
   .string()
   .min(2, 'Name must be at least 2 characters')
   .max(100, 'Name must be less than 100 characters')
-  .regex(/^[a-zA-Z\s\-\.\']+$/, 'Name contains invalid characters');
+  .regex(/^[\p{L}\p{N}\p{P}\p{S}\s]+$/u, 'Name contains invalid characters');
 
 /**
  * Text content validation (for descriptions, etc.)
@@ -147,13 +162,14 @@ export const ProvinceSchema = z
   .max(100, 'Province must be less than 100 characters');
 
 /**
- * Postal code validation (flexible for different countries)
+ * Postal code validation (flexible for different countries, allows null)
  */
 export const PostalCodeSchema = z
   .string()
   .min(3, 'Postal code must be at least 3 characters')
   .max(20, 'Postal code must be less than 20 characters')
   .regex(/^[A-Za-z0-9\s\-]+$/, 'Postal code contains invalid characters')
+  .nullable()
   .optional()
   .or(z.literal(''));
 
@@ -175,11 +191,12 @@ export const GeographicLocationSchema = z.object({
 
 /**
  * Base entity fields that all entities should have
+ * Using more flexible timestamp validation to handle Supabase formats
  */
 export const BaseEntitySchema = z.object({
   id: UuidSchema,
-  created_at: z.string().datetime(),
-  updated_at: z.string().datetime(),
+  created_at: z.string().or(z.date()),
+  updated_at: z.string().or(z.date()),
 });
 
 // ============================================================================
@@ -187,12 +204,9 @@ export const BaseEntitySchema = z.object({
 // ============================================================================
 
 /**
- * Date validation (ISO date string)
+ * Date validation (flexible format for Supabase timestamps)
  */
-export const DateSchema = z
-  .string()
-  .datetime('Invalid date format')
-  .or(z.date());
+export const DateSchema = z.string().or(z.date());
 
 /**
  * Time validation (HH:MM format)
@@ -204,10 +218,11 @@ export const TimeSchema = z
 
 /**
  * Timestamp validation for created_at/updated_at fields
+ * More flexible to handle Supabase timestamp formats
  */
 export const TimestampSchema = z.object({
-  created_at: z.string().datetime().optional(),
-  updated_at: z.string().datetime().optional(),
+  created_at: z.string().or(z.date()).optional(),
+  updated_at: z.string().or(z.date()).optional(),
 });
 
 // ============================================================================

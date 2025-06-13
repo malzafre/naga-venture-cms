@@ -20,11 +20,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Services
-
 // Components
 import { CMSButton } from '@/components/atoms';
-import { FeatureErrorBoundary } from '@/components/errorBoundaries';
 import {
   DataTable,
   StatusBadge,
@@ -50,7 +47,6 @@ const { width: screenWidth } = Dimensions.get('window');
 export default function AllBusinessesScreen() {
   // === ZUSTAND INTEGRATION ===
   // Replaced useState filter management with centralized Zustand store
-  // useShallow is used in the store selectors to prevent unnecessary re-renders
   const {
     filters,
     searchQuery,
@@ -66,43 +62,23 @@ export default function AllBusinessesScreen() {
   const [businessToDelete, setBusinessToDelete] = useState<Business | null>(
     null
   );
-
-  // Data fetching
+  // Data fetching with real-time updates
   const {
     data: businessData,
     isLoading,
     isError,
+    error,
     refetch,
   } = useBusinessListings(filters);
   const deleteBusinessMutation = useDeleteBusiness();
-
-  // Real-time subscription using production-grade hook
+  // Real-time subscription for live updates
   useBusinessSubscription(true);
 
-  // Handle delete business - FIXED: Race condition protection
-  const handleDeleteBusiness = React.useCallback(
-    (business: Business) => {
-      // Prevent concurrent delete operations
-      if (deleteBusinessMutation.isPending) {
-        if (__DEV__) {
-          console.log(
-            '⚠️ [AllBusinesses] Delete operation already in progress, ignoring request'
-          );
-        }
-        return;
-      }
-
-      if (__DEV__) {
-        console.log(
-          '🗑️ [AllBusinesses] Delete button clicked for:',
-          business.business_name
-        );
-      }
-      setBusinessToDelete(business);
-      setDeleteModalVisible(true);
-    },
-    [deleteBusinessMutation.isPending]
-  );
+  // Handle delete business
+  const handleDeleteBusiness = React.useCallback((business: Business) => {
+    setBusinessToDelete(business);
+    setDeleteModalVisible(true);
+  }, []);
   // Confirm delete business
   const confirmDeleteBusiness = React.useCallback(async () => {
     if (!businessToDelete) return;
@@ -231,10 +207,6 @@ export default function AllBusinessesScreen() {
               onPress={() => {
                 NavigationService.toViewBusiness(business.id);
               }}
-              accessible={true}
-              accessibilityLabel={`View ${business.business_name}`}
-              accessibilityHint="Opens business details page"
-              accessibilityRole="button"
             >
               <Eye size={16} color="#0A1B47" weight="bold" />
             </TouchableOpacity>
@@ -243,10 +215,6 @@ export default function AllBusinessesScreen() {
               onPress={() => {
                 NavigationService.toEditBusiness(business.id);
               }}
-              accessible={true}
-              accessibilityLabel={`Edit ${business.business_name}`}
-              accessibilityHint="Opens business edit form"
-              accessibilityRole="button"
             >
               <PencilSimple size={16} color="#0A1B47" weight="bold" />
             </TouchableOpacity>
@@ -254,13 +222,6 @@ export default function AllBusinessesScreen() {
               style={[styles.actionButton, styles.deleteButton]}
               onPress={() => handleDeleteBusiness(business)}
               disabled={deleteBusinessMutation.isPending}
-              accessible={true}
-              accessibilityLabel={`Delete ${business.business_name}`}
-              accessibilityHint="Opens delete confirmation dialog"
-              accessibilityRole="button"
-              accessibilityState={{
-                disabled: deleteBusinessMutation.isPending,
-              }}
             >
               <Trash size={16} color="#DC3545" weight="bold" />
             </TouchableOpacity>
@@ -358,10 +319,14 @@ export default function AllBusinessesScreen() {
   );
 
   const renderDataTable = () => {
+    // Enhanced error handling
     if (isError) {
       return (
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Failed to load businesses</Text>
+          <Text style={styles.errorText}>
+            Failed to load businesses
+            {__DEV__ && error ? `: ${error.message}` : ''}
+          </Text>
           <CMSButton
             title="Retry"
             onPress={() => refetch()}
@@ -371,10 +336,51 @@ export default function AllBusinessesScreen() {
       );
     }
 
+    // Enhanced loading state
+    if (isLoading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading businesses...</Text>
+          {__DEV__ && (
+            <Text style={styles.debugText}>Fetching data from Supabase...</Text>
+          )}
+        </View>
+      );
+    }
+
+    // Enhanced empty state
+    if (!businessData?.data || businessData.data.length === 0) {
+      return (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>
+            No businesses found. Create your first business listing to get
+            started.
+          </Text>
+          {__DEV__ && (
+            <View style={styles.debugContainer}>
+              <Text style={styles.debugText}>
+                Debug Info:{' '}
+                {JSON.stringify(
+                  {
+                    hasBusinessData: !!businessData,
+                    dataLength: businessData?.data?.length,
+                    totalCount: businessData?.count,
+                    currentFilters: filters,
+                  },
+                  null,
+                  2
+                )}
+              </Text>
+            </View>
+          )}
+        </View>
+      );
+    }
+
     return (
       <DataTable
         columns={columns}
-        data={(businessData?.data || []) as Business[]}
+        data={businessData.data as any[]}
         isLoading={isLoading}
         emptyMessage="No businesses found. Create your first business listing to get started."
         showRowIndex
@@ -385,41 +391,37 @@ export default function AllBusinessesScreen() {
   };
 
   return (
-    <FeatureErrorBoundary
-      featureName="Business Listings"
-      enableRetry={true}
-      maxRetries={3}
-    >
-      <SafeAreaView style={styles.container}>
-        {renderHeader()}
-        {renderFilters()}
-        {renderDataTable()}
-        {/* Statistics Summary */}
-        {businessData && (
-          <View style={styles.statsContainer}>
-            <Text style={styles.statsText}>
-              Showing {businessData.data.length} of {businessData.count || 0}{' '}
-              businesses
-            </Text>
-          </View>
-        )}
-        {/* Delete Confirmation Modal */}
-        <ConfirmationModal
-          visible={deleteModalVisible}
-          title="Delete Business"
-          message={
-            businessToDelete
-              ? `Are you sure you want to delete "${businessToDelete.business_name}"? This action cannot be undone.`
-              : ''
-          }
-          confirmText="Delete"
-          cancelText="Cancel"
-          confirmStyle="destructive"
-          onConfirm={confirmDeleteBusiness}
-          onCancel={cancelDeleteBusiness}
-        />
-      </SafeAreaView>
-    </FeatureErrorBoundary>
+    <SafeAreaView style={styles.container}>
+      {renderHeader()}
+      {renderFilters()}
+      {renderDataTable()}
+
+      {/* Statistics Summary */}
+      {businessData && (
+        <View style={styles.statsContainer}>
+          <Text style={styles.statsText}>
+            Showing {businessData.data.length} of {businessData.count || 0}
+            businesses
+          </Text>
+        </View>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        visible={deleteModalVisible}
+        title="Delete Business"
+        message={
+          businessToDelete
+            ? `Are you sure you want to delete "${businessToDelete.business_name}"? This action cannot be undone.`
+            : ''
+        }
+        confirmText="Delete"
+        cancelText="Cancel"
+        confirmStyle="destructive"
+        onConfirm={confirmDeleteBusiness}
+        onCancel={cancelDeleteBusiness}
+      />
+    </SafeAreaView>
   );
 }
 
@@ -594,7 +596,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEF2F2',
     borderColor: '#FECACA',
   },
-
   // Error state
   errorContainer: {
     flex: 1,
@@ -607,6 +608,49 @@ const styles = StyleSheet.create({
     color: '#DC2626',
     marginBottom: 16,
     textAlign: 'center',
+  },
+
+  // Loading state
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#6B7280',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+
+  // Empty state
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#6B7280',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+
+  // Debug styles
+  debugContainer: {
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 6,
+    maxWidth: 400,
+  },
+  debugText: {
+    fontSize: 10,
+    color: '#6B7280',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+    lineHeight: 14,
   },
 
   // Stats styles

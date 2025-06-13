@@ -1,10 +1,12 @@
 // filepath: services/ErrorService.ts
+import { ErrorInfo } from 'react';
+
 import {
   ErrorLogEntry,
   ErrorReportData,
   ErrorSeverity,
 } from '@/components/errorBoundaries/types';
-import { ErrorInfo } from 'react';
+
 import { errorReportingService } from './ErrorReporting';
 
 /**

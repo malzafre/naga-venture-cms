@@ -10,10 +10,11 @@
  * - Network-aware caching
  */
 
-import { DOMAIN_CACHE_CONFIG } from '@/constants/CacheConstants';
-import queryKeys from '@/lib/queryKeys';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
+
+import { DOMAIN_CACHE_CONFIG } from '@/constants/CacheConstants';
+import queryKeys from '@/lib/queryKeys';
 
 /**
  * Global Cache Management Hook
