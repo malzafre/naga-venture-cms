@@ -7,22 +7,19 @@ import { useAuthStore } from '@/stores/authStore';
  * AuthInitializer Component
  *
  * Initializes the Zustand auth store when the app starts.
- * This replaces the AuthProvider pattern from the old Context-based implementation.
+ * The auth listener is now set up globally in authStore.ts to avoid race conditions.
  *
  * Usage: Wrap your app root with this component or include it in your main layout.
  */
 export function AuthInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    // Initialize auth state and set up listener
+    // Initialize auth state
+    // The auth listener is already running globally
     const initAuth = async () => {
       await useAuthStore.getState()._initializeAuth();
     };
 
-    const cleanup = useAuthStore.getState()._setupAuthListener();
-
     initAuth();
-
-    return cleanup;
   }, []);
 
   return <>{children}</>;
@@ -31,7 +28,8 @@ export function AuthInitializer({ children }: { children: React.ReactNode }) {
 /**
  * Alternative: Auth Hook for App-level Initialization
  *
- * If you prefer a hook-based approach instead of a component wrapper:
+ * If you prefer a hook-based approach instead of a component wrapper.
+ * The auth listener is now set up globally in authStore.ts.
  */
 export function useAuthInitialization() {
   useEffect(() => {
@@ -39,10 +37,6 @@ export function useAuthInitialization() {
       await useAuthStore.getState()._initializeAuth();
     };
 
-    const cleanup = useAuthStore.getState()._setupAuthListener();
-
     initAuth();
-
-    return cleanup;
   }, []);
 }

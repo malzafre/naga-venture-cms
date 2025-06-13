@@ -30,7 +30,6 @@ export interface AuthStore extends AuthState {
 
   // Internal actions
   _initializeAuth: () => Promise<void>;
-  _setupAuthListener: () => () => void;
 }
 
 // Initial state
@@ -138,10 +137,11 @@ export const useAuthStore = create<AuthStore>()(
       } finally {
         set((state) => ({ ...state, isSigningOut: false }));
       }
-    },
-
-    // Initialization
+    }, // Initialization
     _initializeAuth: async () => {
+      // Prevent running initialization more than once
+      if (!get().isLoadingInitial) return;
+
       try {
         console.log('[AuthStore] Initializing auth state');
 
@@ -166,42 +166,33 @@ export const useAuthStore = create<AuthStore>()(
         get().setIsLoadingInitial(false);
       }
     },
-
-    // Auth state listener setup
-    _setupAuthListener: () => {
-      const { setSession, setAuthError } = get();
-
-      const {
-        data: { subscription },
-      } = supabase.auth.onAuthStateChange((event, newSession) => {
-        console.log(`[AuthStore] Auth event: ${event}, Session:`, !!newSession);
-
-        // Skip TOKEN_REFRESHED events to prevent unnecessary re-renders
-        if (event === 'TOKEN_REFRESHED') {
-          console.log('[AuthStore] Skipping TOKEN_REFRESHED event');
-          return;
-        }
-
-        // Update session for all other events
-        setSession(newSession);
-
-        if (event === 'SIGNED_OUT') {
-          console.log('[AuthStore] User signed out - clearing auth error');
-          setAuthError(null);
-        } else if (event === 'SIGNED_IN') {
-          console.log('[AuthStore] User signed in - clearing auth error');
-          setAuthError(null);
-        }
-      });
-
-      // Return cleanup function
-      return () => {
-        console.log('[AuthStore] Unsubscribing from auth changes');
-        subscription.unsubscribe();
-      };
-    },
   }))
 );
+
+// ####################################################################
+// THE NEW SINGLETON LISTENER
+// This code runs ONCE when the app loads and exists outside of React.
+// ####################################################################
+
+console.log('[AuthStore] Setting up global Supabase auth listener...');
+
+supabase.auth.onAuthStateChange((event, newSession) => {
+  // Skip events that don't signify a real auth change
+  if (event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+    return;
+  }
+
+  console.log(
+    `[AuthStore] Auth event: ${event}, User: ${newSession?.user?.id || 'none'}`
+  );
+
+  // Get the actions directly from the store and update the state
+  useAuthStore.getState().setSession(newSession);
+
+  if (event === 'SIGNED_OUT') {
+    useAuthStore.getState().setAuthError(null);
+  }
+});
 
 /**
  * Optimized selector hooks for better performance

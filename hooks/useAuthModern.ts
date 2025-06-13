@@ -1,4 +1,4 @@
-// filepath: hooks/useAuth.ts
+// filepath: hooks/useAuthModern.ts
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
@@ -8,7 +8,6 @@ import {
   useAuthError,
   useAuthLoading,
   useAuthSession,
-  useAuthStore,
 } from '@/stores/authStore';
 import { Profile as UserProfile, UserRole } from '@/types/supabase';
 
@@ -25,21 +24,11 @@ export function useAuth() {
   const { isLoadingInitial, isSigningIn, isSigningOut } = useAuthLoading();
   const authError = useAuthError();
   const { signInWithEmail, signOut } = useAuthActions();
-
   const queryClient = useQueryClient();
 
-  // Initialize auth on first mount
-  useEffect(() => {
-    const initAuth = async () => {
-      await useAuthStore.getState()._initializeAuth();
-    };
-
-    const cleanup = useAuthStore.getState()._setupAuthListener();
-
-    initAuth();
-
-    return cleanup;
-  }, []);
+  // Note: Initialization is handled by AuthInitializer component.
+  // The global listener runs automatically in authStore.ts.
+  // This hook is purely a "consumer" of auth state.
 
   // User profile query (server state via TanStack Query)
   const {

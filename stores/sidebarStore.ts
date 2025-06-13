@@ -254,5 +254,6 @@ export const useSidebarActions = () =>
       autoExpandSection: state.autoExpandSection,
       setUserRole: state.setUserRole,
       setCurrentUserId: state.setCurrentUserId,
+      isSectionExpanded: state.isSectionExpanded,
     }))
   );
