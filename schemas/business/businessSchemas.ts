@@ -126,17 +126,48 @@ export const BusinessCreateFormSchema = z.object({
   address: AddressSchema,
   city: CitySchema,
   province: ProvinceSchema,
-  postal_code: PostalCodeSchema,
+  // FIX: Make postal_code optional by allowing an empty string
+  postal_code: PostalCodeSchema.or(z.literal('')),
   latitude: LatitudeSchema,
   longitude: LongitudeSchema,
 
   // Step 3: Contact Information
-  phone: PhoneSchema,
+  // FIX: Make phone optional by allowing an empty string
+  phone: PhoneSchema.or(z.literal('')),
+  // FIX: Email is already correctly optional
   email: EmailSchema.optional().or(z.literal('')),
-  website: UrlSchema,
-  facebook_url: UrlSchema,
-  instagram_url: UrlSchema,
-  twitter_url: UrlSchema,
+  // FIX: Make all URL fields truly optional by allowing an empty string
+  website: UrlSchema.or(z.literal('')),
+  facebook_url: UrlSchema.or(z.literal('')),
+  instagram_url: UrlSchema.or(z.literal('')),
+  twitter_url: UrlSchema.or(z.literal('')),
+});
+
+/**
+ * Step-specific validation schemas for multi-step forms
+ */
+export const BusinessFormStep1Schema = BusinessCreateFormSchema.pick({
+  business_name: true,
+  business_type: true,
+  description: true,
+});
+
+export const BusinessFormStep2Schema = BusinessCreateFormSchema.pick({
+  address: true,
+  city: true,
+  province: true,
+  postal_code: true,
+  latitude: true,
+  longitude: true,
+});
+
+export const BusinessFormStep3Schema = BusinessCreateFormSchema.pick({
+  phone: true,
+  email: true,
+  website: true,
+  facebook_url: true,
+  instagram_url: true,
+  twitter_url: true,
 });
 
 /**
@@ -346,6 +377,9 @@ export type BusinessType = z.infer<typeof BusinessTypeSchema>;
 export type BusinessStatus = z.infer<typeof BusinessStatusSchema>;
 export type Business = z.infer<typeof BusinessSchema>;
 export type BusinessCreateForm = z.infer<typeof BusinessCreateFormSchema>;
+export type BusinessFormStep1 = z.infer<typeof BusinessFormStep1Schema>;
+export type BusinessFormStep2 = z.infer<typeof BusinessFormStep2Schema>;
+export type BusinessFormStep3 = z.infer<typeof BusinessFormStep3Schema>;
 export type BusinessUpdateForm = z.infer<typeof BusinessUpdateFormSchema>;
 export type BusinessInsert = z.infer<typeof BusinessInsertSchema>;
 export type BusinessUpdate = z.infer<typeof BusinessUpdateSchema>;

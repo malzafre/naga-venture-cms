@@ -93,9 +93,9 @@ export default function BusinessForm({
       <Text style={styles.stepTitle}>Basic Information</Text>
       <Text style={styles.stepDescription}>
         Provide the basic details about your business
-      </Text>
-
+      </Text>{' '}
       <Controller
+        key="business_name"
         control={control}
         name="business_name"
         render={({ field: { onChange, onBlur, value } }) => (
@@ -111,13 +111,13 @@ export default function BusinessForm({
           />
         )}
       />
-
       <View style={styles.inputGroup}>
         <Text style={styles.inputLabel}>
           Business Type <Text style={styles.required}>*</Text>
         </Text>
         <View style={styles.pickerContainer}>
           <Controller
+            key="business_type"
             control={control}
             name="business_type"
             render={({ field: { onChange, value } }) => (
@@ -138,8 +138,8 @@ export default function BusinessForm({
           <Text style={styles.errorText}>{errors.business_type.message}</Text>
         )}
       </View>
-
       <Controller
+        key="description"
         control={control}
         name="description"
         render={({ field: { onChange, onBlur, value } }) => (
@@ -166,9 +166,9 @@ export default function BusinessForm({
       <Text style={styles.stepTitle}>Location Details</Text>
       <Text style={styles.stepDescription}>
         Provide the location and address information
-      </Text>
-
+      </Text>{' '}
       <Controller
+        key="address"
         control={control}
         name="address"
         render={({ field: { onChange, onBlur, value } }) => (
@@ -184,10 +184,10 @@ export default function BusinessForm({
           />
         )}
       />
-
       <View style={styles.row}>
         <View style={styles.halfWidth}>
           <Controller
+            key="city"
             control={control}
             name="city"
             render={({ field: { onChange, onBlur, value } }) => (
@@ -207,6 +207,7 @@ export default function BusinessForm({
 
         <View style={styles.halfWidth}>
           <Controller
+            key="province"
             control={control}
             name="province"
             render={({ field: { onChange, onBlur, value } }) => (
@@ -223,16 +224,16 @@ export default function BusinessForm({
             )}
           />
         </View>
-      </View>
-
+      </View>{' '}
       <Controller
+        key="postal_code"
         control={control}
         name="postal_code"
         render={({ field: { onChange, onBlur, value } }) => (
           <CMSInput
             label="Postal Code"
             placeholder="Enter postal code (optional)"
-            value={value}
+            value={value || ''}
             onChangeText={onChange}
             onBlur={onBlur}
             error={errors.postal_code?.message}
@@ -240,15 +241,14 @@ export default function BusinessForm({
           />
         )}
       />
-
       <Text style={styles.sectionTitle}>Location Coordinates</Text>
       <Text style={styles.helpText}>
         Provide exact coordinates for map display. Default is Naga City center.
       </Text>
-
       <View style={styles.row}>
         <View style={styles.halfWidth}>
           <Controller
+            key="latitude"
             control={control}
             name="latitude"
             render={({ field: { onChange, onBlur, value } }) => (
@@ -269,6 +269,7 @@ export default function BusinessForm({
 
         <View style={styles.halfWidth}>
           <Controller
+            key="longitude"
             control={control}
             name="longitude"
             render={({ field: { onChange, onBlur, value } }) => (
@@ -296,16 +297,16 @@ export default function BusinessForm({
       <Text style={styles.stepTitle}>Contact Information</Text>
       <Text style={styles.stepDescription}>
         Add contact details and social media links (all optional)
-      </Text>
-
+      </Text>{' '}
       <Controller
+        key="phone"
         control={control}
         name="phone"
         render={({ field: { onChange, onBlur, value } }) => (
           <CMSInput
             label="Phone Number"
             placeholder="Enter phone number"
-            value={value}
+            value={value || ''}
             onChangeText={onChange}
             onBlur={onBlur}
             error={errors.phone?.message}
@@ -313,16 +314,16 @@ export default function BusinessForm({
             editable={!isLoading}
           />
         )}
-      />
-
+      />{' '}
       <Controller
+        key="email"
         control={control}
         name="email"
         render={({ field: { onChange, onBlur, value } }) => (
           <CMSInput
             label="Email Address"
             placeholder="Enter email address"
-            value={value}
+            value={value || ''}
             onChangeText={onChange}
             onBlur={onBlur}
             error={errors.email?.message}
@@ -331,16 +332,16 @@ export default function BusinessForm({
             editable={!isLoading}
           />
         )}
-      />
-
+      />{' '}
       <Controller
+        key="website"
         control={control}
         name="website"
         render={({ field: { onChange, onBlur, value } }) => (
           <CMSInput
             label="Website"
             placeholder="https://yourwebsite.com"
-            value={value}
+            value={value || ''}
             onChangeText={onChange}
             onBlur={onBlur}
             error={errors.website?.message}
@@ -350,17 +351,16 @@ export default function BusinessForm({
           />
         )}
       />
-
-      <Text style={styles.sectionTitle}>Social Media Links</Text>
-
+      <Text style={styles.sectionTitle}>Social Media Links</Text>{' '}
       <Controller
+        key="facebook_url"
         control={control}
         name="facebook_url"
         render={({ field: { onChange, onBlur, value } }) => (
           <CMSInput
             label="Facebook"
             placeholder="https://facebook.com/yourpage"
-            value={value}
+            value={value || ''}
             onChangeText={onChange}
             onBlur={onBlur}
             error={errors.facebook_url?.message}
@@ -369,16 +369,16 @@ export default function BusinessForm({
             editable={!isLoading}
           />
         )}
-      />
-
+      />{' '}
       <Controller
+        key="instagram_url"
         control={control}
         name="instagram_url"
         render={({ field: { onChange, onBlur, value } }) => (
           <CMSInput
             label="Instagram"
             placeholder="https://instagram.com/youraccount"
-            value={value}
+            value={value || ''}
             onChangeText={onChange}
             onBlur={onBlur}
             error={errors.instagram_url?.message}
@@ -387,16 +387,16 @@ export default function BusinessForm({
             editable={!isLoading}
           />
         )}
-      />
-
+      />{' '}
       <Controller
+        key="twitter_url"
         control={control}
         name="twitter_url"
         render={({ field: { onChange, onBlur, value } }) => (
           <CMSInput
             label="Twitter"
             placeholder="https://twitter.com/youraccount"
-            value={value}
+            value={value || ''}
             onChangeText={onChange}
             onBlur={onBlur}
             error={errors.twitter_url?.message}

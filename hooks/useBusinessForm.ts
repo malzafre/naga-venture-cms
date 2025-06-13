@@ -1,37 +1,17 @@
 // filepath: hooks/useBusinessForm.ts
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import {
-  BusinessCreateFormSchema,
+  BusinessFormStep1Schema,
+  BusinessFormStep2Schema,
+  BusinessFormStep3Schema,
   type BusinessCreateForm,
 } from '@/schemas/business/businessSchemas';
 import { Business } from '@/types/supabase';
 
 // Use the new type alias for better consistency
 export type BusinessFormData = BusinessCreateForm;
-
-// Step field mappings for validation
-const STEP_FIELDS = {
-  1: ['business_name', 'business_type', 'description'] as const,
-  2: [
-    'address',
-    'city',
-    'province',
-    'postal_code',
-    'latitude',
-    'longitude',
-  ] as const,
-  3: [
-    'phone',
-    'email',
-    'website',
-    'facebook_url',
-    'instagram_url',
-    'twitter_url',
-  ] as const,
-} as const;
 
 interface UseBusinessFormOptions {
   initialData?: Business;
@@ -55,6 +35,20 @@ export function useBusinessForm({
   const [currentStep, setCurrentStep] = useState(1);
   const [isNavigating, setIsNavigating] = useState(false);
   const totalSteps = 3;
+
+  // Get the appropriate schema for the current step
+  const getCurrentStepSchema = useCallback(() => {
+    switch (currentStep) {
+      case 1:
+        return BusinessFormStep1Schema;
+      case 2:
+        return BusinessFormStep2Schema;
+      case 3:
+        return BusinessFormStep3Schema;
+      default:
+        return BusinessFormStep1Schema;
+    }
+  }, [currentStep]);
 
   // Extract coordinates from PostGIS GEOGRAPHY(POINT) format
   const extractCoordinates = useCallback(
@@ -84,9 +78,9 @@ export function useBusinessForm({
   const initialCoords = extractCoordinates(
     (initialData?.location as string) || null
   );
-  // Form setup with React Hook Form
+
+  // Form setup with React Hook Form - without resolver for manual validation
   const form = useForm<BusinessFormData>({
-    resolver: zodResolver(BusinessCreateFormSchema),
     mode: 'onChange',
     defaultValues: {
       business_name: initialData?.business_name || '',
@@ -106,12 +100,10 @@ export function useBusinessForm({
       twitter_url: initialData?.twitter_url || '',
     },
   });
-
   const {
     control,
     handleSubmit,
     formState: { errors, isValid },
-    trigger,
     reset,
     watch,
   } = form; // Reset form when initialData changes (for edit mode)
@@ -171,19 +163,55 @@ export function useBusinessForm({
       setCurrentStep(1);
     }
   }, [initialData, isEdit, reset, extractCoordinates]);
-
   // Validate current step fields only
   const validateCurrentStep = useCallback(async (): Promise<boolean> => {
     try {
-      const fieldsToValidate =
-        STEP_FIELDS[currentStep as keyof typeof STEP_FIELDS];
-      const result = await trigger(fieldsToValidate);
-      return result;
+      // Get the current step's schema and validate only those fields
+      const currentStepSchema = getCurrentStepSchema();
+      const formData = form.getValues();
+
+      // Extract only the fields relevant to the current step
+      const stepData = Object.keys(currentStepSchema.shape).reduce(
+        (acc, key) => {
+          (acc as any)[key] = (formData as any)[key];
+          return acc;
+        },
+        {} as any
+      );
+
+      // Validate the step data using the step-specific schema
+      const result = currentStepSchema.safeParse(stepData);
+
+      if (!result.success) {
+        // Clear all errors first
+        form.clearErrors();
+
+        // Set errors for the current step fields only
+        const fieldErrors = result.error.formErrors.fieldErrors;
+        Object.keys(fieldErrors).forEach((fieldName) => {
+          const errors = (fieldErrors as any)[fieldName];
+          if (errors && errors.length > 0) {
+            form.setError(fieldName as any, {
+              type: 'validation',
+              message: errors[0],
+            });
+          }
+        });
+
+        return false;
+      }
+
+      // Clear errors for current step if validation passes
+      Object.keys(currentStepSchema.shape).forEach((fieldName) => {
+        form.clearErrors(fieldName as any);
+      });
+
+      return true;
     } catch (error) {
       console.error('Validation error in step', currentStep, ':', error);
       return false;
     }
-  }, [currentStep, trigger]); // Step navigation handlers with debugging
+  }, [currentStep, getCurrentStepSchema, form]); // Step navigation handlers with debugging
   const nextStep = useCallback(async () => {
     console.log('➡️ [useBusinessForm] Next step requested');
     console.log('➡️ [useBusinessForm] Current step:', currentStep);
@@ -308,11 +336,80 @@ export function useBusinessForm({
     }
   }, [onCancel, currentStep, form]);
 
-  // Get current step validation state
+  // Watch all form values to make validation reactive
+  const _formValues = watch();
+
+  // Real-time validation effect - validates current step whenever form values change
+  useEffect(() => {
+    const currentStepSchema = getCurrentStepSchema();
+    const formData = form.getValues();
+
+    // Extract only the fields relevant to the current step
+    const stepData = Object.keys(currentStepSchema.shape).reduce((acc, key) => {
+      (acc as any)[key] = (formData as any)[key];
+      return acc;
+    }, {} as any);
+
+    // Validate the step data
+    const result = currentStepSchema.safeParse(stepData);
+
+    if (!result.success) {
+      // Set errors for the current step fields only
+      const fieldErrors = result.error.formErrors.fieldErrors;
+      Object.keys(fieldErrors).forEach((fieldName) => {
+        const errors = (fieldErrors as any)[fieldName];
+        if (errors && errors.length > 0) {
+          form.setError(fieldName as any, {
+            type: 'validation',
+            message: errors[0],
+          });
+        }
+      });
+    } else {
+      // Clear errors for current step if validation passes
+      Object.keys(currentStepSchema.shape).forEach((fieldName) => {
+        form.clearErrors(fieldName as any);
+      });
+    }
+  }, [_formValues, currentStep, getCurrentStepSchema, form]);
+
+  // Get current step validation state (reactive to form changes)
   const isCurrentStepValid = useCallback(() => {
-    const fieldsToCheck = STEP_FIELDS[currentStep as keyof typeof STEP_FIELDS];
-    return fieldsToCheck.every((field) => !errors[field]);
-  }, [currentStep, errors]);
+    console.log(
+      '🔍 [useBusinessForm] Checking step validity for step:',
+      currentStep
+    );
+
+    const currentStepSchema = getCurrentStepSchema();
+    const formData = form.getValues();
+
+    console.log('🔍 [useBusinessForm] Current form data:', formData);
+
+    // Extract only the fields relevant to the current step
+    const stepData = Object.keys(currentStepSchema.shape).reduce((acc, key) => {
+      (acc as any)[key] = (formData as any)[key];
+      return acc;
+    }, {} as any);
+
+    console.log('🔍 [useBusinessForm] Step data for validation:', stepData);
+
+    // Validate the step data using the step-specific schema
+    const result = currentStepSchema.safeParse(stepData);
+
+    console.log('🔍 [useBusinessForm] Validation result:', result);
+
+    if (!result.success) {
+      console.log(
+        '❌ [useBusinessForm] Validation errors:',
+        result.error.formErrors
+      );
+    }
+
+    return result.success;
+  }, [getCurrentStepSchema, form, currentStep]);
+
+  // Calculate validation state reactively - this will update when formValues change
+  const stepIsValid = isCurrentStepValid();
   return {
     // Form state
     form,
@@ -335,8 +432,8 @@ export function useBusinessForm({
     clearForm,
 
     // Computed state
-    isCurrentStepValid: isCurrentStepValid(),
-    canGoNext: currentStep < totalSteps,
+    isCurrentStepValid: stepIsValid,
+    canGoNext: currentStep < totalSteps && stepIsValid,
     canGoPrev: currentStep > 1,
     isLastStep: currentStep === totalSteps,
   };

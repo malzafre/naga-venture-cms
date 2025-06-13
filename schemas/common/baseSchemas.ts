@@ -45,24 +45,45 @@ export const PasswordSchema = z
   );
 
 /**
- * Phone number validation (flexible format, allows null)
+ * Phone number validation (flexible format, allows null and empty string)
  * More permissive regex to handle various phone number formats in the database
  */
 export const PhoneSchema = z
   .string()
-  .regex(/^[\+]?[\d\s\-\(\)\.]{7,20}$/, 'Please enter a valid phone number')
-  .nullable()
   .optional()
+  .nullable()
+  .refine(
+    (value) => {
+      if (!value || value === '') return true;
+      return /^[\+]?[\d\s\-\(\)\.]{7,20}$/.test(value);
+    },
+    {
+      message: 'Please enter a valid phone number',
+    }
+  )
   .or(z.literal(''));
 
 /**
- * URL validation (optional, allows null)
+ * URL validation (optional, allows null and empty string)
  */
 export const UrlSchema = z
   .string()
-  .url('Please enter a valid URL')
-  .nullable()
   .optional()
+  .nullable()
+  .refine(
+    (value) => {
+      if (!value || value === '') return true;
+      try {
+        new URL(value);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    {
+      message: 'Please enter a valid URL',
+    }
+  )
   .or(z.literal(''));
 
 /**

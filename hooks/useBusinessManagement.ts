@@ -25,6 +25,7 @@ import queryKeys from '@/lib/queryKeys';
 import { supabase } from '@/lib/supabaseClient';
 import {
   BusinessFiltersSchema,
+  BusinessInsertSchema,
   BusinessSchema,
   BusinessUpdateSchema,
   validateSupabaseListResponse,
@@ -336,14 +337,8 @@ export function useCreateBusiness() {
 
   return useMutation({
     mutationFn: async (businessData: BusinessInsert): Promise<Business> => {
-      // Phase 5: Validate input data with Zod
-      const validatedData = BusinessSchema.omit({
-        id: true,
-        created_at: true,
-        updated_at: true,
-        average_rating: true,
-        review_count: true,
-      }).parse(businessData);
+      // Phase 5: Validate input data with the correct schema
+      const validatedData = BusinessInsertSchema.parse(businessData);
 
       const response = await supabase
         .from('businesses')
@@ -355,7 +350,9 @@ export function useCreateBusiness() {
         handleBusinessError(response.error, 'create business', {
           businessData: validatedData,
         });
-      } // Phase 5: Validate API response
+      }
+
+      // Phase 5: Validate API response
       const validatedBusinessData = validateSupabaseResponse(
         BusinessSchema,
         response
