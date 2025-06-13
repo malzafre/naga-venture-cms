@@ -1,8 +1,9 @@
 // filepath: stores/businessFilterStore.ts
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
+import { useShallow } from 'zustand/react/shallow';
 
-import { BusinessFilters } from '@/hooks/useBusinessManagement';
+import { BusinessFilters } from '@/schemas/business/businessSchemas';
 
 export interface BusinessFilterState {
   // Filter values
@@ -68,14 +69,19 @@ export const useBusinessFilterStore = create<BusinessFilterStore>()(
 
     // Filter actions
     setFilter: (key, value) => {
-      set((state) => ({
-        ...state,
-        filters: {
-          ...state.filters,
-          [key]: value,
-          page: key !== 'page' ? 1 : state.filters.page, // Reset page unless changing page
-        },
-      }));
+      set((state) => {
+        // Bail out if value hasn't changed to prevent unnecessary re-renders
+        if (state.filters[key] === value) return state;
+
+        return {
+          ...state,
+          filters: {
+            ...state.filters,
+            [key]: value,
+            page: key !== 'page' ? 1 : state.filters.page, // Reset page unless changing page
+          },
+        };
+      });
     },
 
     updateFilters: (updates) => {
@@ -111,28 +117,29 @@ export const useBusinessFilterStore = create<BusinessFilterStore>()(
 
     // Search actions
     setSearchQuery: (query) => {
-      const { searchDebounceTimer } = get();
+      const state = get();
+
+      // Bail out if search query hasn't changed
+      if (state.searchQuery === query) return;
+
+      const { searchDebounceTimer } = state;
 
       // Clear existing timer
       if (searchDebounceTimer) {
         clearTimeout(searchDebounceTimer);
       }
 
-      set((state) => ({
-        ...state,
-        searchQuery: query,
-        isSearching: true,
-      }));
-
       // Set new debounce timer
       const newTimer = setTimeout(() => {
         get()._applyDebouncedSearch();
       }, 500);
 
-      set((state) => ({
-        ...state,
-        searchDebounceTimer: newTimer,
-      }));
+      // SINGLE set call for all state updates to prevent infinite loops
+      set({
+        searchQuery: query,
+        isSearching: true,
+        searchDebounceTimer: newTimer as unknown as NodeJS.Timeout,
+      });
     },
 
     clearSearch: () => {
@@ -202,43 +209,51 @@ export const useBusinessFilterStore = create<BusinessFilterStore>()(
 );
 
 /**
- * Selector hooks for optimized component subscriptions
+ * Selector hooks for optimized component subscriptions using useShallow
  */
 
 // Get active filters (most commonly used for API calls)
 export const useBusinessFilters = () =>
-  useBusinessFilterStore((state) => state.filters);
+  useBusinessFilterStore(useShallow((state) => state.filters));
 
 // Get search state
 export const useBusinessSearch = () =>
-  useBusinessFilterStore((state) => ({
-    searchQuery: state.searchQuery,
-    isSearching: state.isSearching,
-  }));
+  useBusinessFilterStore(
+    useShallow((state) => ({
+      searchQuery: state.searchQuery,
+      isSearching: state.isSearching,
+    }))
+  );
 
 // Get UI state
 export const useBusinessFilterUI = () =>
-  useBusinessFilterStore((state) => ({
-    showFilters: state.showFilters,
-  }));
+  useBusinessFilterStore(
+    useShallow((state) => ({
+      showFilters: state.showFilters,
+    }))
+  );
 
 // Get filter actions (stable reference)
 export const useBusinessFilterActions = () =>
-  useBusinessFilterStore((state) => ({
-    setFilter: state.setFilter,
-    updateFilters: state.updateFilters,
-    resetFilters: state.resetFilters,
-    setSearchQuery: state.setSearchQuery,
-    clearSearch: state.clearSearch,
-    toggleShowFilters: state.toggleShowFilters,
-    setShowFilters: state.setShowFilters,
-  }));
+  useBusinessFilterStore(
+    useShallow((state) => ({
+      setFilter: state.setFilter,
+      updateFilters: state.updateFilters,
+      resetFilters: state.resetFilters,
+      setSearchQuery: state.setSearchQuery,
+      clearSearch: state.clearSearch,
+      toggleShowFilters: state.toggleShowFilters,
+      setShowFilters: state.setShowFilters,
+    }))
+  );
 
 // Get complete filter state (use sparingly)
 export const useBusinessFilterState = () =>
-  useBusinessFilterStore((state) => ({
-    filters: state.filters,
-    searchQuery: state.searchQuery,
-    showFilters: state.showFilters,
-    isSearching: state.isSearching,
-  }));
+  useBusinessFilterStore(
+    useShallow((state) => ({
+      filters: state.filters,
+      searchQuery: state.searchQuery,
+      showFilters: state.showFilters,
+      isSearching: state.isSearching,
+    }))
+  );

@@ -24,6 +24,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Components
 import { CMSButton } from '@/components/atoms';
+import { FeatureErrorBoundary } from '@/components/errorBoundaries';
 import {
   DataTable,
   StatusBadge,
@@ -49,6 +50,7 @@ const { width: screenWidth } = Dimensions.get('window');
 export default function AllBusinessesScreen() {
   // === ZUSTAND INTEGRATION ===
   // Replaced useState filter management with centralized Zustand store
+  // useShallow is used in the store selectors to prevent unnecessary re-renders
   const {
     filters,
     searchQuery,
@@ -73,19 +75,34 @@ export default function AllBusinessesScreen() {
     refetch,
   } = useBusinessListings(filters);
   const deleteBusinessMutation = useDeleteBusiness();
+
   // Real-time subscription using production-grade hook
   useBusinessSubscription(true);
-  // Handle delete business
-  const handleDeleteBusiness = React.useCallback((business: Business) => {
-    if (__DEV__) {
-      console.log(
-        '🗑️ [AllBusinesses] Delete button clicked for:',
-        business.business_name
-      );
-    }
-    setBusinessToDelete(business);
-    setDeleteModalVisible(true);
-  }, []);
+
+  // Handle delete business - FIXED: Race condition protection
+  const handleDeleteBusiness = React.useCallback(
+    (business: Business) => {
+      // Prevent concurrent delete operations
+      if (deleteBusinessMutation.isPending) {
+        if (__DEV__) {
+          console.log(
+            '⚠️ [AllBusinesses] Delete operation already in progress, ignoring request'
+          );
+        }
+        return;
+      }
+
+      if (__DEV__) {
+        console.log(
+          '🗑️ [AllBusinesses] Delete button clicked for:',
+          business.business_name
+        );
+      }
+      setBusinessToDelete(business);
+      setDeleteModalVisible(true);
+    },
+    [deleteBusinessMutation.isPending]
+  );
   // Confirm delete business
   const confirmDeleteBusiness = React.useCallback(async () => {
     if (!businessToDelete) return;
@@ -214,6 +231,10 @@ export default function AllBusinessesScreen() {
               onPress={() => {
                 NavigationService.toViewBusiness(business.id);
               }}
+              accessible={true}
+              accessibilityLabel={`View ${business.business_name}`}
+              accessibilityHint="Opens business details page"
+              accessibilityRole="button"
             >
               <Eye size={16} color="#0A1B47" weight="bold" />
             </TouchableOpacity>
@@ -222,6 +243,10 @@ export default function AllBusinessesScreen() {
               onPress={() => {
                 NavigationService.toEditBusiness(business.id);
               }}
+              accessible={true}
+              accessibilityLabel={`Edit ${business.business_name}`}
+              accessibilityHint="Opens business edit form"
+              accessibilityRole="button"
             >
               <PencilSimple size={16} color="#0A1B47" weight="bold" />
             </TouchableOpacity>
@@ -229,6 +254,13 @@ export default function AllBusinessesScreen() {
               style={[styles.actionButton, styles.deleteButton]}
               onPress={() => handleDeleteBusiness(business)}
               disabled={deleteBusinessMutation.isPending}
+              accessible={true}
+              accessibilityLabel={`Delete ${business.business_name}`}
+              accessibilityHint="Opens delete confirmation dialog"
+              accessibilityRole="button"
+              accessibilityState={{
+                disabled: deleteBusinessMutation.isPending,
+              }}
             >
               <Trash size={16} color="#DC3545" weight="bold" />
             </TouchableOpacity>
@@ -342,7 +374,7 @@ export default function AllBusinessesScreen() {
     return (
       <DataTable
         columns={columns}
-        data={businessData?.data || []}
+        data={(businessData?.data || []) as Business[]}
         isLoading={isLoading}
         emptyMessage="No businesses found. Create your first business listing to get started."
         showRowIndex
@@ -353,35 +385,41 @@ export default function AllBusinessesScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {renderHeader()}
-      {renderFilters()}
-      {renderDataTable()}
-      {/* Statistics Summary */}
-      {businessData && (
-        <View style={styles.statsContainer}>
-          <Text style={styles.statsText}>
-            Showing {businessData.data.length} of {businessData.count || 0}
-            businesses
-          </Text>
-        </View>
-      )}
-      {/* Delete Confirmation Modal */}
-      <ConfirmationModal
-        visible={deleteModalVisible}
-        title="Delete Business"
-        message={
-          businessToDelete
-            ? `Are you sure you want to delete "${businessToDelete.business_name}"? This action cannot be undone.`
-            : ''
-        }
-        confirmText="Delete"
-        cancelText="Cancel"
-        confirmStyle="destructive"
-        onConfirm={confirmDeleteBusiness}
-        onCancel={cancelDeleteBusiness}
-      />
-    </SafeAreaView>
+    <FeatureErrorBoundary
+      featureName="Business Listings"
+      enableRetry={true}
+      maxRetries={3}
+    >
+      <SafeAreaView style={styles.container}>
+        {renderHeader()}
+        {renderFilters()}
+        {renderDataTable()}
+        {/* Statistics Summary */}
+        {businessData && (
+          <View style={styles.statsContainer}>
+            <Text style={styles.statsText}>
+              Showing {businessData.data.length} of {businessData.count || 0}{' '}
+              businesses
+            </Text>
+          </View>
+        )}
+        {/* Delete Confirmation Modal */}
+        <ConfirmationModal
+          visible={deleteModalVisible}
+          title="Delete Business"
+          message={
+            businessToDelete
+              ? `Are you sure you want to delete "${businessToDelete.business_name}"? This action cannot be undone.`
+              : ''
+          }
+          confirmText="Delete"
+          cancelText="Cancel"
+          confirmStyle="destructive"
+          onConfirm={confirmDeleteBusiness}
+          onCancel={cancelDeleteBusiness}
+        />
+      </SafeAreaView>
+    </FeatureErrorBoundary>
   );
 }
 

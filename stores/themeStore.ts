@@ -1,6 +1,7 @@
 // filepath: stores/themeStore.ts
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
+import { useShallow } from 'zustand/react/shallow';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type ColorScheme = 'default' | 'blue' | 'green' | 'purple';
@@ -79,6 +80,9 @@ export const useThemeStore = create<ThemeStore>()(
 
     // Theme actions
     setMode: (mode) => {
+      const currentMode = get().mode;
+      if (currentMode === mode) return; // Bailout condition
+
       set((state) => ({
         ...state,
         mode,
@@ -87,6 +91,9 @@ export const useThemeStore = create<ThemeStore>()(
     },
 
     setColorScheme: (scheme) => {
+      const currentScheme = get().colorScheme;
+      if (currentScheme === scheme) return; // Bailout condition
+
       set((state) => ({
         ...state,
         colorScheme: scheme,
@@ -96,6 +103,9 @@ export const useThemeStore = create<ThemeStore>()(
 
     // UI preference actions
     setReducedMotion: (enabled) => {
+      const current = get().reducedMotion;
+      if (current === enabled) return; // Bailout condition
+
       set((state) => ({
         ...state,
         reducedMotion: enabled,
@@ -104,6 +114,9 @@ export const useThemeStore = create<ThemeStore>()(
     },
 
     setHighContrast: (enabled) => {
+      const current = get().highContrast;
+      if (current === enabled) return; // Bailout condition
+
       set((state) => ({
         ...state,
         highContrast: enabled,
@@ -112,6 +125,9 @@ export const useThemeStore = create<ThemeStore>()(
     },
 
     setFontSize: (size) => {
+      const current = get().fontSize;
+      if (current === size) return; // Bailout condition
+
       set((state) => ({
         ...state,
         fontSize: size,
@@ -237,35 +253,43 @@ export const useCurrentTheme = () =>
 
 // Get theme mode and color scheme
 export const useThemeSettings = () =>
-  useThemeStore((state) => ({
-    mode: state.mode,
-    colorScheme: state.colorScheme,
-  }));
+  useThemeStore(
+    useShallow((state) => ({
+      mode: state.mode,
+      colorScheme: state.colorScheme,
+    }))
+  );
 
 // Get accessibility preferences
 export const useAccessibilityPreferences = () =>
-  useThemeStore((state) => ({
-    reducedMotion: state.reducedMotion,
-    highContrast: state.highContrast,
-    fontSize: state.fontSize,
-  }));
+  useThemeStore(
+    useShallow((state) => ({
+      reducedMotion: state.reducedMotion,
+      highContrast: state.highContrast,
+      fontSize: state.fontSize,
+    }))
+  );
 
 // Get layout preferences
 export const useLayoutPreferences = () =>
-  useThemeStore((state) => ({
-    sidebarWidth: state.sidebarWidth,
-    compactMode: state.compactMode,
-  }));
+  useThemeStore(
+    useShallow((state) => ({
+      sidebarWidth: state.sidebarWidth,
+      compactMode: state.compactMode,
+    }))
+  );
 
 // Get theme actions (stable reference)
 export const useThemeActions = () =>
-  useThemeStore((state) => ({
-    setMode: state.setMode,
-    setColorScheme: state.setColorScheme,
-    setReducedMotion: state.setReducedMotion,
-    setHighContrast: state.setHighContrast,
-    setFontSize: state.setFontSize,
-    setSidebarWidth: state.setSidebarWidth,
-    setCompactMode: state.setCompactMode,
-    setSystemTheme: state.setSystemTheme,
-  }));
+  useThemeStore(
+    useShallow((state) => ({
+      setMode: state.setMode,
+      setColorScheme: state.setColorScheme,
+      setReducedMotion: state.setReducedMotion,
+      setHighContrast: state.setHighContrast,
+      setFontSize: state.setFontSize,
+      setSidebarWidth: state.setSidebarWidth,
+      setCompactMode: state.setCompactMode,
+      setSystemTheme: state.setSystemTheme,
+    }))
+  );

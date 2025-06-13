@@ -1,4 +1,6 @@
 // filepath: hooks/useBusinessFilterManagement.ts
+import { useEffect, useMemo } from 'react';
+
 import {
   useBusinessFilterActions,
   useBusinessFilterStore,
@@ -6,7 +8,6 @@ import {
   useBusinessFilters,
   useBusinessSearch,
 } from '@/stores';
-import { useEffect } from 'react';
 
 /**
  * Smart Hook: useBusinessFilterManagement
@@ -32,32 +33,46 @@ export function useBusinessFilterManagement() {
       useBusinessFilterStore.getState()._clearDebounceTimer();
     };
   }, []);
+  // Return organized interface for components - MEMOIZED for stability
+  return useMemo(
+    () => ({
+      // Current filter state (for API calls)
+      filters,
 
-  // Return organized interface for components
-  return {
-    // Current filter state (for API calls)
-    filters,
+      // Search state
+      searchQuery: search.searchQuery,
+      isSearching: search.isSearching,
 
-    // Search state
-    searchQuery: search.searchQuery,
-    isSearching: search.isSearching,
+      // UI state
+      showFilters: ui.showFilters,
 
-    // UI state
-    showFilters: ui.showFilters,
+      // Filter actions
+      setFilter: actions.setFilter,
+      updateFilters: actions.updateFilters,
+      resetFilters: actions.resetFilters,
 
-    // Filter actions
-    setFilter: actions.setFilter,
-    updateFilters: actions.updateFilters,
-    resetFilters: actions.resetFilters,
+      // Search actions
+      setSearchQuery: actions.setSearchQuery,
+      clearSearch: actions.clearSearch,
 
-    // Search actions
-    setSearchQuery: actions.setSearchQuery,
-    clearSearch: actions.clearSearch,
-
-    // UI actions
-    toggleShowFilters: actions.toggleShowFilters,
-    setShowFilters: actions.setShowFilters,
-  };
+      // UI actions
+      toggleShowFilters: actions.toggleShowFilters,
+      setShowFilters: actions.setShowFilters,
+    }),
+    [
+      filters,
+      search.searchQuery,
+      search.isSearching,
+      ui.showFilters,
+      actions.setFilter,
+      actions.updateFilters,
+      actions.resetFilters,
+      actions.setSearchQuery,
+      actions.clearSearch,
+      actions.toggleShowFilters,
+      actions.setShowFilters,
+    ]
+  );
 }
 
 /**

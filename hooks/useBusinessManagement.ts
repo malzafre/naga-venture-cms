@@ -468,10 +468,20 @@ export function useDeleteBusiness() {
     },
     onSuccess: (_, businessId) => {
       console.log('[useDeleteBusiness] Success:', businessId);
-      // Invalidate list queries and remove detail query
-      queryClient.invalidateQueries({ queryKey: businessQueryKeys.lists() });
+
+      // ENHANCED: Invalidate all business-related queries
+      queryClient.invalidateQueries({
+        queryKey: businessQueryKeys.lists(),
+      });
+
+      // Remove the specific business detail query
       queryClient.removeQueries({
         queryKey: businessQueryKeys.detail(businessId),
+      });
+
+      // Invalidate all business queries to ensure consistency
+      queryClient.invalidateQueries({
+        queryKey: businessQueryKeys.all,
       });
     },
     onError: (error) => {

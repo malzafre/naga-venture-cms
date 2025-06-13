@@ -1,6 +1,7 @@
 // filepath: stores/sidebarStore.ts
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
+import { useShallow } from 'zustand/react/shallow';
 
 import { SidebarState } from '@/types/navigation';
 import { UserRole } from '@/types/supabase';
@@ -53,6 +54,9 @@ export const useSidebarStore = create<SidebarStore>()(
 
     // Actions
     setActiveSection: (section: string) => {
+      const current = get().activeSection;
+      if (current === section) return; // Bailout condition
+
       set((state) => ({
         ...state,
         activeSection: section,
@@ -100,7 +104,6 @@ export const useSidebarStore = create<SidebarStore>()(
           expandedSections: [...state.expandedSections, sectionId],
         };
       });
-      get()._persistState(get().currentUserId); // Also persist on auto-expand
     },
 
     setUserRole: (role: UserRole | undefined) => {
@@ -205,7 +208,7 @@ export const useSidebarStore = create<SidebarStore>()(
 );
 
 /**
- * ✅ FIXED SELECTOR HOOKS - Prevent infinite loops with stable references
+ * ✅ MODERNIZED SELECTOR HOOKS - Prevent infinite loops with stable references and useShallow
  */
 
 // Get only expanded sections (most commonly used)
@@ -216,38 +219,40 @@ export const useExpandedSections = () =>
 export const useActiveSection = () =>
   useSidebarStore((state) => state.activeSection);
 
-// ✅ FIXED: Create stable action references using a proper cached approach
-let cachedActions: {
-  setActiveSection: (section: string) => void;
-  toggleSection: (sectionId: string) => void;
-  setExpandedSections: (sections: string[]) => void;
-  autoExpandSection: (sectionId: string) => void;
-  setUserRole: (role: UserRole | undefined) => void;
-  isSectionExpanded: (sectionId: string) => boolean;
-  isSectionActive: (sectionId: string) => boolean;
-  _loadPersistedState: (userId: string | null | undefined) => Promise<void>;
-  _persistState: (userId: string | null | undefined) => Promise<void>;
-} | null = null;
+// Get user role only
+export const useSidebarUserRole = () =>
+  useSidebarStore((state) => state.userRole);
 
-function createStableActions() {
-  const state = useSidebarStore.getState();
-  return {
-    setActiveSection: state.setActiveSection,
-    toggleSection: state.toggleSection,
-    setExpandedSections: state.setExpandedSections,
-    autoExpandSection: state.autoExpandSection,
-    setUserRole: state.setUserRole,
-    isSectionExpanded: state.isSectionExpanded,
-    isSectionActive: state.isSectionActive,
-    _loadPersistedState: state._loadPersistedState,
-    _persistState: state._persistState,
-  };
-}
+// Get complete sidebar state (use sparingly) - Updated with useShallow
+export const useSidebarState = () =>
+  useSidebarStore(
+    useShallow((state) => ({
+      expandedSections: state.expandedSections,
+      activeSection: state.activeSection,
+      userRole: state.userRole,
+    }))
+  );
 
-// Get sidebar actions (stable reference) - FIXED: Use cached actions to prevent infinite loops
-export const useSidebarActions = () => {
-  if (!cachedActions) {
-    cachedActions = createStableActions();
-  }
-  return cachedActions;
-};
+// Get navigation state for menu components
+export const useSidebarNavigation = () =>
+  useSidebarStore(
+    useShallow((state) => ({
+      expandedSections: state.expandedSections,
+      activeSection: state.activeSection,
+      isSectionExpanded: state.isSectionExpanded,
+      isSectionActive: state.isSectionActive,
+    }))
+  );
+
+// Get all sidebar actions (stable reference) - MODERNIZED with useShallow
+export const useSidebarActions = () =>
+  useSidebarStore(
+    useShallow((state) => ({
+      setActiveSection: state.setActiveSection,
+      toggleSection: state.toggleSection,
+      setExpandedSections: state.setExpandedSections,
+      autoExpandSection: state.autoExpandSection,
+      setUserRole: state.setUserRole,
+      setCurrentUserId: state.setCurrentUserId,
+    }))
+  );
