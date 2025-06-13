@@ -12,6 +12,7 @@ import {
 
 import { CMSSidebar } from '@/components';
 import { useAuth } from '@/context/AuthContext';
+import { isAdminRole } from '@/hooks/useRouteGuard';
 
 const { width: screenWidth } = Dimensions.get('window');
 const SIDEBAR_WIDTH = Platform.select({
@@ -28,17 +29,8 @@ export default function AdminLayout() {
       if (!user) {
         // If user is not authenticated, redirect to CMS login
         router.replace('/login');
-      } else if (
-        userProfile &&
-        userProfile.role &&
-        ![
-          'tourism_admin',
-          'business_listing_manager',
-          'tourism_content_manager',
-          'business_registration_manager',
-        ].includes(userProfile.role)
-      ) {
-        // If user doesn't have a valid role, redirect to unauthorized
+      } else if (userProfile && !isAdminRole(userProfile.role)) {
+        // If user doesn't have admin access, redirect to unauthorized
         router.replace('/unauthorized');
       }
     }

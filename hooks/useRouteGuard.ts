@@ -7,359 +7,336 @@ import type { Database } from '@/types/database';
 
 type UserRole = Database['public']['Enums']['user_role'];
 
+// Route permission type definition
 interface RoutePermission {
   path: string;
   allowedRoles: UserRole[];
 }
+
+// Centralized role group definitions to eliminate redundancy and improve maintainability
+const ADMIN_ROLES: UserRole[] = [
+  'tourism_admin',
+  'business_listing_manager',
+  'tourism_content_manager',
+  'business_registration_manager',
+];
+
+const CONTENT_MANAGEMENT_ROLES: UserRole[] = [
+  'tourism_admin',
+  'tourism_content_manager',
+  'business_listing_manager',
+];
+
+const BUSINESS_MANAGEMENT_ROLES: UserRole[] = [
+  'tourism_admin',
+  'business_listing_manager',
+  'business_registration_manager',
+];
+
+const BUSINESS_REGISTRATION_ROLES: UserRole[] = [
+  'tourism_admin',
+  'business_registration_manager',
+];
+
+const TOURISM_CONTENT_ROLES: UserRole[] = [
+  'tourism_admin',
+  'tourism_content_manager',
+];
+
+const USER_MANAGEMENT_ROLES: UserRole[] = [
+  'tourism_admin',
+  'business_registration_manager',
+  'business_listing_manager',
+];
+
+const ANALYTICS_ROLES: UserRole[] = [
+  'tourism_admin',
+  'business_listing_manager',
+  'business_registration_manager',
+];
+
+// Tourism admin only routes (system administration, etc.)
+const ADMIN_ONLY_ROLES: UserRole[] = ['tourism_admin'];
+
+// Helper function to check if a role is an admin role
+export const isAdminRole = (role: UserRole | null | undefined): boolean => {
+  return role ? ADMIN_ROLES.includes(role) : false;
+};
 
 // Route permissions configuration following NAGA VENTURE RBAC Documentation exactly
 const ROUTE_PERMISSIONS: RoutePermission[] = [
   // Dashboard - All admin roles have access
   {
     path: '/(sidebar)/dashboard',
-    allowedRoles: [
-      'tourism_admin',
-      'business_listing_manager',
-      'tourism_content_manager',
-      'business_registration_manager',
-    ],
+    allowedRoles: ADMIN_ROLES,
   },
   // Legacy Dashboard path
   {
     path: '/TourismCMS/(admin)/dashboard',
-    allowedRoles: [
-      'tourism_admin',
-      'business_listing_manager',
-      'tourism_content_manager',
-      'business_registration_manager',
-    ],
+    allowedRoles: ADMIN_ROLES,
   },
   // ========== USER MANAGEMENT SECTION ==========
   // User Management Parent - Tourism Admin and Business Registration Manager
   {
     path: '/TourismCMS/(admin)/user-management',
-    allowedRoles: ['tourism_admin', 'business_registration_manager'],
-  },
-  // Staff Management
+    allowedRoles: USER_MANAGEMENT_ROLES,
+  }, // Staff Management
   {
     path: '/TourismCMS/(admin)/user-management/staff-management',
-    allowedRoles: ['tourism_admin'],
+    allowedRoles: ADMIN_ONLY_ROLES,
   }, // Business Owners
   {
     path: '/TourismCMS/(admin)/user-management/business-owners',
-    allowedRoles: [
-      'tourism_admin',
-      'business_registration_manager',
-      'business_listing_manager',
-    ],
-  },
-  // Tourist Accounts
+    allowedRoles: BUSINESS_MANAGEMENT_ROLES,
+  }, // Tourist Accounts
   {
     path: '/TourismCMS/(admin)/user-management/tourist-accounts',
-    allowedRoles: ['tourism_admin'],
+    allowedRoles: ADMIN_ONLY_ROLES,
   },
   // ========== NEW USER MANAGEMENT ROUTES ==========
   // User Management Routes
   {
     path: '/(sidebar)/user-management/business-owners',
-    allowedRoles: [
-      'tourism_admin',
-      'business_registration_manager',
-      'business_listing_manager',
-    ],
+    allowedRoles: BUSINESS_MANAGEMENT_ROLES,
   },
   {
     path: '/(sidebar)/user-management/staff-management',
-    allowedRoles: ['tourism_admin'],
+    allowedRoles: ADMIN_ONLY_ROLES,
   },
   {
     path: '/(sidebar)/user-management/tourist-accounts',
-    allowedRoles: ['tourism_admin'],
+    allowedRoles: ADMIN_ONLY_ROLES,
   },
 
   // ========== BUSINESS MANAGEMENT SECTION ==========
   // Business Management Parent
   {
     path: '/TourismCMS/(admin)/business-management',
-    allowedRoles: [
-      'tourism_admin',
-      'business_listing_manager',
-      'business_registration_manager',
-    ],
-  },
-  // Business Listings
+    allowedRoles: BUSINESS_MANAGEMENT_ROLES,
+  }, // Business Listings
   {
     path: '/TourismCMS/(admin)/business-management/business-listings/all-businesses',
-    allowedRoles: ['tourism_admin', 'business_listing_manager'],
+    allowedRoles: BUSINESS_MANAGEMENT_ROLES,
   },
   {
     path: '/TourismCMS/(admin)/business-management/business-listings/accommodations',
-    allowedRoles: ['tourism_admin', 'business_listing_manager'],
+    allowedRoles: BUSINESS_MANAGEMENT_ROLES,
   },
   {
     path: '/TourismCMS/(admin)/business-management/business-listings/shops-services',
-    allowedRoles: ['tourism_admin', 'business_listing_manager'],
+    allowedRoles: BUSINESS_MANAGEMENT_ROLES,
   },
   {
     path: '/TourismCMS/(admin)/business-management/business-listings/featured-businesses',
-    allowedRoles: ['tourism_admin', 'business_listing_manager'],
+    allowedRoles: BUSINESS_MANAGEMENT_ROLES,
   },
   // Business CRUD operations
   {
     path: '/TourismCMS/(admin)/business-management/business-listings/create',
-    allowedRoles: ['tourism_admin', 'business_listing_manager'],
+    allowedRoles: BUSINESS_MANAGEMENT_ROLES,
   },
   {
     path: '/TourismCMS/(admin)/business-management/business-listings/edit',
-    allowedRoles: ['tourism_admin', 'business_listing_manager'],
+    allowedRoles: BUSINESS_MANAGEMENT_ROLES,
   },
   {
     path: '/TourismCMS/(admin)/business-management/business-listings/view',
-    allowedRoles: ['tourism_admin', 'business_listing_manager'],
+    allowedRoles: BUSINESS_MANAGEMENT_ROLES,
   },
   // Business Registrations - Main Page
   {
     path: '/(sidebar)/business-management/business-registrations',
-    allowedRoles: ['tourism_admin', 'business_registration_manager'],
-  }, // Category Management
+    allowedRoles: BUSINESS_REGISTRATION_ROLES,
+  },
+  // Category Management
   {
     path: '/(sidebar)/categories/category-management',
-    allowedRoles: [
-      'tourism_admin',
-      'tourism_content_manager',
-      'business_listing_manager',
-    ],
+    allowedRoles: CONTENT_MANAGEMENT_ROLES,
   },
 
-  // ========== NEW CONTENT MANAGEMENT ROUTES ==========  // Content Management Routes
+  // ========== NEW CONTENT MANAGEMENT ROUTES ==========
+  // Content Management Routes
   {
     path: '/(sidebar)/content-management/content-approval',
-    allowedRoles: [
-      'tourism_admin',
-      'tourism_content_manager',
-      'business_listing_manager',
-    ],
+    allowedRoles: CONTENT_MANAGEMENT_ROLES,
   },
   {
     path: '/(sidebar)/content-management/reviews-ratings',
-    allowedRoles: [
-      'tourism_admin',
-      'tourism_content_manager',
-      'business_listing_manager',
-    ],
+    allowedRoles: CONTENT_MANAGEMENT_ROLES,
   },
 
-  // Business Registrations - Main Page
-  {
-    path: '/(sidebar)/business-management/business-registrations',
-    allowedRoles: ['tourism_admin', 'business_registration_manager'],
-  },
-  // Business Registrations
+  // Business Registrations (Legacy and detailed routes)
   {
     path: '/TourismCMS/(admin)/business-management/business-registrations/pending-approvals',
-    allowedRoles: ['tourism_admin', 'business_registration_manager'],
+    allowedRoles: BUSINESS_REGISTRATION_ROLES,
   },
   {
     path: '/TourismCMS/(admin)/business-management/business-registrations/registration-history',
-    allowedRoles: ['tourism_admin', 'business_registration_manager'],
+    allowedRoles: BUSINESS_REGISTRATION_ROLES,
   },
   {
     path: '/TourismCMS/(admin)/business-management/business-registrations/rejected-applications',
-    allowedRoles: ['tourism_admin', 'business_registration_manager'],
-  },
-  // Business Analytics
+    allowedRoles: BUSINESS_REGISTRATION_ROLES,
+  }, // Business Analytics
   {
     path: '/TourismCMS/(admin)/business-management/business-analytics',
-    allowedRoles: ['tourism_admin', 'business_listing_manager'],
+    allowedRoles: BUSINESS_MANAGEMENT_ROLES,
   },
 
   // ========== TOURISM CONTENT SECTION ==========
   // Tourism Content Parent
   {
     path: '/TourismCMS/(admin)/tourism-content',
-    allowedRoles: ['tourism_admin', 'tourism_content_manager'],
+    allowedRoles: TOURISM_CONTENT_ROLES,
   },
   // Tourist Spots
   {
     path: '/TourismCMS/(admin)/tourism-content/tourist-spots',
-    allowedRoles: ['tourism_admin', 'tourism_content_manager'],
+    allowedRoles: TOURISM_CONTENT_ROLES,
   },
   // Events Management
   {
     path: '/TourismCMS/(admin)/tourism-content/events-management',
-    allowedRoles: ['tourism_admin', 'tourism_content_manager'],
+    allowedRoles: TOURISM_CONTENT_ROLES,
   },
   // Promotions
   {
     path: '/TourismCMS/(admin)/tourism-content/promotions',
-    allowedRoles: ['tourism_admin', 'tourism_content_manager'],
+    allowedRoles: TOURISM_CONTENT_ROLES,
   },
 
   // ========== CONTENT MANAGEMENT SECTION ==========
   // Content Management Parent
   {
     path: '/TourismCMS/(admin)/content-management',
-    allowedRoles: [
-      'tourism_admin',
-      'business_listing_manager',
-      'tourism_content_manager',
-    ],
+    allowedRoles: CONTENT_MANAGEMENT_ROLES,
   },
   // Content Approval
   {
     path: '/TourismCMS/(admin)/content-management/content-approval',
-    allowedRoles: [
-      'tourism_admin',
-      'business_listing_manager',
-      'tourism_content_manager',
-    ],
+    allowedRoles: CONTENT_MANAGEMENT_ROLES,
   },
   // Reviews & Ratings
   {
     path: '/TourismCMS/(admin)/content-management/reviews-ratings',
-    allowedRoles: [
-      'tourism_admin',
-      'business_listing_manager',
-      'tourism_content_manager',
-    ],
+    allowedRoles: CONTENT_MANAGEMENT_ROLES,
   },
 
   // ========== CATEGORIES & ORGANIZATION SECTION ==========
   // Categories Parent
   {
     path: '/TourismCMS/(admin)/categories-organization',
-    allowedRoles: [
-      'tourism_admin',
-      'business_listing_manager',
-      'tourism_content_manager',
-    ],
-  },
-  // Business Categories
+    allowedRoles: CONTENT_MANAGEMENT_ROLES,
+  }, // Business Categories
   {
     path: '/TourismCMS/(admin)/categories-organization/business-categories',
-    allowedRoles: ['tourism_admin', 'business_listing_manager'],
-  },
-  // Tourism Categories
+    allowedRoles: BUSINESS_MANAGEMENT_ROLES,
+  }, // Tourism Categories
   {
     path: '/TourismCMS/(admin)/categories-organization/tourism-categories',
-    allowedRoles: ['tourism_admin', 'tourism_content_manager'],
+    allowedRoles: TOURISM_CONTENT_ROLES,
   },
-
   // ========== BOOKINGS & FINANCE SECTION ==========
   // Bookings & Finance Parent
   {
     path: '/TourismCMS/(admin)/bookings-finance',
-    allowedRoles: ['tourism_admin'],
+    allowedRoles: ADMIN_ONLY_ROLES,
   },
   // Booking Management
   {
     path: '/TourismCMS/(admin)/bookings-finance/booking-management',
-    allowedRoles: ['tourism_admin'],
+    allowedRoles: ADMIN_ONLY_ROLES,
   },
   // Financial Overview
   {
     path: '/TourismCMS/(admin)/bookings-finance/financial-overview',
-    allowedRoles: ['tourism_admin'],
+    allowedRoles: ADMIN_ONLY_ROLES,
   },
 
   // ========== ANALYTICS & REPORTING SECTION ==========
   // Analytics Parent
   {
     path: '/TourismCMS/(admin)/analytics-reporting',
-    allowedRoles: [
-      'tourism_admin',
-      'business_listing_manager',
-      'tourism_content_manager',
-      'business_registration_manager',
-    ],
-  },
-  // Platform Analytics
+    allowedRoles: ANALYTICS_ROLES,
+  }, // Platform Analytics
   {
     path: '/TourismCMS/(admin)/analytics-reporting/platform-analytics',
-    allowedRoles: ['tourism_admin'],
-  },
-  // Business Analytics Detail
+    allowedRoles: ADMIN_ONLY_ROLES,
+  }, // Business Analytics Detail
   {
     path: '/TourismCMS/(admin)/analytics-reporting/business-analytics-detail',
-    allowedRoles: ['tourism_admin', 'business_listing_manager'],
+    allowedRoles: BUSINESS_MANAGEMENT_ROLES,
   },
   // Tourism Analytics
   {
     path: '/TourismCMS/(admin)/analytics-reporting/tourism-analytics',
-    allowedRoles: ['tourism_admin', 'tourism_content_manager'],
+    allowedRoles: TOURISM_CONTENT_ROLES,
   },
   // Registration Analytics
   {
     path: '/TourismCMS/(admin)/analytics-reporting/registration-analytics',
-    allowedRoles: ['tourism_admin', 'business_registration_manager'],
+    allowedRoles: BUSINESS_REGISTRATION_ROLES,
   },
-
   // ========== NEW ANALYTICS & REPORTING ROUTES ==========
   // Analytics & Reporting Routes
   {
     path: '/(sidebar)/analytics-reporting/platform-analytics',
-    allowedRoles: ['tourism_admin'],
+    allowedRoles: ADMIN_ONLY_ROLES,
   },
   {
     path: '/(sidebar)/analytics-reporting/tourism-analytics',
-    allowedRoles: ['tourism_admin'],
+    allowedRoles: ADMIN_ONLY_ROLES,
   },
   {
     path: '/(sidebar)/analytics-reporting/registration-analytics',
-    allowedRoles: ['tourism_admin', 'business_registration_manager'],
+    allowedRoles: BUSINESS_REGISTRATION_ROLES,
   },
   {
     path: '/(sidebar)/analytics-reporting/business-analytics-detail',
-    allowedRoles: ['tourism_admin', 'business_listing_manager'],
+    allowedRoles: BUSINESS_MANAGEMENT_ROLES,
   },
-
   // ========== SYSTEM ADMINISTRATION SECTION ==========
   // System Administration Parent
   {
     path: '/TourismCMS/(admin)/system-administration',
-    allowedRoles: ['tourism_admin'],
+    allowedRoles: ADMIN_ONLY_ROLES,
   },
   // System Settings
   {
     path: '/TourismCMS/(admin)/system-administration/system-settings',
-    allowedRoles: ['tourism_admin'],
+    allowedRoles: ADMIN_ONLY_ROLES,
   },
   // API Management
   {
     path: '/TourismCMS/(admin)/system-administration/api-management',
-    allowedRoles: ['tourism_admin'],
+    allowedRoles: ADMIN_ONLY_ROLES,
   },
   // Security & Backup
   {
     path: '/TourismCMS/(admin)/system-administration/security-backup',
-    allowedRoles: ['tourism_admin'],
+    allowedRoles: ADMIN_ONLY_ROLES,
   },
 
   // ========== LEGACY ROUTES (for backward compatibility) ==========
   // Analytics - All admin roles (but content varies by role)
   {
     path: '/TourismCMS/(admin)/analytics',
-    allowedRoles: [
-      'tourism_admin',
-      'business_listing_manager',
-      'tourism_content_manager',
-      'business_registration_manager',
-    ],
+    allowedRoles: ANALYTICS_ROLES,
   },
   // System Settings (legacy)
   {
     path: '/TourismCMS/(admin)/system-settings',
-    allowedRoles: ['tourism_admin'],
+    allowedRoles: ADMIN_ONLY_ROLES,
   },
   // API Management (legacy)
   {
     path: '/TourismCMS/(admin)/api-management',
-    allowedRoles: ['tourism_admin'],
+    allowedRoles: ADMIN_ONLY_ROLES,
   },
   // Security & Backup (legacy)
   {
     path: '/TourismCMS/(admin)/security-backup',
-    allowedRoles: ['tourism_admin'],
+    allowedRoles: ADMIN_ONLY_ROLES,
   },
 ];
 
