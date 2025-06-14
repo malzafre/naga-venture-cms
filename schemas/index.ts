@@ -25,7 +25,7 @@ export * from './common/baseSchemas';
 export * from './api/responseSchemas';
 export * from './auth/authSchemas';
 export * from './business/businessSchemas';
-export * from './categories/categorySchemas';
+export * from './categoriesSchemas'; // Corrected import
 export * from './tourism/eventSchemas';
 export * from './tourism/touristSpotSchemas';
 

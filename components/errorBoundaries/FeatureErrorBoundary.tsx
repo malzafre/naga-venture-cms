@@ -177,7 +177,7 @@ const FeatureErrorFallback: React.FC<ErrorFallbackProps> = ({
   return (
     <View style={styles.featureErrorContainer}>
       <View style={styles.featureErrorContent}>
-        <Text style={styles.featureErrorIcon}>⚠️</Text>{' '}
+        <Text style={styles.featureErrorIcon}>⚠️</Text>
         <Text style={styles.featureErrorTitle}>{featureName} Error</Text>
         <Text style={styles.featureErrorMessage}>
           This feature encountered an error and couldn&apos;t load properly.

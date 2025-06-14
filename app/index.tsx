@@ -91,7 +91,6 @@ const Index = () => {
               marginTop: 20,
             }}
           >
-            {' '}
             - Where Faith Meets Adventure.
           </Text>
           <View

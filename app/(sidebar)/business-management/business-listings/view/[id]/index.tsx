@@ -130,7 +130,7 @@ export default function ViewBusinessScreen() {
             <Text style={styles.headerTitle}>Business Details</Text>
             <Text style={styles.headerSubtitle}>
               View and manage business information
-            </Text>{' '}
+            </Text>
           </View>
           <CMSButton
             title="Edit"
@@ -153,7 +153,7 @@ export default function ViewBusinessScreen() {
                 <View style={styles.businessInfo}>
                   <Text style={styles.businessName}>
                     {business.business_name}
-                  </Text>{' '}
+                  </Text>
                   <Text style={styles.businessType}>
                     {business.business_type?.replaceAll('_', ' ').toUpperCase()}
                   </Text>
@@ -171,10 +171,10 @@ export default function ViewBusinessScreen() {
               <View style={styles.metaInfo}>
                 <Text style={styles.metaText}>
                   Created: {new Date(business.created_at).toLocaleDateString()}
-                </Text>{' '}
+                </Text>
                 {business.review_count > 0 && (
                   <Text style={styles.metaText}>
-                    Reviews: {business.review_count} • Rating:{' '}
+                    Reviews: {business.review_count} • Rating:
                     {business.average_rating?.toFixed(1) || 'N/A'}
                   </Text>
                 )}

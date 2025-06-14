@@ -38,7 +38,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       <View style={styles.overlay}>
         <View style={styles.modal}>
           <Text style={styles.title}>{title}</Text>
-          <Text style={styles.message}>{message}</Text>{' '}
+          <Text style={styles.message}>{message}</Text>
           <View style={styles.buttonContainer}>
             {cancelText ? (
               <CMSButton

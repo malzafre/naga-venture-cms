@@ -13,8 +13,6 @@ import {
   NameSchema,
   PaginationQuerySchema,
   PaginationResponseSchema,
-  TextContentSchema,
-  UrlSchema,
   UuidSchema,
 } from '../common/baseSchemas';
 
@@ -28,8 +26,8 @@ import {
 export const MainCategorySchema = z.object({
   id: UuidSchema,
   name: NameSchema,
-  description: TextContentSchema.optional(),
-  icon_url: UrlSchema,
+  description: z.string().nullable().optional(),
+  icon_url: z.string().nullable().optional(),
   is_active: z.boolean(),
   display_order: z.number().int().min(0),
   created_at: DateSchema,
@@ -43,8 +41,11 @@ export const MainCategorySchema = z.object({
  */
 export const MainCategoryCreateFormSchema = z.object({
   name: NameSchema,
-  description: TextContentSchema.optional(),
-  icon_url: UrlSchema,
+  description: z
+    .string()
+    .max(500, 'Description must be less than 500 characters')
+    .optional()
+    .or(z.literal('')),
   is_active: z.boolean().default(true),
   display_order: z.number().int().min(0).default(0),
 });
@@ -61,7 +62,6 @@ export const MainCategoryUpdateFormSchema =
 export const MainCategoryInsertSchema = z.object({
   name: NameSchema,
   description: z.string().nullable(),
-  icon_url: z.string().nullable(),
   is_active: z.boolean().default(true),
   display_order: z.number().int().min(0).default(0),
   created_by: UuidSchema.optional(),
@@ -86,8 +86,8 @@ export const SubCategorySchema = z.object({
   id: UuidSchema,
   main_category_id: UuidSchema,
   name: NameSchema,
-  description: TextContentSchema.optional(),
-  icon_url: UrlSchema,
+  description: z.string().nullable().optional(),
+  icon_url: z.string().nullable().optional(),
   is_active: z.boolean(),
   display_order: z.number().int().min(0),
   created_at: DateSchema,
@@ -113,8 +113,11 @@ export const SubCategoryWithMainSchema = SubCategorySchema.extend({
 export const SubCategoryCreateFormSchema = z.object({
   main_category_id: UuidSchema,
   name: NameSchema,
-  description: TextContentSchema.optional(),
-  icon_url: UrlSchema,
+  description: z
+    .string()
+    .max(500, 'Description must be less than 500 characters')
+    .optional()
+    .or(z.literal('')),
   is_active: z.boolean().default(true),
   display_order: z.number().int().min(0).default(0),
 });
@@ -132,7 +135,6 @@ export const SubCategoryInsertSchema = z.object({
   main_category_id: UuidSchema,
   name: NameSchema,
   description: z.string().nullable(),
-  icon_url: z.string().nullable(),
   is_active: z.boolean().default(true),
   display_order: z.number().int().min(0).default(0),
   created_by: UuidSchema.optional(),

@@ -93,7 +93,7 @@ export default function BusinessForm({
       <Text style={styles.stepTitle}>Basic Information</Text>
       <Text style={styles.stepDescription}>
         Provide the basic details about your business
-      </Text>{' '}
+      </Text>
       <Controller
         key="business_name"
         control={control}
@@ -166,7 +166,7 @@ export default function BusinessForm({
       <Text style={styles.stepTitle}>Location Details</Text>
       <Text style={styles.stepDescription}>
         Provide the location and address information
-      </Text>{' '}
+      </Text>
       <Controller
         key="address"
         control={control}
@@ -224,7 +224,7 @@ export default function BusinessForm({
             )}
           />
         </View>
-      </View>{' '}
+      </View>
       <Controller
         key="postal_code"
         control={control}
@@ -297,7 +297,7 @@ export default function BusinessForm({
       <Text style={styles.stepTitle}>Contact Information</Text>
       <Text style={styles.stepDescription}>
         Add contact details and social media links (all optional)
-      </Text>{' '}
+      </Text>
       <Controller
         key="phone"
         control={control}
@@ -314,7 +314,7 @@ export default function BusinessForm({
             editable={!isLoading}
           />
         )}
-      />{' '}
+      />
       <Controller
         key="email"
         control={control}
@@ -332,7 +332,7 @@ export default function BusinessForm({
             editable={!isLoading}
           />
         )}
-      />{' '}
+      />
       <Controller
         key="website"
         control={control}
@@ -351,7 +351,7 @@ export default function BusinessForm({
           />
         )}
       />
-      <Text style={styles.sectionTitle}>Social Media Links</Text>{' '}
+      <Text style={styles.sectionTitle}>Social Media Links</Text>
       <Controller
         key="facebook_url"
         control={control}
@@ -369,7 +369,7 @@ export default function BusinessForm({
             editable={!isLoading}
           />
         )}
-      />{' '}
+      />
       <Controller
         key="instagram_url"
         control={control}
@@ -387,7 +387,7 @@ export default function BusinessForm({
             editable={!isLoading}
           />
         )}
-      />{' '}
+      />
       <Controller
         key="twitter_url"
         control={control}
@@ -487,7 +487,7 @@ export default function BusinessForm({
               style={styles.navButton}
               disabled={isLoading || isNavigating}
             />
-          )}{' '}
+          )}
           <CMSButton
             title="Cancel"
             onPress={handleCancelClick}

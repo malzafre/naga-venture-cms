@@ -264,7 +264,7 @@ export default function AllBusinessesScreen() {
           placeholderTextColor="#9CA3AF"
         />
       </View>
-      {/* Filter Toggle */}{' '}
+      {/* Filter Toggle */}
       <TouchableOpacity
         style={styles.filterButton}
         onPress={() => toggleShowFilters()}
@@ -279,7 +279,6 @@ export default function AllBusinessesScreen() {
             <View style={styles.filterGroup}>
               <Text style={styles.filterLabel}>Status</Text>
               <View style={styles.pickerContainer}>
-                {' '}
                 <Picker
                   selectedValue={filters.status || ''}
                   onValueChange={(value) =>
@@ -299,7 +298,6 @@ export default function AllBusinessesScreen() {
             <View style={styles.filterGroup}>
               <Text style={styles.filterLabel}>Business Type</Text>
               <View style={styles.pickerContainer}>
-                {' '}
                 <Picker
                   selectedValue={filters.business_type || ''}
                   onValueChange={(value) =>
@@ -361,7 +359,7 @@ export default function AllBusinessesScreen() {
           {__DEV__ && (
             <View style={styles.debugContainer}>
               <Text style={styles.debugText}>
-                Debug Info:{' '}
+                Debug Info:
                 {JSON.stringify(
                   {
                     hasBusinessData: !!businessData,
