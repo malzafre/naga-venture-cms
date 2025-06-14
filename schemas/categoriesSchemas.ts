@@ -6,7 +6,7 @@ import { z } from 'zod';
 // Base schema for common category fields
 const CategoryBaseSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long'),
-  description: z.string().optional(),
+  description: z.string().nullable().optional(),
   is_active: z.boolean().default(true),
   display_order: z.number().int().min(0).default(0),
   // icon_url is intentionally omitted as per requirements

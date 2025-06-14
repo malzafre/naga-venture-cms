@@ -358,7 +358,7 @@ const CategoryDetailPanel: React.FC<CategoryDetailPanelProps> = ({
           <Text style={styles.sectionTitle}>
             Subcategories ({mainCategory.sub_categories.length})
           </Text>
-          <ScrollView 
+          <ScrollView
             style={styles.subcategoriesList}
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}

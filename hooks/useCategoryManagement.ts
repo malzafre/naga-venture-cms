@@ -597,9 +597,12 @@ export function useCreateSubCategory() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.categories.subLists(),
       });
+
+      // CRITICAL FIX: Invalidate all main category lists to refresh subcategory data
       queryClient.invalidateQueries({
         queryKey: queryKeys.categories.mainLists(),
       });
+
       queryClient.setQueryData(
         queryKeys.categories.subDetail(newCategory.id),
         newCategory
@@ -669,9 +672,12 @@ export function useUpdateSubCategory() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.categories.subLists(),
       });
+
+      // CRITICAL FIX: Invalidate all main category lists to refresh subcategory data
       queryClient.invalidateQueries({
         queryKey: queryKeys.categories.mainLists(),
       });
+
       queryClient.setQueryData(
         queryKeys.categories.subDetail(updatedCategory.id),
         updatedCategory
@@ -726,9 +732,12 @@ export function useDeleteSubCategory() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.categories.subLists(),
       });
+
+      // CRITICAL FIX: Invalidate all main category lists to refresh subcategory data
       queryClient.invalidateQueries({
         queryKey: queryKeys.categories.mainLists(),
       });
+
       queryClient.removeQueries({
         queryKey: queryKeys.categories.subDetail(deletedSubCategoryId),
       });

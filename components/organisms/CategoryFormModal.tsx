@@ -25,14 +25,13 @@ import {
   useUpdateMainCategory,
   useUpdateSubCategory,
 } from '@/hooks/useCategoryManagement';
+import { type MainCategory, type SubCategory } from '@/schemas';
 import {
-  MainCategoryInsertSchema,
-  MainCategoryUpdateSchema,
-  SubCategoryInsertSchema,
-  SubCategoryUpdateSchema,
-  type MainCategory,
-  type SubCategory,
-} from '@/schemas';
+  MainCategoryCreateFormSchema,
+  MainCategoryUpdateFormSchema,
+  SubCategoryCreateFormSchema,
+  SubCategoryUpdateFormSchema,
+} from '@/schemas/categories/categorySchemas';
 
 // ============================================================================
 // TYPES
@@ -64,19 +63,19 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
   const updateMainCategoryMutation = useUpdateMainCategory();
   const createSubCategoryMutation = useCreateSubCategory();
   const updateSubCategoryMutation = useUpdateSubCategory();
+
   // Form setup based on type and mode
   const schema = React.useMemo(() => {
     if (type === 'main') {
       return mode === 'create'
-        ? MainCategoryInsertSchema
-        : MainCategoryUpdateSchema;
+        ? MainCategoryCreateFormSchema
+        : MainCategoryUpdateFormSchema;
     } else {
       return mode === 'create'
-        ? SubCategoryInsertSchema.omit({ main_category_id: true })
-        : SubCategoryUpdateSchema.omit({ main_category_id: true });
+        ? SubCategoryCreateFormSchema.omit({ main_category_id: true })
+        : SubCategoryUpdateFormSchema.omit({ main_category_id: true });
     }
   }, [type, mode]);
-
   const {
     control,
     handleSubmit,
@@ -91,6 +90,12 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
       display_order: 0,
     },
   });
+  // Check if any mutation is in progress
+  const isMutationInProgress =
+    createMainCategoryMutation.isPending ||
+    updateMainCategoryMutation.isPending ||
+    createSubCategoryMutation.isPending ||
+    updateSubCategoryMutation.isPending;
 
   // Reset form when modal opens with category data
   useEffect(() => {
@@ -112,53 +117,107 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
       }
     }
   }, [isVisible, mode, category, reset]);
+
   // Form submission handler
   const onSubmit = async (data: any) => {
     try {
+      let successMessage = '';
+
+      // Helper function to properly transform description for API
+      const transformDescription = (
+        desc: string | undefined
+      ): string | null => {
+        return desc && desc.trim() !== '' ? desc.trim() : null;
+      };
+
       if (type === 'main') {
         if (mode === 'create') {
-          await createMainCategoryMutation.mutateAsync({
+          // For create operations, prepare data with correct types
+          const createData: any = {
             name: data.name,
-            description: data.description || null,
             is_active: data.is_active ?? true,
             display_order: data.display_order ?? 0,
-          });
+          };
+
+          // Only include description if it has content
+          const description = transformDescription(data.description);
+          if (description !== null) {
+            createData.description = description;
+          }
+
+          await createMainCategoryMutation.mutateAsync(createData);
+          successMessage = 'Main category created successfully';
         } else if (mode === 'edit' && category) {
+          // For update operations, only include defined fields
+          const updateData: any = {
+            name: data.name,
+            is_active: data.is_active,
+            display_order: data.display_order,
+          };
+
+          // Only include description if it has a meaningful value
+          const description = transformDescription(data.description);
+          if (description !== null) {
+            updateData.description = description;
+          }
+
           await updateMainCategoryMutation.mutateAsync({
             id: category.id,
-            updates: {
-              name: data.name,
-              description: data.description || null,
-              is_active: data.is_active,
-              display_order: data.display_order,
-            },
+            updates: updateData,
           });
+          successMessage = 'Main category updated successfully';
         }
       } else {
         if (mode === 'create' && parentCategoryId) {
-          await createSubCategoryMutation.mutateAsync({
+          // For create operations, prepare data with correct types
+          const createData: any = {
             main_category_id: parentCategoryId,
             name: data.name,
-            description: data.description || null,
             is_active: data.is_active ?? true,
             display_order: data.display_order ?? 0,
-          });
+          };
+
+          // Only include description if it has content
+          const description = transformDescription(data.description);
+          if (description !== null) {
+            createData.description = description;
+          }
+
+          await createSubCategoryMutation.mutateAsync(createData);
+          successMessage = 'Sub-category created successfully';
         } else if (mode === 'edit' && category) {
+          // For update operations, only include defined fields
+          const updateData: any = {
+            name: data.name,
+            is_active: data.is_active,
+            display_order: data.display_order,
+          };
+
+          // Only include description if it has a meaningful value
+          const description = transformDescription(data.description);
+          if (description !== null) {
+            updateData.description = description;
+          }
+
           await updateSubCategoryMutation.mutateAsync({
             id: category.id,
-            updates: {
-              name: data.name,
-              description: data.description || null,
-              is_active: data.is_active,
-              display_order: data.display_order,
-            },
+            updates: updateData,
           });
+          successMessage = 'Sub-category updated successfully';
         }
       }
 
-      onClose();
+      // Success: reset form, close modal, and show success message
       reset();
+      onClose();
+
+      // Show success message after a small delay to ensure modal is closed
+      setTimeout(() => {
+        Alert.alert('Success', successMessage);
+      }, 100);
     } catch (error) {
+      // Error handling - show alert but keep modal open
+      console.error('Form submission error:', error);
       Alert.alert(
         'Error',
         error instanceof Error ? error.message : 'An error occurred'
@@ -300,17 +359,18 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
             >
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
               style={[
                 styles.button,
                 styles.submitButton,
-                isSubmitting && styles.buttonDisabled,
+                (isSubmitting || isMutationInProgress) && styles.buttonDisabled,
               ]}
               onPress={handleSubmit(onSubmit)}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isMutationInProgress}
             >
               <Text style={styles.submitButtonText}>
-                {isSubmitting
+                {isSubmitting || isMutationInProgress
                   ? 'Saving...'
                   : mode === 'create'
                     ? 'Create'
