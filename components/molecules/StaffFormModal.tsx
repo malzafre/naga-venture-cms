@@ -125,16 +125,35 @@ export default function StaffFormModal({
         permissions,
       },
       {
-        onSuccess: () => {
-          Alert.alert('Success', 'Staff member created successfully');
+        onSuccess: (data) => {
+          const hasTemporaryPassword = data.temporaryPassword;
+
+          Alert.alert(
+            'Staff Created Successfully!',
+            hasTemporaryPassword
+              ? `${data.message}\n\nTemporary Password: ${data.temporaryPassword}\n\nPlease save this password and share it securely with the staff member.`
+              : data.message || 'Staff member created successfully!',
+            [
+              {
+                text: 'Copy Password',
+                onPress: () => {
+                  if (hasTemporaryPassword) {
+                    // In a real app, you'd use Clipboard API
+                    console.log('Password copied:', data.temporaryPassword);
+                  }
+                },
+                style: hasTemporaryPassword ? 'default' : 'cancel',
+              },
+              { text: 'OK', style: 'default' },
+            ]
+          );
           handleClose();
           onSuccess?.();
         },
         onError: (error) => {
-          Alert.alert(
-            'Error',
-            `Failed to create staff member: ${error.message}`
-          );
+          Alert.alert('Error', `Failed to send invitation: ${error.message}`, [
+            { text: 'OK', style: 'destructive' },
+          ]);
         },
       }
     );

@@ -34,6 +34,20 @@ import {
 } from '@/schemas';
 
 // ============================================================================
+// CONSTANTS
+// ============================================================================
+
+/**
+ * Staff roles constant - used across multiple hooks to avoid re-creation
+ */
+const STAFF_ROLES: UserRole[] = [
+  'tourism_admin',
+  'business_listing_manager',
+  'tourism_content_manager',
+  'business_registration_manager',
+] as const;
+
+// ============================================================================
 // ERROR HANDLING
 // ============================================================================
 
@@ -604,20 +618,12 @@ export function useUserDashboardData() {
  * Filters user listings to show only staff members (admins and managers)
  */
 export function useStaffListings(filters: UserFilters = {}) {
-  // Staff roles only
-  const staffRoles: UserRole[] = [
-    'tourism_admin',
-    'business_listing_manager',
-    'tourism_content_manager',
-    'business_registration_manager',
-  ];
-
   // If a specific role is provided and it's a staff role, use it
   // Otherwise, we'll filter results client-side to show all staff
   const queryFilters: UserFilters = {
     ...filters,
     role:
-      filters.role && staffRoles.includes(filters.role)
+      filters.role && STAFF_ROLES.includes(filters.role)
         ? filters.role
         : undefined,
   };
@@ -630,9 +636,9 @@ export function useStaffListings(filters: UserFilters = {}) {
 
     return {
       ...query.data,
-      data: query.data.data.filter((user) => staffRoles.includes(user.role)),
+      data: query.data.data.filter((user) => STAFF_ROLES.includes(user.role)),
     };
-  }, [query.data, filters.role, staffRoles]);
+  }, [query.data, filters.role]);
 
   return {
     ...query,
@@ -641,10 +647,14 @@ export function useStaffListings(filters: UserFilters = {}) {
 }
 
 /**
+ * Staff creation hook using Edge Function for secure user creation
+ */
+
+/**
  * Create Staff Member Hook
  *
- * Creates a new staff member with specified role and permissions
- * Note: Requires admin privileges and uses Supabase Auth Admin API
+ * Creates a new staff member with auto-generated password sent via email
+ * More practical approach for CMS staff management
  */
 export function useCreateStaff() {
   const queryClient = useQueryClient();
@@ -683,79 +693,49 @@ export function useCreateStaff() {
         });
 
       // Validate that the role is a staff role
-      const staffRoles: UserRole[] = [
-        'tourism_admin',
-        'business_listing_manager',
-        'tourism_content_manager',
-        'business_registration_manager',
-      ];
-
-      if (!staffRoles.includes(validatedData.role)) {
+      if (!STAFF_ROLES.includes(validatedData.role)) {
         throw new Error('Invalid staff role specified');
       }
 
       try {
-        // Create the user in Supabase Auth (requires service role key)
-        const { data: authUser, error: authError } =
-          await supabase.auth.admin.createUser({
-            email: validatedData.email,
-            email_confirm: true,
-            user_metadata: {
-              first_name: validatedData.firstName,
-              last_name: validatedData.lastName,
+        // Use the Edge Function to create staff user with service role privileges
+        const { data: result, error: edgeFunctionError } =
+          await supabase.functions.invoke('create-staff-user-final', {
+            body: {
+              email: validatedData.email,
               role: validatedData.role,
+              firstName: validatedData.firstName,
+              lastName: validatedData.lastName,
+              phoneNumber: validatedData.phoneNumber,
+              permissions: permissions,
             },
           });
 
-        if (authError || !authUser.user) {
+        if (edgeFunctionError) {
           throw new Error(
-            `Failed to create auth user: ${authError?.message || 'Unknown error'}`
+            `Failed to create staff user: ${edgeFunctionError.message}`
           );
         }
 
-        const userId = authUser.user.id;
+        if (!result || !result.success) {
+          throw new Error(result?.error || 'Failed to create staff user');
+        }
 
-        // Update the profile with additional data
-        const profileUpdate = {
-          first_name: validatedData.firstName || null,
-          last_name: validatedData.lastName || null,
-          phone_number: validatedData.phoneNumber || null,
-          role: validatedData.role,
-          is_verified: true, // Staff members are auto-verified
+        // Return the result from the Edge Function
+        return {
+          id: result.user.id,
+          email: result.user.email,
+          role: result.user.role as UserRole,
+          first_name: result.user.firstName || null,
+          last_name: result.user.lastName || null,
+          phone_number: null,
+          profile_image_url: null,
+          is_verified: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          temporaryPassword: result.user.temporaryPassword,
+          message: result.message,
         };
-
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .update(profileUpdate)
-          .eq('id', userId)
-          .select()
-          .single();
-
-        if (profileError) {
-          throw new Error(`Failed to update profile: ${profileError.message}`);
-        }
-
-        // Create staff permissions if provided
-        if (Object.keys(permissions).length > 0) {
-          const { error: permissionsError } = await supabase
-            .from('staff_permissions')
-            .insert({
-              profile_id: userId,
-              ...permissions,
-            });
-
-          if (permissionsError) {
-            console.warn(
-              'Failed to create staff permissions:',
-              permissionsError
-            );
-            // Don't throw here as the staff member was created successfully
-          }
-        }
-
-        // Validate and return the profile data
-        const validatedProfile = ProfileSchema.parse(profile);
-        return validatedProfile;
       } catch (error) {
         handleUserError(error, 'create staff member', {
           email: validatedData.email,
@@ -796,14 +776,7 @@ export function useUpdateStaffRole() {
       const validatedRole = UserRoleSchema.parse(newRole);
 
       // Validate that the new role is a staff role
-      const staffRoles: UserRole[] = [
-        'tourism_admin',
-        'business_listing_manager',
-        'tourism_content_manager',
-        'business_registration_manager',
-      ];
-
-      if (!staffRoles.includes(validatedRole)) {
+      if (!STAFF_ROLES.includes(validatedRole)) {
         throw new Error('Invalid staff role specified');
       }
 
@@ -884,14 +857,6 @@ export function useUpdateStaffRole() {
  * Fetches staff members along with their permission details
  */
 export function useStaffWithPermissions(filters: UserFilters = {}) {
-  // Staff roles only
-  const staffRoles: UserRole[] = [
-    'tourism_admin',
-    'business_listing_manager',
-    'tourism_content_manager',
-    'business_registration_manager',
-  ];
-
   const cacheConfig = DOMAIN_CACHE_CONFIG.users;
 
   return useQuery({
@@ -906,10 +871,10 @@ export function useStaffWithPermissions(filters: UserFilters = {}) {
       );
 
       // Filter to staff roles only
-      query = query.in('role', staffRoles);
+      query = query.in('role', STAFF_ROLES);
 
       // Apply additional filters
-      if (filters.role && staffRoles.includes(filters.role)) {
+      if (filters.role && STAFF_ROLES.includes(filters.role)) {
         query = query.eq('role', filters.role);
       }
 
@@ -958,11 +923,82 @@ export function useStaffWithPermissions(filters: UserFilters = {}) {
       return {
         data: validatedData,
         count: response.count,
-        hasMore: validatedData.length === (filters.limit || 20),
+        hasMore: validatedData.data.length === (filters.limit || 20),
       };
     },
     ...cacheConfig,
     placeholderData: keepPreviousData,
-    retry: cacheUtils.getRetryConfig('standard'),
+    retry: cacheUtils.getRetryConfig('normal'),
   });
+}
+
+// ============================================================================
+// DELETE USER MUTATION
+// ============================================================================
+
+/**
+ * Mutation for deleting user accounts
+ */
+export function useDeleteUser() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      email,
+    }: {
+      userId?: string;
+      email?: string;
+    }) => {
+      if (!userId && !email) {
+        throw new Error('Either userId or email is required');
+      }
+
+      const { data, error } = await supabase.functions.invoke(
+        'delete-user-account',
+        {
+          body: {
+            userId,
+            email,
+          },
+        }
+      );
+
+      if (error) {
+        console.error('Delete user error:', error);
+        throw new Error(`Failed to delete user: ${error.message}`);
+      }
+
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to delete user');
+      }
+
+      return data;
+    },
+    onSuccess: (data) => {
+      // Invalidate all user-related queries
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.users.all,
+      });
+
+      console.log('User deleted successfully:', data.deletedUser?.email);
+    },
+    onError: (error) => {
+      console.error('Delete user mutation error:', error);
+    },
+  });
+}
+
+/**
+ * Quick delete function for convenience
+ */
+export function useQuickDeleteUser() {
+  const deleteUser = useDeleteUser();
+
+  return {
+    deleteByEmail: (email: string) => deleteUser.mutate({ email }),
+    deleteById: (userId: string) => deleteUser.mutate({ userId }),
+    isDeleting: deleteUser.isPending,
+    error: deleteUser.error,
+  };
 }
