@@ -25,7 +25,6 @@ module.exports = defineConfig([
         {
           endOfLine: 'auto', // Use auto line endings to avoid conflicts
           useTabs: false, // Use spaces instead of tabs
-          tabWidth: 2,
           singleQuote: true,
           semi: true,
           trailingComma: 'es5',

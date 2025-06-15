@@ -92,6 +92,36 @@ const queryKeys = {
     usage: (type: 'business' | 'tourist_spot') =>
       [...queryKeys.categories.all, 'usage', type] as const,
   },
+
+  // User Management Domain
+  users: {
+    all: ['users'] as const,
+    lists: () => [...queryKeys.users.all, 'list'] as const,
+    list: (filters: Record<string, unknown>) =>
+      [...queryKeys.users.lists(), { ...filters }] as const,
+    details: () => [...queryKeys.users.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.users.details(), id] as const,
+
+    // Staff-specific queries
+    staff: () => [...queryKeys.users.all, 'staff'] as const,
+    staffWithPermissions: (filters: Record<string, unknown>) =>
+      [...queryKeys.users.staff(), 'permissions', { ...filters }] as const,
+
+    // User filtering
+    byRole: (role: string) => [...queryKeys.users.lists(), { role }] as const,
+    byStatus: (isVerified: boolean) =>
+      [...queryKeys.users.lists(), { is_verified: isVerified }] as const,
+    search: (query: string) =>
+      [...queryKeys.users.all, 'search', query] as const,
+  },
+
+  // Analytics Domain
+  analytics: {
+    all: ['analytics'] as const,
+    userStats: () => [...queryKeys.analytics.all, 'users'] as const,
+    businessStats: () => [...queryKeys.analytics.all, 'businesses'] as const,
+    categoryStats: () => [...queryKeys.analytics.all, 'categories'] as const,
+  },
 };
 
 export default queryKeys;

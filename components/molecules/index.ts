@@ -2,6 +2,7 @@ export { default as CMSHeader } from './CMSHeader';
 export { CMSNavigationSection } from './CMSNavigationSection';
 export { default as CMSStatCard } from './CMSStatCard';
 export { default as DataTable } from './DataTable';
+export { default as StaffFormModal } from './StaffFormModal';
 export { StatusBadge } from './StatusBadge';
 
 // Export types

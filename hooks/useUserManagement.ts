@@ -16,6 +16,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import React from 'react';
 import { z } from 'zod';
 
 import { DOMAIN_CACHE_CONFIG, cacheUtils } from '@/constants/CacheConstants';
@@ -591,4 +592,377 @@ export function useUserDashboardData() {
       recentUsersQuery.error ||
       unverifiedUsersQuery.error,
   };
+}
+
+// ============================================================================
+// STAFF MANAGEMENT HOOKS
+// ============================================================================
+
+/**
+ * Staff-Only User Listings Hook
+ *
+ * Filters user listings to show only staff members (admins and managers)
+ */
+export function useStaffListings(filters: UserFilters = {}) {
+  // Staff roles only
+  const staffRoles: UserRole[] = [
+    'tourism_admin',
+    'business_listing_manager',
+    'tourism_content_manager',
+    'business_registration_manager',
+  ];
+
+  // If a specific role is provided and it's a staff role, use it
+  // Otherwise, we'll filter results client-side to show all staff
+  const queryFilters: UserFilters = {
+    ...filters,
+    role:
+      filters.role && staffRoles.includes(filters.role)
+        ? filters.role
+        : undefined,
+  };
+
+  const query = useUserListings(queryFilters);
+
+  // If no specific role filter, filter results to only include staff roles
+  const filteredData = React.useMemo(() => {
+    if (!query.data || filters.role) return query.data;
+
+    return {
+      ...query.data,
+      data: query.data.data.filter((user) => staffRoles.includes(user.role)),
+    };
+  }, [query.data, filters.role, staffRoles]);
+
+  return {
+    ...query,
+    data: filteredData,
+  };
+}
+
+/**
+ * Create Staff Member Hook
+ *
+ * Creates a new staff member with specified role and permissions
+ * Note: Requires admin privileges and uses Supabase Auth Admin API
+ */
+export function useCreateStaff() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      email,
+      role,
+      firstName = '',
+      lastName = '',
+      phoneNumber = '',
+      permissions = {},
+    }: {
+      email: string;
+      role: UserRole;
+      firstName?: string;
+      lastName?: string;
+      phoneNumber?: string;
+      permissions?: Partial<StaffPermissions>;
+    }) => {
+      // Validate input data
+      const validatedData = z
+        .object({
+          email: z.string().email('Invalid email address'),
+          role: UserRoleSchema,
+          firstName: z.string().optional(),
+          lastName: z.string().optional(),
+          phoneNumber: z.string().optional(),
+        })
+        .parse({
+          email,
+          role,
+          firstName,
+          lastName,
+          phoneNumber,
+        });
+
+      // Validate that the role is a staff role
+      const staffRoles: UserRole[] = [
+        'tourism_admin',
+        'business_listing_manager',
+        'tourism_content_manager',
+        'business_registration_manager',
+      ];
+
+      if (!staffRoles.includes(validatedData.role)) {
+        throw new Error('Invalid staff role specified');
+      }
+
+      try {
+        // Create the user in Supabase Auth (requires service role key)
+        const { data: authUser, error: authError } =
+          await supabase.auth.admin.createUser({
+            email: validatedData.email,
+            email_confirm: true,
+            user_metadata: {
+              first_name: validatedData.firstName,
+              last_name: validatedData.lastName,
+              role: validatedData.role,
+            },
+          });
+
+        if (authError || !authUser.user) {
+          throw new Error(
+            `Failed to create auth user: ${authError?.message || 'Unknown error'}`
+          );
+        }
+
+        const userId = authUser.user.id;
+
+        // Update the profile with additional data
+        const profileUpdate = {
+          first_name: validatedData.firstName || null,
+          last_name: validatedData.lastName || null,
+          phone_number: validatedData.phoneNumber || null,
+          role: validatedData.role,
+          is_verified: true, // Staff members are auto-verified
+        };
+
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .update(profileUpdate)
+          .eq('id', userId)
+          .select()
+          .single();
+
+        if (profileError) {
+          throw new Error(`Failed to update profile: ${profileError.message}`);
+        }
+
+        // Create staff permissions if provided
+        if (Object.keys(permissions).length > 0) {
+          const { error: permissionsError } = await supabase
+            .from('staff_permissions')
+            .insert({
+              profile_id: userId,
+              ...permissions,
+            });
+
+          if (permissionsError) {
+            console.warn(
+              'Failed to create staff permissions:',
+              permissionsError
+            );
+            // Don't throw here as the staff member was created successfully
+          }
+        }
+
+        // Validate and return the profile data
+        const validatedProfile = ProfileSchema.parse(profile);
+        return validatedProfile;
+      } catch (error) {
+        handleUserError(error, 'create staff member', {
+          email: validatedData.email,
+          role: validatedData.role,
+        });
+        throw error;
+      }
+    },
+
+    onSuccess: () => {
+      // Invalidate all user-related queries
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.analytics.all });
+    },
+
+    retry: false, // Don't retry user creation
+  });
+}
+
+/**
+ * Update Staff Role Hook
+ *
+ * Updates a staff member's role with validation
+ */
+export function useUpdateStaffRole() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      newRole,
+    }: {
+      userId: string;
+      newRole: UserRole;
+    }) => {
+      // Validate input data
+      const validatedId = z.string().uuid().parse(userId);
+      const validatedRole = UserRoleSchema.parse(newRole);
+
+      // Validate that the new role is a staff role
+      const staffRoles: UserRole[] = [
+        'tourism_admin',
+        'business_listing_manager',
+        'tourism_content_manager',
+        'business_registration_manager',
+      ];
+
+      if (!staffRoles.includes(validatedRole)) {
+        throw new Error('Invalid staff role specified');
+      }
+
+      try {
+        // Update the user's role
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .update({ role: validatedRole })
+          .eq('id', validatedId)
+          .select()
+          .single();
+
+        if (error) {
+          throw new Error(`Failed to update role: ${error.message}`);
+        }
+
+        // Validate and return the updated profile
+        const validatedProfile = ProfileSchema.parse(profile);
+        return validatedProfile;
+      } catch (error) {
+        handleUserError(error, 'update staff role', {
+          userId: validatedId,
+          newRole: validatedRole,
+        });
+        throw error;
+      }
+    },
+
+    onMutate: async ({ userId, newRole }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({
+        queryKey: queryKeys.users.detail(userId),
+      });
+      await queryClient.cancelQueries({ queryKey: queryKeys.users.lists() });
+
+      // Snapshot previous value
+      const previousUser = queryClient.getQueryData(
+        queryKeys.users.detail(userId)
+      );
+
+      // Optimistically update
+      if (previousUser) {
+        queryClient.setQueryData(queryKeys.users.detail(userId), {
+          ...previousUser,
+          role: newRole,
+        });
+      }
+
+      return { previousUser };
+    },
+
+    onError: (err, { userId }, context) => {
+      // Revert optimistic update
+      if (context?.previousUser) {
+        queryClient.setQueryData(
+          queryKeys.users.detail(userId),
+          context.previousUser
+        );
+      }
+    },
+
+    onSuccess: (data, { userId }) => {
+      // Update cache with new data
+      queryClient.setQueryData(queryKeys.users.detail(userId), data);
+
+      // Invalidate list queries
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.analytics.all });
+    },
+
+    retry: cacheUtils.getRetryConfig('critical'),
+  });
+}
+
+/**
+ * Staff Members with Permissions Hook
+ *
+ * Fetches staff members along with their permission details
+ */
+export function useStaffWithPermissions(filters: UserFilters = {}) {
+  // Staff roles only
+  const staffRoles: UserRole[] = [
+    'tourism_admin',
+    'business_listing_manager',
+    'tourism_content_manager',
+    'business_registration_manager',
+  ];
+
+  const cacheConfig = DOMAIN_CACHE_CONFIG.users;
+
+  return useQuery({
+    queryKey: queryKeys.users.staffWithPermissions(filters),
+    queryFn: async () => {
+      let query = supabase.from('profiles').select(
+        `
+          *,
+          staff_permissions(*)
+        `,
+        { count: 'exact' }
+      );
+
+      // Filter to staff roles only
+      query = query.in('role', staffRoles);
+
+      // Apply additional filters
+      if (filters.role && staffRoles.includes(filters.role)) {
+        query = query.eq('role', filters.role);
+      }
+
+      if (filters.is_verified !== undefined) {
+        query = query.eq('is_verified', filters.is_verified);
+      }
+
+      if (filters.searchQuery && filters.searchQuery.trim()) {
+        const searchTerm = filters.searchQuery.trim();
+        query = query.or(
+          `first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`
+        );
+      }
+
+      // Apply sorting
+      query = query.order(filters.sortBy || 'created_at', {
+        ascending: filters.sortOrder === 'asc',
+      });
+
+      // Apply pagination
+      if (filters.page && filters.limit) {
+        const from = (filters.page - 1) * filters.limit;
+        const to = from + filters.limit - 1;
+        query = query.range(from, to);
+      }
+
+      const response = await query;
+
+      if (response.error) {
+        handleUserError(
+          response.error,
+          'fetch staff with permissions',
+          filters
+        );
+      }
+
+      // Validate response
+      const validatedData = validateSupabaseListResponse(
+        z.object({
+          ...ProfileSchema.shape,
+          staff_permissions: z.array(StaffPermissionsSchema).nullable(),
+        }),
+        response
+      );
+
+      return {
+        data: validatedData,
+        count: response.count,
+        hasMore: validatedData.length === (filters.limit || 20),
+      };
+    },
+    ...cacheConfig,
+    placeholderData: keepPreviousData,
+    retry: cacheUtils.getRetryConfig('standard'),
+  });
 }
