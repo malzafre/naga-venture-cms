@@ -1,12 +1,13 @@
-import React, { memo } from 'react';
+import { FlashList } from '@shopify/flash-list';
+import React, { memo, useMemo } from 'react';
 import {
   ActivityIndicator,
   Platform,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from 'react-native';
 
 /**
@@ -20,7 +21,7 @@ import {
 export interface DataTableColumn<T = any> {
   key: string;
   title: string;
-  width?: number | string;
+  width?: number;
   minWidth?: number;
   sortable?: boolean;
   render?: (value: any, item: T, index: number) => React.ReactNode;
@@ -36,6 +37,8 @@ export interface DataTableProps<T = any> {
   showRowIndex?: boolean;
   maxHeight?: number;
   style?: any;
+  fixedHeight?: boolean; // New prop to disable scrolling and use fixed height
+  expectedRowCount?: number; // Number of rows to reserve space for (useful for pagination)
 }
 
 export const DataTable = <T extends Record<string, any>>({
@@ -47,7 +50,136 @@ export const DataTable = <T extends Record<string, any>>({
   showRowIndex = false,
   maxHeight,
   style,
+  fixedHeight = false,
+  expectedRowCount = 10,
 }: DataTableProps<T>) => {
+  // Get screen dimensions for responsive calculations
+  const { height: screenHeight, width: screenWidth } = useWindowDimensions();
+
+  // Calculate responsive row count based on screen size
+  const responsiveRowCount = useMemo(() => {
+    if (!fixedHeight) return expectedRowCount;
+
+    // Base calculations (compact sizing)
+    const headerHeight = 40; // Reduced header height
+    const rowHeight = 44; // Reduced row height
+    const reservedHeight = 200; // Space for filters, pagination, etc.
+
+    // Available height for the table
+    const availableHeight = screenHeight - reservedHeight;
+    const maxTableHeight = availableHeight - headerHeight;
+
+    // Calculate how many rows can fit
+    const maxPossibleRows = Math.floor(maxTableHeight / rowHeight);
+
+    // Responsive breakpoints (optimized for compact design)
+    let optimalRows;
+    if (screenHeight >= 1080) {
+      // Large screens (desktop/large tablets) - take advantage of compact design
+      optimalRows = Math.min(18, maxPossibleRows);
+    } else if (screenHeight >= 800) {
+      // Medium screens (tablets/small laptops) - more rows due to compact design
+      optimalRows = Math.min(15, maxPossibleRows);
+    } else if (screenHeight >= 600) {
+      // Small screens (large phones in landscape) - still more rows
+      optimalRows = Math.min(10, maxPossibleRows);
+    } else {
+      // Very small screens - minimal but still more than before
+      optimalRows = Math.min(7, maxPossibleRows);
+    }
+
+    // Ensure we don't go below minimum viable rows
+    const finalRowCount = Math.max(5, Math.min(optimalRows, expectedRowCount));
+
+    if (__DEV__) {
+      console.log('📱 [DataTable] Responsive calculation:', {
+        screenHeight,
+        screenWidth,
+        availableHeight,
+        maxPossibleRows,
+        optimalRows,
+        finalRowCount,
+        expectedRowCount,
+      });
+    }
+
+    return finalRowCount;
+  }, [screenHeight, screenWidth, fixedHeight, expectedRowCount]);
+
+  // Debug logging to understand the data being passed
+  if (__DEV__) {
+    console.log('📊 [DataTable] Props:', {
+      dataLength: data.length,
+      expectedRowCount,
+      responsiveRowCount,
+      fixedHeight,
+      isLoading,
+      itemIds: data.map((item, idx) => ({
+        index: idx,
+        id: item.id || `no-id-${idx}`,
+      })),
+    });
+  }
+  const renderItem = ({ item, index }: { item: T; index: number }) => {
+    const RowComponent = onRowPress ? TouchableOpacity : View;
+
+    return (
+      <RowComponent
+        style={[
+          styles.dataRow,
+          index % 2 === 1 && styles.alternateRow,
+          onRowPress && styles.pressableRow,
+        ]}
+        onPress={onRowPress ? () => onRowPress(item, index) : undefined}
+        disabled={!onRowPress}
+        activeOpacity={onRowPress ? 0.7 : 1}
+      >
+        {showRowIndex && (
+          <View style={[styles.dataCell, styles.indexCell]}>
+            <Text style={styles.indexText}>{index + 1}</Text>
+          </View>
+        )}
+        {columns.map((column, colIndex) => (
+          <View
+            key={column.key}
+            style={[
+              styles.dataCell,
+              {
+                width: column.width,
+                minWidth: column.minWidth || 100,
+                alignItems:
+                  column.align === 'center'
+                    ? 'center'
+                    : column.align === 'right'
+                      ? 'flex-end'
+                      : 'flex-start',
+              },
+              colIndex === columns.length - 1 && styles.lastColumn,
+            ]}
+          >
+            {column.render ? (
+              <View style={styles.cellContent}>
+                {column.render(item[column.key], item, index)}
+              </View>
+            ) : (
+              <View style={styles.cellContent}>
+                <Text
+                  style={[
+                    styles.cellText,
+                    { textAlign: column.align || 'left' },
+                  ]}
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
+                >
+                  {item[column.key]?.toString() || '-'}
+                </Text>
+              </View>
+            )}
+          </View>
+        ))}
+      </RowComponent>
+    );
+  };
   const renderHeader = () => (
     <View style={styles.headerRow}>
       {showRowIndex && (
@@ -81,68 +213,6 @@ export const DataTable = <T extends Record<string, any>>({
     </View>
   );
 
-  const renderRow = (item: T, rowIndex: number) => {
-    const RowComponent = onRowPress ? TouchableOpacity : View;
-
-    return (
-      <RowComponent
-        key={rowIndex}
-        style={[
-          styles.dataRow,
-          rowIndex % 2 === 1 && styles.alternateRow,
-          onRowPress && styles.pressableRow,
-        ]}
-        onPress={onRowPress ? () => onRowPress(item, rowIndex) : undefined}
-        disabled={!onRowPress}
-        activeOpacity={onRowPress ? 0.7 : 1}
-      >
-        {showRowIndex && (
-          <View style={[styles.dataCell, styles.indexCell]}>
-            <Text style={styles.indexText}>{rowIndex + 1}</Text>
-          </View>
-        )}
-        {columns.map((column, colIndex) => (
-          <View
-            key={column.key}
-            style={[
-              styles.dataCell,
-              {
-                width: column.width,
-                minWidth: column.minWidth || 100,
-                alignItems:
-                  column.align === 'center'
-                    ? 'center'
-                    : column.align === 'right'
-                      ? 'flex-end'
-                      : 'flex-start',
-              },
-              colIndex === columns.length - 1 && styles.lastColumn,
-            ]}
-          >
-            {column.render ? (
-              <View style={styles.cellContent}>
-                {column.render(item[column.key], item, rowIndex)}
-              </View>
-            ) : (
-              <View style={styles.cellContent}>
-                <Text
-                  style={[
-                    styles.cellText,
-                    { textAlign: column.align || 'left' },
-                  ]}
-                  numberOfLines={2}
-                  ellipsizeMode="tail"
-                >
-                  {item[column.key]?.toString() || '-'}
-                </Text>
-              </View>
-            )}
-          </View>
-        ))}
-      </RowComponent>
-    );
-  };
-
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
       <Text style={styles.emptyText}>{emptyMessage}</Text>
@@ -159,17 +229,63 @@ export const DataTable = <T extends Record<string, any>>({
   return (
     <View style={[styles.container, style]}>
       {renderHeader()}
-      <ScrollView
-        style={[styles.scrollContainer, maxHeight ? { maxHeight } : null]}
-        showsVerticalScrollIndicator={true}
-        bounces={false}
-      >
-        {isLoading
-          ? renderLoadingState()
-          : data.length === 0
-            ? renderEmptyState()
-            : data.map((item, index) => renderRow(item, index))}
-      </ScrollView>
+      {fixedHeight ? (
+        <View
+          style={[
+            styles.fixedContainer,
+            {
+              // Use responsive row count for height calculation (compact)
+              height: responsiveRowCount * 44, // 44px per row (compact)
+            },
+          ]}
+        >
+          {isLoading ? (
+            renderLoadingState()
+          ) : data.length === 0 ? (
+            renderEmptyState()
+          ) : (
+            <>
+              <FlashList
+                data={data}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => `${item.id || index}`}
+                estimatedItemSize={44} // Updated for compact size
+                // Enable minimal scrolling when we have exactly the expected count
+                // This helps FlashList render all items properly
+                scrollEnabled={true}
+                showsVerticalScrollIndicator={false}
+                style={styles.flashListContainer}
+                getItemType={() => 'row'}
+                removeClippedSubviews={false}
+                // Force render all items for pagination
+                onEndReachedThreshold={0.1}
+              />
+              {/* Fill remaining space if needed to maintain layout */}
+              {data.length < responsiveRowCount && (
+                <View
+                  style={{
+                    height: (responsiveRowCount - data.length) * 44, // Updated for compact size
+                    backgroundColor: '#FAFAFA',
+                    borderTopWidth: data.length > 0 ? 1 : 0,
+                    borderTopColor: '#F3F4F6',
+                  }}
+                />
+              )}
+            </>
+          )}
+        </View>
+      ) : (
+        <FlashList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => `${item.id || index}`}
+          estimatedItemSize={56}
+          showsVerticalScrollIndicator={true}
+          style={[styles.scrollContainer, maxHeight ? { maxHeight } : null]}
+          ListEmptyComponent={data.length === 0 ? renderEmptyState : undefined}
+          ListHeaderComponent={isLoading ? renderLoadingState : undefined}
+        />
+      )}
     </View>
   );
 };
@@ -198,25 +314,24 @@ const styles = StyleSheet.create({
       },
     }),
   },
-
   // Header styles
   headerRow: {
     flexDirection: 'row',
     backgroundColor: '#F9FAFB',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
-    minHeight: 48,
+    minHeight: 40, // Reduced from 48
   },
   headerCell: {
     flex: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingHorizontal: 8, // Reduced from 12
+    paddingVertical: 8, // Reduced from 12
     justifyContent: 'center',
     borderRightWidth: 1,
     borderRightColor: '#E5E7EB',
   },
   headerText: {
-    fontSize: 12,
+    fontSize: 11, // Reduced from 12
     fontWeight: '600',
     color: '#374151',
     textTransform: 'uppercase',
@@ -227,9 +342,24 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
   },
+  fixedContainer: {
+    backgroundColor: '#FFFFFF',
+    flex: 1,
+    // Add responsive properties
+    ...Platform.select({
+      web: {
+        overflow: 'hidden',
+      },
+    }),
+  },
+  flashListContainer: {
+    flex: 1,
+    // Responsive FlashList styling
+    backgroundColor: 'transparent',
+  },
   dataRow: {
     flexDirection: 'row',
-    minHeight: 56,
+    minHeight: 44, // Reduced from 56
     borderBottomWidth: 1,
     borderBottomColor: '#F3F4F6',
   },
@@ -245,8 +375,8 @@ const styles = StyleSheet.create({
   },
   dataCell: {
     flex: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingHorizontal: 8, // Reduced from 12
+    paddingVertical: 8, // Reduced from 12
     justifyContent: 'center',
     borderRightWidth: 1,
     borderRightColor: '#F3F4F6',
@@ -255,20 +385,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cellText: {
-    fontSize: 14,
+    fontSize: 13, // Reduced from 14
     color: '#374151',
-    lineHeight: 20,
+    lineHeight: 18, // Reduced from 20
   },
-
   // Index column styles
   indexCell: {
     flex: 0,
-    width: 50,
-    minWidth: 50,
+    width: 42, // Reduced from 50
+    minWidth: 42, // Reduced from 50
     alignItems: 'center',
   },
   indexText: {
-    fontSize: 12,
+    fontSize: 11, // Reduced from 12
     color: '#6B7280',
     fontWeight: '500',
   },
