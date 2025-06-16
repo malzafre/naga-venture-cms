@@ -12,8 +12,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ConfirmationModal } from '@/components/molecules/ConfirmationModal';
 import { BusinessForm, CMSRouteGuard } from '@/components/organisms';
 import { NavigationService } from '@/constants/NavigationService';
+import { useBusinessImageManagement } from '@/hooks/useBusinessImageManagement';
 import { useCreateBusiness } from '@/hooks/useBusinessManagement';
-import { BusinessInsert } from '@/types/supabase';
+import { BusinessInsert } from '@/schemas';
 
 /**
  * Create Business Page
@@ -22,19 +23,84 @@ import { BusinessInsert } from '@/types/supabase';
  */
 export default function CreateBusinessScreen() {
   const createBusinessMutation = useCreateBusiness();
+  const { uploadImages } = useBusinessImageManagement({
+    onError: (error) => {
+      console.error('Image upload error:', error);
+      setErrorMessage(`Business created successfully, but failed to upload images: ${error}`);
+      setErrorModalVisible(true);
+    },
+  });
+
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const handleSubmit = (data: BusinessInsert) => {
-    createBusinessMutation.mutate(data, {
-      onSuccess: (newBusiness) => {
-        setSuccessMessage(`Business "${newBusiness.business_name}" has been created successfully!`);
-        setSuccessModalVisible(true);
+
+  const handleSubmit = async (formData: any) => {
+    console.log('📝 Form data received:', formData);
+
+    // Extract images and create clean business data object
+    const { images, ...rawBusinessData } = formData;
+
+    // Ensure required fields are not undefined
+    if (
+      !rawBusinessData.business_name ||
+      !rawBusinessData.description ||
+      !rawBusinessData.address
+    ) {
+      setErrorMessage('Missing required fields. Please check the form and try again.');
+      setErrorModalVisible(true);
+      return;
+    }
+
+    // Create clean BusinessInsert object with only required fields
+    const businessInsertData: BusinessInsert = {
+      business_name: String(rawBusinessData.business_name),
+      business_type: rawBusinessData.business_type || 'shop',
+      description: String(rawBusinessData.description),
+      address: String(rawBusinessData.address),
+      city: String(rawBusinessData.city || 'Naga City'),
+      province: String(rawBusinessData.province || 'Camarines Sur'),
+      location: String(rawBusinessData.location),
+      postal_code: rawBusinessData.postal_code ? String(rawBusinessData.postal_code) : null,
+      phone: rawBusinessData.phone ? String(rawBusinessData.phone) : null,
+      email: rawBusinessData.email ? String(rawBusinessData.email) : null,
+      website: rawBusinessData.website ? String(rawBusinessData.website) : null,
+      facebook_url: rawBusinessData.facebook_url ? String(rawBusinessData.facebook_url) : null,
+      instagram_url: rawBusinessData.instagram_url ? String(rawBusinessData.instagram_url) : null,
+      twitter_url: rawBusinessData.twitter_url ? String(rawBusinessData.twitter_url) : null,
+    };
+
+    console.log('🏢 Business insert data:', businessInsertData);
+    console.log('🖼️ Images to upload:', images);
+
+    createBusinessMutation.mutate(businessInsertData, {
+      onSuccess: async (newBusiness) => {
+        console.log('✅ Business created successfully:', newBusiness);
+
+        try {
+          // Upload images if any
+          if (images && images.length > 0) {
+            console.log('📤 Starting image upload...');
+            uploadImages(newBusiness.id as string, images);
+            console.log('📤 Image upload initiated');
+          }
+
+          setSuccessMessage(
+            `Business "${newBusiness.business_name}" has been created successfully!`
+          );
+          setSuccessModalVisible(true);
+        } catch (imageError) {
+          console.error('❌ Image upload error:', imageError);
+          setSuccessMessage(
+            `Business "${newBusiness.business_name}" has been created successfully! However, some images failed to upload. You can add images later by editing the business.`
+          );
+          setSuccessModalVisible(true);
+        }
       },
       onError: (error) => {
-        console.error('Create business error:', error);
+        console.error('❌ Create business error:', error);
         setErrorMessage(
           `Failed to create business listing. Please try again.\n\nError Details: ${error.message}`
         );

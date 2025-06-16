@@ -100,6 +100,20 @@ export const BusinessSchema = z.object({
   rejection_reason: z.string().nullable(),
 });
 
+/**
+ * Simple business form image schema (for form state only)
+ */
+export const BusinessFormImageSchema = z.object({
+  id: z.string().min(1),
+  uri: z.string().min(1),
+  type: z.string().min(1),
+  name: z.string().min(1),
+  size: z.number().positive(),
+  // Optional display properties
+  caption: z.string().optional(),
+  isPrimary: z.boolean().optional(),
+});
+
 // ============================================================================
 // FORM SCHEMAS
 // ============================================================================
@@ -132,6 +146,9 @@ export const BusinessCreateFormSchema = z.object({
   facebook_url: UrlSchema.or(z.literal('')),
   instagram_url: UrlSchema.or(z.literal('')),
   twitter_url: UrlSchema.or(z.literal('')),
+
+  // Step 4: Images (Optional)
+  images: z.array(BusinessFormImageSchema).max(10, 'Maximum 10 images allowed').optional(),
 });
 
 /**
@@ -159,6 +176,10 @@ export const BusinessFormStep3Schema = BusinessCreateFormSchema.pick({
   facebook_url: true,
   instagram_url: true,
   twitter_url: true,
+});
+
+export const BusinessFormStep4Schema = BusinessCreateFormSchema.pick({
+  images: true,
 });
 
 /**
@@ -371,6 +392,7 @@ export type BusinessCreateForm = z.infer<typeof BusinessCreateFormSchema>;
 export type BusinessFormStep1 = z.infer<typeof BusinessFormStep1Schema>;
 export type BusinessFormStep2 = z.infer<typeof BusinessFormStep2Schema>;
 export type BusinessFormStep3 = z.infer<typeof BusinessFormStep3Schema>;
+export type BusinessFormStep4 = z.infer<typeof BusinessFormStep4Schema>;
 export type BusinessUpdateForm = z.infer<typeof BusinessUpdateFormSchema>;
 export type BusinessInsert = z.infer<typeof BusinessInsertSchema>;
 export type BusinessUpdate = z.infer<typeof BusinessUpdateSchema>;
@@ -384,5 +406,6 @@ export type BusinessCategoryAssign = z.infer<typeof BusinessCategoryAssignSchema
 export type BusinessHours = z.infer<typeof BusinessHoursSchema>;
 export type BusinessHoursForm = z.infer<typeof BusinessHoursFormSchema>;
 export type BusinessImage = z.infer<typeof BusinessImageSchema>;
+export type BusinessFormImage = z.infer<typeof BusinessFormImageSchema>;
 export type BusinessImageUpload = z.infer<typeof BusinessImageUploadSchema>;
 export type BusinessCoordinates = z.infer<typeof BusinessCoordinatesSchema>;

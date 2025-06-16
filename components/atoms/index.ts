@@ -1,5 +1,6 @@
 // filepath: components/TourismCMS/atoms/index.ts
 export { default as CMSButton } from './CMSButton';
+export { default as CMSImagePicker } from './CMSImagePicker';
 export { default as CMSInput } from './CMSInput';
 export { CMSNavigationDropdownIndicator } from './CMSNavigationDropdownIndicator';
 export { CMSNavigationItem } from './CMSNavigationItem';

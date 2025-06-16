@@ -6,6 +6,7 @@ import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 // Smart hook
 import { CMSButton, CMSInput } from '@/components/atoms';
+import { CMSImageGallery } from '@/components/molecules';
 import { useBusinessForm } from '@/hooks/useBusinessForm';
 // Types
 import { Business } from '@/types/supabase';
@@ -405,6 +406,30 @@ export default function BusinessForm({
     </View>
   );
 
+  // Step 4: Images
+  const renderImagesStep = () => (
+    <View style={styles.stepContent}>
+      <Text style={styles.stepTitle}>Business Images</Text>
+      <Text style={styles.stepDescription}>
+        Add photos to showcase your business (optional but recommended)
+      </Text>
+      <Controller
+        key="images"
+        control={control}
+        name="images"
+        render={({ field: { onChange, value } }) => (
+          <CMSImageGallery
+            images={value || []}
+            onImagesChange={onChange}
+            maxImages={10}
+            disabled={isLoading}
+            showCaptions={false}
+          />
+        )}
+      />
+    </View>
+  );
+
   // Render step content based on current step
   const renderStepContent = () => {
     switch (currentStep) {
@@ -414,6 +439,8 @@ export default function BusinessForm({
         return renderLocationStep();
       case 3:
         return renderContactStep();
+      case 4:
+        return renderImagesStep();
       default:
         return null;
     }
@@ -446,6 +473,7 @@ export default function BusinessForm({
               {stepNumber === 1 && 'Basic Info'}
               {stepNumber === 2 && 'Location'}
               {stepNumber === 3 && 'Contact'}
+              {stepNumber === 4 && 'Images'}
             </Text>
             {stepNumber < totalSteps && <View style={styles.stepConnector} />}
           </View>

@@ -1,4 +1,6 @@
+export { default as BusinessImageViewer } from './BusinessImageViewer';
 export { default as CMSHeader } from './CMSHeader';
+export { default as CMSImageGallery } from './CMSImageGallery';
 export { CMSNavigationSection } from './CMSNavigationSection';
 export { default as CMSStatCard } from './CMSStatCard';
 export { ConfirmationModal } from './ConfirmationModal';

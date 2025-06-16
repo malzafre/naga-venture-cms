@@ -28,7 +28,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Components
 import { CMSButton } from '@/components/atoms';
-import { StatusBadge } from '@/components/molecules';
+import { BusinessImageViewer, StatusBadge } from '@/components/molecules';
 import { CMSRouteGuard } from '@/components/organisms';
 import { NavigationService } from '@/constants/NavigationService';
 import { useBusiness } from '@/hooks/useBusinessManagement';
@@ -168,6 +168,12 @@ export default function ViewBusinessScreen() {
                 )}
               </View>
             </View>
+          </View>
+
+          {/* Business Images Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Business Images</Text>
+            <BusinessImageViewer businessId={business.id} />
           </View>
 
           {/* Location Information */}

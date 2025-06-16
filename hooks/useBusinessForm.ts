@@ -17,6 +17,7 @@ const STEP_FIELDS = {
   1: ['business_name', 'business_type', 'description'] as const,
   2: ['address', 'city', 'province', 'postal_code', 'latitude', 'longitude'] as const,
   3: ['phone', 'email', 'website', 'facebook_url', 'instagram_url', 'twitter_url'] as const,
+  4: ['images'] as const,
 } as const;
 
 interface UseBusinessFormOptions {
@@ -40,7 +41,7 @@ export function useBusinessForm({
 }: UseBusinessFormOptions) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isNavigating, setIsNavigating] = useState(false);
-  const totalSteps = 3;
+  const totalSteps = 4;
 
   // Extract coordinates from PostGIS GEOGRAPHY(POINT) format
   const extractCoordinates = useCallback(
@@ -75,8 +76,8 @@ export function useBusinessForm({
       business_type: initialData?.business_type || 'shop',
       description: initialData?.description || '',
       address: initialData?.address || '',
-      city: initialData?.city || '',
-      province: initialData?.province || '',
+      city: initialData?.city || 'Naga City',
+      province: initialData?.province || 'Camarines Sur',
       postal_code: initialData?.postal_code || '',
       latitude: initialCoords.lat,
       longitude: initialCoords.lng,
@@ -86,6 +87,7 @@ export function useBusinessForm({
       facebook_url: initialData?.facebook_url || '',
       instagram_url: initialData?.instagram_url || '',
       twitter_url: initialData?.twitter_url || '',
+      images: [],
     },
   });
 
@@ -110,8 +112,8 @@ export function useBusinessForm({
         business_type: initialData.business_type || 'shop',
         description: initialData.description || '',
         address: initialData.address || '',
-        city: initialData.city || '',
-        province: initialData.province || '',
+        city: initialData.city || 'Naga City',
+        province: initialData.province || 'Camarines Sur',
         postal_code: initialData.postal_code || '',
         latitude: coords.lat,
         longitude: coords.lng,
@@ -121,6 +123,7 @@ export function useBusinessForm({
         facebook_url: initialData.facebook_url || '',
         instagram_url: initialData.instagram_url || '',
         twitter_url: initialData.twitter_url || '',
+        images: [],
       };
       console.log('📝 [useBusinessForm] Edit data prepared:', editData);
       reset(editData);
@@ -131,8 +134,8 @@ export function useBusinessForm({
         business_type: 'shop' as const,
         description: '',
         address: '',
-        city: '',
-        province: '',
+        city: 'Naga City',
+        province: 'Camarines Sur',
         postal_code: '',
         latitude: 13.6218,
         longitude: 123.1948,
@@ -142,6 +145,7 @@ export function useBusinessForm({
         facebook_url: '',
         instagram_url: '',
         twitter_url: '',
+        images: [],
       };
       console.log('🆕 [useBusinessForm] Create data prepared:', createData);
       reset(createData);
@@ -211,8 +215,8 @@ export function useBusinessForm({
       business_type: 'shop' as const,
       description: '',
       address: '',
-      city: '',
-      province: '',
+      city: 'Naga City',
+      province: 'Camarines Sur',
       postal_code: '',
       latitude: 13.6218,
       longitude: 123.1948,
@@ -232,6 +236,9 @@ export function useBusinessForm({
   // Form submission handler
   const onFormSubmit = useCallback(
     (data: BusinessFormData) => {
+      console.log('📝 [useBusinessForm] Form submitted with data:', data);
+      console.log('🖼️ [useBusinessForm] Images in submission:', data.images);
+
       const businessData = {
         // Step 1 data
         business_name: data.business_name,
@@ -252,6 +259,9 @@ export function useBusinessForm({
         facebook_url: data.facebook_url || null,
         instagram_url: data.instagram_url || null,
         twitter_url: data.twitter_url || null,
+
+        // Step 4 data - Images (handled separately after business creation)
+        images: data.images || [],
       };
 
       onSubmit(businessData);
