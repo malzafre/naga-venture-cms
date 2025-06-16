@@ -44,6 +44,42 @@ export default function ViewBusinessScreen() {
   // Fetch business data
   const { data: business, isLoading, isError, error } = useBusiness(id);
 
+  // Enhanced debug logging
+  console.log('🏢 [ViewBusinessScreen] Component rendered');
+  console.log('🏢 [ViewBusinessScreen] Business ID from params:', id);
+  console.log('🏢 [ViewBusinessScreen] Business data:', business);
+  console.log(
+    '🏢 [ViewBusinessScreen] Business images:',
+    business?.business_images
+  );
+  console.log(
+    '🏢 [ViewBusinessScreen] Images length:',
+    business?.business_images?.length || 0
+  );
+  console.log(
+    '🏢 [ViewBusinessScreen] isLoading:',
+    isLoading,
+    'isError:',
+    isError
+  );
+
+  if (business?.business_images) {
+    console.log('🏢 [ViewBusinessScreen] Individual business images:');
+    business.business_images.forEach((image, index) => {
+      console.log(`🏢 [ViewBusinessScreen] Image ${index}:`, {
+        id: image.id,
+        image_url: image.image_url,
+        caption: image.caption,
+        is_primary: image.is_primary,
+        display_order: image.display_order,
+      });
+    });
+  } else {
+    console.log(
+      '🏢 [ViewBusinessScreen] No business images found or business_images is null/undefined'
+    );
+  }
+
   const handleEditBusiness = () => {
     if (!id) return;
     NavigationService.toEditBusiness(id);
@@ -128,12 +164,22 @@ export default function ViewBusinessScreen() {
           </TouchableOpacity>
           <View style={styles.headerContent}>
             <Text style={styles.headerTitle}>Business Details</Text>
-            <Text style={styles.headerSubtitle}>View and manage business information</Text>
+            <Text style={styles.headerSubtitle}>
+              View and manage business information
+            </Text>
           </View>
-          <CMSButton title="Edit" onPress={handleEditBusiness} variant="primary" size="small" />
+          <CMSButton
+            title="Edit"
+            onPress={handleEditBusiness}
+            variant="primary"
+            size="small"
+          />
         </View>
 
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Basic Information */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Basic Information</Text>
@@ -141,7 +187,9 @@ export default function ViewBusinessScreen() {
             <View style={styles.card}>
               <View style={styles.businessHeader}>
                 <View style={styles.businessInfo}>
-                  <Text style={styles.businessName}>{business.business_name}</Text>
+                  <Text style={styles.businessName}>
+                    {business.business_name}
+                  </Text>
                   <Text style={styles.businessType}>
                     {business.business_type?.replaceAll('_', ' ').toUpperCase()}
                   </Text>
@@ -173,7 +221,7 @@ export default function ViewBusinessScreen() {
           {/* Business Images Section */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Business Images</Text>
-            <BusinessImageViewer businessId={business.id} />
+            <BusinessImageViewer images={business.business_images || []} />
           </View>
 
           {/* Location Information */}
@@ -209,7 +257,9 @@ export default function ViewBusinessScreen() {
                     <Phone size={16} color="#6B7280" />
                     <Text style={styles.infoLabel}>Phone</Text>
                   </View>
-                  <Text style={[styles.infoValue, styles.linkText]}>{business.phone}</Text>
+                  <Text style={[styles.infoValue, styles.linkText]}>
+                    {business.phone}
+                  </Text>
                 </TouchableOpacity>
               )}
 
@@ -222,7 +272,9 @@ export default function ViewBusinessScreen() {
                     <At size={16} color="#6B7280" />
                     <Text style={styles.infoLabel}>Email</Text>
                   </View>
-                  <Text style={[styles.infoValue, styles.linkText]}>{business.email}</Text>
+                  <Text style={[styles.infoValue, styles.linkText]}>
+                    {business.email}
+                  </Text>
                 </TouchableOpacity>
               )}
 
@@ -235,14 +287,18 @@ export default function ViewBusinessScreen() {
                     <Globe size={16} color="#6B7280" />
                     <Text style={styles.infoLabel}>Website</Text>
                   </View>
-                  <Text style={[styles.infoValue, styles.linkText]}>{business.website}</Text>
+                  <Text style={[styles.infoValue, styles.linkText]}>
+                    {business.website}
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>
           </View>
 
           {/* Social Media */}
-          {(business.facebook_url || business.instagram_url || business.twitter_url) && (
+          {(business.facebook_url ||
+            business.instagram_url ||
+            business.twitter_url) && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Social Media</Text>
 
@@ -256,7 +312,9 @@ export default function ViewBusinessScreen() {
                       <FacebookLogo size={16} color="#1877F2" />
                       <Text style={styles.infoLabel}>Facebook</Text>
                     </View>
-                    <Text style={[styles.infoValue, styles.linkText]}>{business.facebook_url}</Text>
+                    <Text style={[styles.infoValue, styles.linkText]}>
+                      {business.facebook_url}
+                    </Text>
                   </TouchableOpacity>
                 )}
 
@@ -284,7 +342,9 @@ export default function ViewBusinessScreen() {
                       <TwitterLogo size={16} color="#1DA1F2" />
                       <Text style={styles.infoLabel}>Twitter</Text>
                     </View>
-                    <Text style={[styles.infoValue, styles.linkText]}>{business.twitter_url}</Text>
+                    <Text style={[styles.infoValue, styles.linkText]}>
+                      {business.twitter_url}
+                    </Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -309,14 +369,18 @@ export default function ViewBusinessScreen() {
                 {business.profiles.email && (
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>Email</Text>
-                    <Text style={styles.infoValue}>{business.profiles.email}</Text>
+                    <Text style={styles.infoValue}>
+                      {business.profiles.email}
+                    </Text>
                   </View>
                 )}
 
                 {business.profiles.phone_number && (
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>Phone</Text>
-                    <Text style={styles.infoValue}>{business.profiles.phone_number}</Text>
+                    <Text style={styles.infoValue}>
+                      {business.profiles.phone_number}
+                    </Text>
                   </View>
                 )}
               </View>

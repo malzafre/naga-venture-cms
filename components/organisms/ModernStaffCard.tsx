@@ -133,7 +133,7 @@ export default function ModernStaffCard({
           </CMSText>
 
           <RoleBadge role={staff.role} roleColor={getRoleColor(staff.role)} />
-        </View>{' '}
+        </View>
         <View style={styles.cardActions}>
           <ActionButton
             IconComponent={PencilSimple}
@@ -162,11 +162,10 @@ export default function ModernStaffCard({
           isUpdating={isUpdating}
           getRoleColor={getRoleColor}
         />
-      )}{' '}
+      )}
       {/* Footer with metadata */}
       <View style={[styles.cardFooter, { borderTopColor: colors.border }]}>
         <View style={styles.footerContent}>
-          {' '}
           <Calendar size={14} color={colors.textSecondary} />
           <CMSText type="caption" style={[styles.footerText, { color: colors.textSecondary }]}>
             Joined {formatDate(staff.created_at)}
@@ -203,7 +202,7 @@ function StaffAvatar({ initials, roleColor, isVerified }: StaffAvatarProps) {
     <View style={styles.avatarContainer}>
       <View style={[styles.avatar, { backgroundColor: roleColor }]}>
         <CMSText style={styles.avatarText}>{initials}</CMSText>
-      </View>{' '}
+      </View>
       {isVerified && (
         <View style={[styles.verifiedBadge, { backgroundColor: colors.success }]}>
           <Check size={12} color="white" />

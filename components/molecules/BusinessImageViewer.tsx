@@ -26,7 +26,7 @@ import { useTheme } from '@/constants/useTheme';
 // TYPES
 // ============================================================================
 
-interface BusinessImage {
+interface BusinessImageViewerImage {
   id: string;
   image_url: string;
   caption?: string | null;
@@ -35,7 +35,13 @@ interface BusinessImage {
 }
 
 interface BusinessImageViewerProps {
-  images: BusinessImage[];
+  images: {
+    id: string;
+    image_url?: string | null | undefined;
+    caption?: string | null | undefined;
+    is_primary: boolean;
+    display_order: number;
+  }[];
   title?: string;
 }
 
@@ -46,7 +52,8 @@ interface BusinessImageViewerProps {
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 const IMAGE_SPACING = 8;
 const IMAGES_PER_ROW = 3;
-const IMAGE_SIZE = (screenWidth - 40 - IMAGE_SPACING * (IMAGES_PER_ROW - 1)) / IMAGES_PER_ROW;
+const IMAGE_SIZE =
+  (screenWidth - 40 - IMAGE_SPACING * (IMAGES_PER_ROW - 1)) / IMAGES_PER_ROW;
 
 // ============================================================================
 // COMPONENT
@@ -56,17 +63,58 @@ export default function BusinessImageViewer({
   images,
   title = 'Business Images',
 }: BusinessImageViewerProps) {
-  console.log('🖼️ [BusinessImageViewer] Rendering with images:', images.length);
-
+  console.log('🖼️ [BusinessImageViewer] Component rendered');
+  console.log('🖼️ [BusinessImageViewer] Images prop:', images);
+  console.log('🖼️ [BusinessImageViewer] Images length:', images?.length || 0);
   const { theme } = useTheme();
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
+    null
+  );
+  // Filter out images with invalid URLs
+  const validImages =
+    images?.filter(
+      (image): image is BusinessImageViewerImage =>
+        image &&
+        typeof image.image_url === 'string' &&
+        image.image_url.trim().length > 0
+    ) || [];
+
+  console.log(
+    '🖼️ [BusinessImageViewer] Valid images after filtering:',
+    validImages
+  );
+
+  // Early return if no valid images
+  if (validImages.length === 0) {
+    console.log(
+      '🖼️ [BusinessImageViewer] No valid images to display, returning early'
+    );
+    return (
+      <View style={{ padding: 16, alignItems: 'center' }}>
+        <ImageSquare size={48} color={theme.colors.neutral100} />
+        <Text style={{ color: theme.colors.textMuted, marginTop: 8 }}>
+          No images available
+        </Text>
+      </View>
+    );
+  }
+
+  // Debug each valid image
+  validImages.forEach((image, index) => {
+    console.log(
+      `🖼️ [BusinessImageViewer] Processing valid image ${index}:`,
+      image
+    );
+  });
 
   // Sort images by display_order and primary status
-  const sortedImages = [...images].sort((a, b) => {
+  const sortedImages = [...validImages].sort((a, b) => {
     if (a.is_primary && !b.is_primary) return -1;
     if (!a.is_primary && b.is_primary) return 1;
     return a.display_order - b.display_order;
   });
+
+  console.log('🖼️ [BusinessImageViewer] Sorted images:', sortedImages);
 
   // Dynamic styles using theme
   const styles = StyleSheet.create({
@@ -200,38 +248,63 @@ export default function BusinessImageViewer({
       color: '#CCCCCC',
     },
   });
+  const renderImageItem = ({
+    item,
+    index,
+  }: {
+    item: BusinessImageViewerImage;
+    index: number;
+  }) => {
+    console.log(
+      `🖼️ [BusinessImageViewer] Rendering image item ${index}:`,
+      item
+    );
+    console.log(`🖼️ [BusinessImageViewer] Image URL:`, item.image_url);
 
-  const renderImageItem = ({ item, index }: { item: BusinessImage; index: number }) => (
-    <TouchableOpacity
-      style={styles.imageContainer}
-      onPress={() => setSelectedImageIndex(index)}
-      activeOpacity={0.8}
-    >
-      <Image
-        source={{ uri: item.image_url }}
-        style={styles.image}
-        contentFit="cover"
-        transition={200}
-        placeholder="📷"
-      />
+    return (
+      <TouchableOpacity
+        style={styles.imageContainer}
+        onPress={() => setSelectedImageIndex(index)}
+        activeOpacity={0.8}
+      >
+        <Image
+          source={{ uri: item.image_url }}
+          style={styles.image}
+          contentFit="cover"
+          transition={200}
+          placeholder="📷"
+          onError={(error) => {
+            console.error('🖼️ [BusinessImageViewer] Image load error:', error);
+            console.error(
+              '🖼️ [BusinessImageViewer] Failed image URL:',
+              item.image_url
+            );
+          }}
+          onLoad={() => {
+            console.log(
+              '🖼️ [BusinessImageViewer] Image loaded successfully:',
+              item.image_url
+            );
+          }}
+        />
 
-      {item.is_primary && (
-        <View style={styles.primaryBadge}>
-          <Text style={styles.primaryText}>PRIMARY</Text>
-        </View>
-      )}
+        {item.is_primary && (
+          <View style={styles.primaryBadge}>
+            <Text style={styles.primaryText}>PRIMARY</Text>
+          </View>
+        )}
 
-      {item.caption && (
-        <View style={styles.captionOverlay}>
-          <Text style={styles.captionText} numberOfLines={1}>
-            {item.caption}
-          </Text>
-        </View>
-      )}
-    </TouchableOpacity>
-  );
-
-  const renderModalImage = (image: BusinessImage, index: number) => (
+        {item.caption && (
+          <View style={styles.captionOverlay}>
+            <Text style={styles.captionText} numberOfLines={1}>
+              {item.caption}
+            </Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
+  const renderModalImage = (image: BusinessImageViewerImage, index: number) => (
     <ScrollView
       key={image.id}
       style={styles.modalScrollView}
@@ -258,14 +331,16 @@ export default function BusinessImageViewer({
           <Text style={styles.title}>{title}</Text>
         </View>
         <View style={styles.emptyState}>
-          <ImageSquare size={32} color={theme.colors.neutral500} style={styles.emptyIcon} />
+          <ImageSquare
+            size={32}
+            color={theme.colors.neutral500}
+            style={styles.emptyIcon}
+          />
           <Text style={styles.emptyText}>No images available</Text>
         </View>
       </View>
     );
   }
-
-  const selectedImage = selectedImageIndex !== null ? sortedImages[selectedImageIndex] : null;
 
   return (
     <View style={styles.container}>
@@ -276,7 +351,6 @@ export default function BusinessImageViewer({
           {images.length} image{images.length === 1 ? '' : 's'}
         </Text>
       </View>
-
       <FlatList
         data={sortedImages}
         renderItem={renderImageItem}
@@ -284,9 +358,10 @@ export default function BusinessImageViewer({
         numColumns={IMAGES_PER_ROW}
         scrollEnabled={false}
         contentContainerStyle={styles.grid}
-        ItemSeparatorComponent={() => <View style={{ height: IMAGE_SPACING }} />}
+        ItemSeparatorComponent={() => (
+          <View style={{ height: IMAGE_SPACING }} />
+        )}
       />
-
       {/* Lightbox Modal */}
       <Modal
         visible={selectedImageIndex !== null}
@@ -298,7 +373,10 @@ export default function BusinessImageViewer({
         <View style={styles.modal}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>
-              {selectedImage?.is_primary ? 'Primary Image' : 'Business Image'}
+              {selectedImageIndex !== null &&
+              sortedImages[selectedImageIndex]?.is_primary
+                ? 'Primary Image'
+                : 'Business Image'}
             </Text>
             <TouchableOpacity
               style={styles.closeButton}
@@ -308,13 +386,21 @@ export default function BusinessImageViewer({
             </TouchableOpacity>
           </View>
 
-          {selectedImage && renderModalImage(selectedImage, selectedImageIndex!)}
+          {selectedImageIndex !== null &&
+            sortedImages[selectedImageIndex] &&
+            renderModalImage(
+              sortedImages[selectedImageIndex],
+              selectedImageIndex
+            )}
 
-          {selectedImage?.caption && (
-            <View style={styles.modalCaption}>
-              <Text style={styles.modalCaptionText}>{selectedImage.caption}</Text>
-            </View>
-          )}
+          {selectedImageIndex !== null &&
+            sortedImages[selectedImageIndex]?.caption && (
+              <View style={styles.modalCaption}>
+                <Text style={styles.modalCaptionText}>
+                  {sortedImages[selectedImageIndex].caption}
+                </Text>
+              </View>
+            )}
 
           <View style={styles.modalImageCounter}>
             <Text style={styles.modalCounterText}>

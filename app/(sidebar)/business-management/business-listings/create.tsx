@@ -26,7 +26,9 @@ export default function CreateBusinessScreen() {
   const { uploadImages } = useBusinessImageManagement({
     onError: (error) => {
       console.error('Image upload error:', error);
-      setErrorMessage(`Business created successfully, but failed to upload images: ${error}`);
+      setErrorMessage(
+        `Business created successfully, but failed to upload images: ${error}`
+      );
       setErrorModalVisible(true);
     },
   });
@@ -49,7 +51,9 @@ export default function CreateBusinessScreen() {
       !rawBusinessData.description ||
       !rawBusinessData.address
     ) {
-      setErrorMessage('Missing required fields. Please check the form and try again.');
+      setErrorMessage(
+        'Missing required fields. Please check the form and try again.'
+      );
       setErrorModalVisible(true);
       return;
     }
@@ -63,13 +67,21 @@ export default function CreateBusinessScreen() {
       city: String(rawBusinessData.city || 'Naga City'),
       province: String(rawBusinessData.province || 'Camarines Sur'),
       location: String(rawBusinessData.location),
-      postal_code: rawBusinessData.postal_code ? String(rawBusinessData.postal_code) : null,
+      postal_code: rawBusinessData.postal_code
+        ? String(rawBusinessData.postal_code)
+        : null,
       phone: rawBusinessData.phone ? String(rawBusinessData.phone) : null,
       email: rawBusinessData.email ? String(rawBusinessData.email) : null,
       website: rawBusinessData.website ? String(rawBusinessData.website) : null,
-      facebook_url: rawBusinessData.facebook_url ? String(rawBusinessData.facebook_url) : null,
-      instagram_url: rawBusinessData.instagram_url ? String(rawBusinessData.instagram_url) : null,
-      twitter_url: rawBusinessData.twitter_url ? String(rawBusinessData.twitter_url) : null,
+      facebook_url: rawBusinessData.facebook_url
+        ? String(rawBusinessData.facebook_url)
+        : null,
+      instagram_url: rawBusinessData.instagram_url
+        ? String(rawBusinessData.instagram_url)
+        : null,
+      twitter_url: rawBusinessData.twitter_url
+        ? String(rawBusinessData.twitter_url)
+        : null,
     };
 
     console.log('🏢 Business insert data:', businessInsertData);
@@ -78,17 +90,37 @@ export default function CreateBusinessScreen() {
     createBusinessMutation.mutate(businessInsertData, {
       onSuccess: async (newBusiness) => {
         console.log('✅ Business created successfully:', newBusiness);
+        console.log('✅ Business ID:', newBusiness.id);
 
         try {
           // Upload images if any
           if (images && images.length > 0) {
-            console.log('📤 Starting image upload...');
+            console.log(
+              '📤 Starting image upload for business:',
+              newBusiness.id
+            );
+            console.log(
+              '📤 Images to upload:',
+              images.map((img: any) => ({
+                id: img.id,
+                name: img.name,
+                size: img.size,
+              }))
+            );
+
+            // Upload images and wait for completion
             uploadImages(newBusiness.id as string, images);
-            console.log('📤 Image upload initiated');
+
+            console.log(
+              '📤 Image upload initiated for business:',
+              newBusiness.id
+            );
+          } else {
+            console.log('📤 No images to upload');
           }
 
           setSuccessMessage(
-            `Business "${newBusiness.business_name}" has been created successfully!`
+            `Business "${newBusiness.business_name}" has been created successfully${images && images.length > 0 ? ` with ${images.length} images` : ''}!`
           );
           setSuccessModalVisible(true);
         } catch (imageError) {
@@ -115,7 +147,9 @@ export default function CreateBusinessScreen() {
   };
 
   const confirmCancel = () => {
-    console.log('✅ [CreateBusinessScreen] User confirmed cancel - navigating back');
+    console.log(
+      '✅ [CreateBusinessScreen] User confirmed cancel - navigating back'
+    );
     setCancelModalVisible(false);
     try {
       NavigationService.toAllBusinesses();

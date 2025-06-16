@@ -358,7 +358,7 @@ export default function CMSImagePicker({
       <View style={styles.content}>
         <Text style={styles.icon}>📷</Text>
         <Text style={styles.primaryText}>
-          {isMaxReached ? 'Maximum Images Reached' : 'Add Images'}{' '}
+          {isMaxReached ? 'Maximum Images Reached' : 'Add Images'}
         </Text>
         <Text style={styles.secondaryText}>
           {isMaxReached

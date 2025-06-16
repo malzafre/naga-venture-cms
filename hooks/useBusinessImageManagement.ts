@@ -41,16 +41,19 @@ export function useBusinessImageManagement({
   onError,
   onSuccess,
 }: BusinessImageManagementOptions = {}) {
-  console.log('🎯 [useBusinessImageManagement] Hook initialized with:', { businessId });
+  console.log('🎯 [useBusinessImageManagement] Hook initialized with:', {
+    businessId,
+  });
 
   const queryClient = useQueryClient();
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>(
+    {}
+  );
 
   // ============================================================================
   // UPLOAD MUTATION
   // ============================================================================
-
   const uploadImagesMutation = useMutation({
     mutationFn: async ({
       businessId: targetBusinessId,
@@ -59,14 +62,27 @@ export function useBusinessImageManagement({
       businessId: string;
       images: ImageItem[];
     }) => {
+      console.log(
+        '📤 [uploadImagesMutation] Starting upload for business:',
+        targetBusinessId
+      );
+      console.log('📤 [uploadImagesMutation] Images to upload:', images);
+
       if (!targetBusinessId) {
+        console.error('📤 [uploadImagesMutation] No business ID provided');
         throw new Error('Business ID is required for image upload');
       }
 
       const results = [];
       const imagesToUpload = images.filter((img) => !img.isUploaded);
 
+      console.log(
+        '📤 [uploadImagesMutation] Filtered images to upload:',
+        imagesToUpload.length
+      );
+
       if (imagesToUpload.length === 0) {
+        console.log('📤 [uploadImagesMutation] No images to upload');
         return [];
       }
 
@@ -75,12 +91,24 @@ export function useBusinessImageManagement({
       try {
         // Upload images to storage
         for (const [index, image] of imagesToUpload.entries()) {
+          console.log(
+            `📤 [uploadImagesMutation] Uploading image ${index + 1}/${imagesToUpload.length}:`,
+            image
+          );
+
           setUploadProgress((prev) => ({
             ...prev,
             [image.id]: (index / imagesToUpload.length) * 50, // 50% for storage upload
           }));
 
-          const uploadResult = await StorageService.uploadBusinessImage(targetBusinessId, image);
+          const uploadResult = await StorageService.uploadBusinessImage(
+            targetBusinessId,
+            image
+          );
+          console.log(
+            `📤 [uploadImagesMutation] Storage upload result for image ${index}:`,
+            uploadResult
+          );
 
           setUploadProgress((prev) => ({
             ...prev,
@@ -96,6 +124,11 @@ export function useBusinessImageManagement({
             display_order: index,
           };
 
+          console.log(
+            `📤 [uploadImagesMutation] Saving image ${index} to database:`,
+            imageData
+          );
+
           // Validate data
           const validatedData = BusinessImageUploadSchema.parse(imageData);
 
@@ -105,7 +138,16 @@ export function useBusinessImageManagement({
             .select()
             .single();
 
+          console.log(
+            `📤 [uploadImagesMutation] Database insert result for image ${index}:`,
+            { data, error }
+          );
+
           if (error) {
+            console.error(
+              `📤 [uploadImagesMutation] Database error for image ${index}:`,
+              error
+            );
             throw new Error(`Database error: ${error.message}`);
           }
 
@@ -137,7 +179,9 @@ export function useBusinessImageManagement({
         });
       }
 
-      onSuccess?.(`Successfully uploaded ${data.length} image${data.length === 1 ? '' : 's'}`);
+      onSuccess?.(
+        `Successfully uploaded ${data.length} image${data.length === 1 ? '' : 's'}`
+      );
     },
     onError: (error: any) => {
       console.error('[BusinessImageManagement] Upload error:', error);
@@ -150,9 +194,18 @@ export function useBusinessImageManagement({
   // ============================================================================
 
   const deleteImageMutation = useMutation({
-    mutationFn: async ({ imageId, imagePath }: { imageId: string; imagePath?: string }) => {
+    mutationFn: async ({
+      imageId,
+      imagePath,
+    }: {
+      imageId: string;
+      imagePath?: string;
+    }) => {
       // Delete from database first
-      const { error } = await supabase.from('business_images').delete().eq('id', imageId);
+      const { error } = await supabase
+        .from('business_images')
+        .delete()
+        .eq('id', imageId);
 
       if (error) {
         throw new Error(`Database error: ${error.message}`);
@@ -163,7 +216,10 @@ export function useBusinessImageManagement({
         try {
           await StorageService.deleteBusinessImage(imagePath);
         } catch (storageError) {
-          console.warn('[BusinessImageManagement] Storage deletion warning:', storageError);
+          console.warn(
+            '[BusinessImageManagement] Storage deletion warning:',
+            storageError
+          );
           // Don't throw here as database deletion succeeded
         }
       }
@@ -245,13 +301,16 @@ export function useBusinessImageManagement({
   /**
    * Convert form images to database format for upload
    */
-  const convertFormImagesToUpload = useCallback((images: ImageItem[]): ImageItem[] => {
-    return images.map((img, index) => ({
-      ...img,
-      isPrimary: index === 0 && images.length > 0, // First image is primary by default
-      display_order: index,
-    }));
-  }, []);
+  const convertFormImagesToUpload = useCallback(
+    (images: ImageItem[]): ImageItem[] => {
+      return images.map((img, index) => ({
+        ...img,
+        isPrimary: index === 0 && images.length > 0, // First image is primary by default
+        display_order: index,
+      }));
+    },
+    []
+  );
   /**
    * Upload images for a business
    */
@@ -260,11 +319,18 @@ export function useBusinessImageManagement({
       console.log('🚀 [useBusinessImageManagement] uploadImages called with:', {
         targetBusinessId,
         imageCount: images.length,
-        images: images.map((img) => ({ id: img.id, name: img.name, size: img.size })),
+        images: images.map((img) => ({
+          id: img.id,
+          name: img.name,
+          size: img.size,
+        })),
       });
 
       const convertedImages = convertFormImagesToUpload(images);
-      console.log('🔄 [useBusinessImageManagement] Converted images:', convertedImages.length);
+      console.log(
+        '🔄 [useBusinessImageManagement] Converted images:',
+        convertedImages.length
+      );
 
       uploadImagesMutation.mutate({
         businessId: targetBusinessId,

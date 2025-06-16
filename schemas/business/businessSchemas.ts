@@ -27,6 +27,9 @@ import {
   UuidSchema,
 } from '../common/baseSchemas';
 
+// Import ProfileSchema for business owner information
+import { ProfileSchema } from '../auth/authSchemas';
+
 // ============================================================================
 // ENUMS
 // ============================================================================
@@ -41,9 +44,12 @@ export const BusinessTypeSchema = z.enum(['accommodation', 'shop', 'service'], {
 /**
  * Business status validation
  */
-export const BusinessStatusSchema = z.enum(['pending', 'approved', 'rejected', 'inactive'], {
-  errorMap: () => ({ message: 'Invalid business status' }),
-});
+export const BusinessStatusSchema = z.enum(
+  ['pending', 'approved', 'rejected', 'inactive'],
+  {
+    errorMap: () => ({ message: 'Invalid business status' }),
+  }
+);
 
 // ============================================================================
 // CORE BUSINESS SCHEMAS
@@ -75,7 +81,10 @@ export const BusinessSchema = z.object({
   owner_id: UuidSchema.nullable(),
   business_name: NameSchema,
   business_type: BusinessTypeSchema,
-  description: TextContentSchema.min(200, 'Description must be at least 200 characters'),
+  description: TextContentSchema.min(
+    200,
+    'Description must be at least 200 characters'
+  ),
   address: AddressSchema,
   city: CitySchema,
   province: ProvinceSchema,
@@ -98,6 +107,8 @@ export const BusinessSchema = z.object({
   approved_at: DateSchema.nullable(),
   approved_by: UuidSchema.nullable(),
   rejection_reason: z.string().nullable(),
+  // Add business_images relationship (will be defined later in the file)
+  business_images: z.array(z.any()).optional(),
 });
 
 /**
@@ -125,7 +136,10 @@ export const BusinessCreateFormSchema = z.object({
   // Step 1: Basic Information
   business_name: NameSchema,
   business_type: BusinessTypeSchema,
-  description: TextContentSchema.min(200, 'Description must be at least 200 characters'),
+  description: TextContentSchema.min(
+    200,
+    'Description must be at least 200 characters'
+  ),
 
   // Step 2: Location Information
   address: AddressSchema,
@@ -148,7 +162,10 @@ export const BusinessCreateFormSchema = z.object({
   twitter_url: UrlSchema.or(z.literal('')),
 
   // Step 4: Images (Optional)
-  images: z.array(BusinessFormImageSchema).max(10, 'Maximum 10 images allowed').optional(),
+  images: z
+    .array(BusinessFormImageSchema)
+    .max(10, 'Maximum 10 images allowed')
+    .optional(),
 });
 
 /**
@@ -381,6 +398,49 @@ export const BusinessImageUploadSchema = z.object({
   display_order: z.number().int().min(0).default(0),
 });
 
+/**
+ * Business schema with images (for API responses that include business_images)
+ */
+export const BusinessWithImagesSchema = BusinessSchema.extend({
+  business_images: z.array(BusinessImageSchema).optional(),
+});
+
+/**
+ * Comprehensive business schema with all related data (for detailed views)
+ */
+export const BusinessWithRelationsSchema = BusinessSchema.extend({
+  business_images: z.array(BusinessImageSchema).optional(),
+  profiles: ProfileSchema.nullable(), // Business owner profile
+  business_categories: z
+    .array(
+      z.object({
+        id: UuidSchema,
+        sub_categories: z.object({
+          id: UuidSchema,
+          name: z.string(),
+          description: z.string().nullable(),
+          main_categories: z.object({
+            id: UuidSchema,
+            name: z.string(),
+            description: z.string().nullable(),
+          }),
+        }),
+      })
+    )
+    .optional(),
+  business_amenities: z
+    .array(
+      z.object({
+        amenities: z.object({
+          id: UuidSchema,
+          name: z.string(),
+          icon_url: z.string().nullable(),
+        }),
+      })
+    )
+    .optional(),
+});
+
 // ============================================================================
 // TYPE EXPORTS
 // ============================================================================
@@ -388,6 +448,8 @@ export const BusinessImageUploadSchema = z.object({
 export type BusinessType = z.infer<typeof BusinessTypeSchema>;
 export type BusinessStatus = z.infer<typeof BusinessStatusSchema>;
 export type Business = z.infer<typeof BusinessSchema>;
+export type BusinessWithImages = z.infer<typeof BusinessWithImagesSchema>;
+export type BusinessWithRelations = z.infer<typeof BusinessWithRelationsSchema>;
 export type BusinessCreateForm = z.infer<typeof BusinessCreateFormSchema>;
 export type BusinessFormStep1 = z.infer<typeof BusinessFormStep1Schema>;
 export type BusinessFormStep2 = z.infer<typeof BusinessFormStep2Schema>;
@@ -399,10 +461,16 @@ export type BusinessUpdate = z.infer<typeof BusinessUpdateSchema>;
 export type BusinessFilters = z.infer<typeof BusinessFiltersSchema>;
 export type BusinessSearch = z.infer<typeof BusinessSearchSchema>;
 export type BusinessApiResponse = z.infer<typeof BusinessApiResponseSchema>;
-export type BusinessListApiResponse = z.infer<typeof BusinessListApiResponseSchema>;
-export type BusinessMutationResponse = z.infer<typeof BusinessMutationResponseSchema>;
+export type BusinessListApiResponse = z.infer<
+  typeof BusinessListApiResponseSchema
+>;
+export type BusinessMutationResponse = z.infer<
+  typeof BusinessMutationResponseSchema
+>;
 export type BusinessCategory = z.infer<typeof BusinessCategorySchema>;
-export type BusinessCategoryAssign = z.infer<typeof BusinessCategoryAssignSchema>;
+export type BusinessCategoryAssign = z.infer<
+  typeof BusinessCategoryAssignSchema
+>;
 export type BusinessHours = z.infer<typeof BusinessHoursSchema>;
 export type BusinessHoursForm = z.infer<typeof BusinessHoursFormSchema>;
 export type BusinessImage = z.infer<typeof BusinessImageSchema>;

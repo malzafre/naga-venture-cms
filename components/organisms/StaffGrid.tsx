@@ -69,7 +69,7 @@ export default function StaffGrid({
 
   return (
     <View style={styles.container}>
-      <StaffHeader totalCount={totalCount} selectedRole={selectedRole} roleLabels={ROLE_LABELS} />{' '}
+      <StaffHeader totalCount={totalCount} selectedRole={selectedRole} roleLabels={ROLE_LABELS} />
       <ScrollView style={styles.staffGrid}>
         <View style={styles.gridContainer}>
           {staffMembers.map((staff) => (

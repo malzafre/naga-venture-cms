@@ -12,7 +12,12 @@
  * - Optimistic updates for instant UI feedback
  */
 
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { z } from 'zod';
 
 import { DOMAIN_CACHE_CONFIG } from '@/constants/CacheConstants';
@@ -23,14 +28,15 @@ import {
   BusinessInsertSchema,
   BusinessSchema,
   BusinessUpdateSchema,
+  BusinessWithRelationsSchema,
   validateSupabaseListResponse,
   validateSupabaseResponse,
   type Business,
   type BusinessFilters,
   type BusinessInsert,
   type BusinessUpdate,
+  type BusinessWithRelations,
 } from '@/schemas';
-import type { BusinessWithImages } from '@/types/supabase';
 
 // ============================================================================
 // ERROR HANDLING
@@ -39,7 +45,11 @@ import type { BusinessWithImages } from '@/types/supabase';
 /**
  * Enhanced error handling for business operations with contextual logging
  */
-const handleBusinessError = (error: any, operation: string, context?: Record<string, any>) => {
+const handleBusinessError = (
+  error: any,
+  operation: string,
+  context?: Record<string, any>
+) => {
   // Log error with context for debugging
   console.error(`[BusinessManagement] ${operation}:`, error, context);
 
@@ -57,7 +67,9 @@ const handleBusinessError = (error: any, operation: string, context?: Record<str
   }
 
   // Default enhanced error message
-  throw new Error(`Failed to ${operation}: ${error.message || 'Unknown error'}`);
+  throw new Error(
+    `Failed to ${operation}: ${error.message || 'Unknown error'}`
+  );
 };
 
 // ============================================================================
@@ -103,7 +115,13 @@ export function useBusinessListings(filters: Partial<BusinessFilters> = {}) {
 
   const validatedFilters = BusinessFiltersSchema.parse(defaultFilters);
 
-  const { status, business_type, search, page = 1, limit = 20 } = validatedFilters;
+  const {
+    status,
+    business_type,
+    search,
+    page = 1,
+    limit = 20,
+  } = validatedFilters;
 
   return useQuery({
     queryKey: businessQueryKeys.list(validatedFilters),
@@ -113,9 +131,12 @@ export function useBusinessListings(filters: Partial<BusinessFilters> = {}) {
           *,
           business_images!business_images_business_id_fkey(
             id,
+            business_id,
             image_url,
             is_primary,
-            caption
+            caption,
+            created_at,
+            updated_at
           ),
           business_categories!business_categories_business_id_fkey(
             sub_categories!business_categories_sub_category_id_fkey(
@@ -147,7 +168,9 @@ export function useBusinessListings(filters: Partial<BusinessFilters> = {}) {
       }
 
       if (search && search.trim()) {
-        query = query.or(`business_name.ilike.%${search}%,description.ilike.%${search}%`);
+        query = query.or(
+          `business_name.ilike.%${search}%,description.ilike.%${search}%`
+        );
       }
 
       // Apply pagination
@@ -167,9 +190,14 @@ export function useBusinessListings(filters: Partial<BusinessFilters> = {}) {
       }
 
       // Phase 5: Validate API response with Zod
-      const validatedResponse = validateSupabaseListResponse(BusinessSchema, response);
+      const validatedResponse = validateSupabaseListResponse(
+        BusinessSchema,
+        response
+      );
 
-      const hasMore = validatedResponse.count ? from + limit < validatedResponse.count : false;
+      const hasMore = validatedResponse.count
+        ? from + limit < validatedResponse.count
+        : false;
 
       return {
         data: validatedResponse.data,
@@ -189,10 +217,20 @@ export function useBusinessListings(filters: Partial<BusinessFilters> = {}) {
  * Fetches detailed data for a single business with comprehensive validation.
  */
 export function useBusiness(businessId: string | undefined) {
+  console.log('🔍 [useBusiness] Hook called with ID:', businessId);
+
   return useQuery({
     queryKey: businessQueryKeys.detail(businessId || ''),
-    queryFn: async (): Promise<BusinessWithImages | null> => {
-      if (!businessId) return null;
+    queryFn: async (): Promise<BusinessWithRelations | null> => {
+      if (!businessId) {
+        console.log('🔍 [useBusiness] No business ID provided, returning null');
+        return null;
+      }
+
+      console.log(
+        '🔍 [useBusiness] Fetching business data for ID:',
+        businessId
+      );
 
       // Phase 5: Validate businessId input
       const validatedId = z.string().uuid().parse(businessId);
@@ -204,10 +242,13 @@ export function useBusiness(businessId: string | undefined) {
           *,
           business_images!business_images_business_id_fkey(
             id,
+            business_id,
             image_url,
             is_primary,
             caption,
-            display_order
+            display_order,
+            created_at,
+            updated_at
           ),
           business_categories!business_categories_business_id_fkey(
             id,
@@ -241,18 +282,35 @@ export function useBusiness(businessId: string | undefined) {
         .eq('id', validatedId)
         .single();
 
+      console.log('🔍 [useBusiness] Supabase response - data:', response.data);
+      console.log(
+        '🔍 [useBusiness] Supabase response - error:',
+        response.error
+      );
+      console.log(
+        '🔍 [useBusiness] Business images from query:',
+        response.data?.business_images
+      );
+
       if (response.error) {
+        console.error(
+          '🔍 [useBusiness] Error fetching business:',
+          response.error
+        );
         handleBusinessError(response.error, 'fetch business details', {
           businessId: validatedId,
         });
       } // Phase 5: Validate API response with Zod
-      const validatedData = validateSupabaseResponse(BusinessSchema, response);
+      const validatedData = validateSupabaseResponse(
+        BusinessWithRelationsSchema,
+        response
+      );
 
       if (!validatedData) {
         throw new Error('Business not found');
       }
 
-      return validatedData as BusinessWithImages;
+      return validatedData as BusinessWithRelations;
     },
     enabled: !!businessId,
     staleTime: 10 * 60 * 1000, // 10 minutes
@@ -268,7 +326,7 @@ export function useBusiness(businessId: string | undefined) {
  */
 export function useBusinessCategories() {
   return useQuery({
-    queryKey: queryKeys.categories.lists(),
+    queryKey: queryKeys.categories.subLists(),
     queryFn: async () => {
       const response = await supabase
         .from('sub_categories')
@@ -316,7 +374,11 @@ export function useCreateBusiness() {
       // Phase 5: Validate input data with the correct schema
       const validatedData = BusinessInsertSchema.parse(businessData);
 
-      const response = await supabase.from('businesses').insert(validatedData).select().single();
+      const response = await supabase
+        .from('businesses')
+        .insert(validatedData)
+        .select()
+        .single();
 
       if (response.error) {
         handleBusinessError(response.error, 'create business', {
@@ -325,7 +387,10 @@ export function useCreateBusiness() {
       }
 
       // Phase 5: Validate API response
-      const validatedBusinessData = validateSupabaseResponse(BusinessSchema, response);
+      const validatedBusinessData = validateSupabaseResponse(
+        BusinessSchema,
+        response
+      );
 
       if (!validatedBusinessData) {
         throw new Error('Failed to create business - invalid response');
@@ -339,7 +404,10 @@ export function useCreateBusiness() {
       queryClient.invalidateQueries({ queryKey: businessQueryKeys.lists() });
 
       // Set detail cache for immediate navigation
-      queryClient.setQueryData(businessQueryKeys.detail(newBusiness.id as string), newBusiness);
+      queryClient.setQueryData(
+        businessQueryKeys.detail(newBusiness.id as string),
+        newBusiness
+      );
     },
     onError: (error) => {
       console.error('[useCreateBusiness] Mutation error:', error);
@@ -380,7 +448,10 @@ export function useUpdateBusiness() {
           updateData: validatedUpdateData,
         });
       } // Phase 5: Validate API response
-      const validatedBusinessData = validateSupabaseResponse(BusinessSchema, response);
+      const validatedBusinessData = validateSupabaseResponse(
+        BusinessSchema,
+        response
+      );
 
       if (!validatedBusinessData) {
         throw new Error('Failed to update business - invalid response');
@@ -415,7 +486,10 @@ export function useDeleteBusiness() {
       // Phase 5: Validate businessId input
       const validatedId = z.string().uuid().parse(businessId);
 
-      const response = await supabase.from('businesses').delete().eq('id', validatedId);
+      const response = await supabase
+        .from('businesses')
+        .delete()
+        .eq('id', validatedId);
 
       if (response.error) {
         handleBusinessError(response.error, 'delete business', {
@@ -446,7 +520,9 @@ export function useDeleteBusiness() {
  *
  * Infinite scroll business listings with comprehensive validation.
  */
-export function useInfiniteBusinessListings(filters: Partial<BusinessFilters> = {}) {
+export function useInfiniteBusinessListings(
+  filters: Partial<BusinessFilters> = {}
+) {
   // Phase 5: Validate input filters with defaults
   const defaultFilters: BusinessFilters = {
     page: 1,
@@ -467,9 +543,12 @@ export function useInfiniteBusinessListings(filters: Partial<BusinessFilters> = 
           *,
           business_images!business_images_business_id_fkey(
             id,
+            business_id,
             image_url,
             is_primary,
-            caption
+            caption,
+            created_at,
+            updated_at
           ),
           business_categories!business_categories_business_id_fkey(
             sub_categories!business_categories_sub_category_id_fkey(
@@ -509,10 +588,14 @@ export function useInfiniteBusinessListings(filters: Partial<BusinessFilters> = 
       }
 
       // Phase 5: Validate response
-      const validatedResponse = validateSupabaseListResponse(BusinessSchema, response);
+      const validatedResponse = validateSupabaseListResponse(
+        BusinessSchema,
+        response
+      );
 
       const hasMore = validatedResponse.count
-        ? (pageParam - 1) * limit + (validatedResponse.data?.length || 0) < validatedResponse.count
+        ? (pageParam - 1) * limit + (validatedResponse.data?.length || 0) <
+          validatedResponse.count
         : false;
 
       return {
@@ -537,7 +620,10 @@ export function useInfiniteBusinessListings(filters: Partial<BusinessFilters> = 
  *
  * Business analytics with validation for dashboard use.
  */
-export function useBusinessAnalytics(businessId?: string, timeframe: string = 'month') {
+export function useBusinessAnalytics(
+  businessId?: string,
+  timeframe: string = 'month'
+) {
   const cacheConfig = DOMAIN_CACHE_CONFIG.analytics;
 
   // Main business data (if businessId provided)
@@ -561,14 +647,21 @@ export function useBusinessAnalytics(businessId?: string, timeframe: string = 'm
 
       // Calculate statistics
       const totalBusinesses = businesses.length;
-      const pendingBusinesses = businesses.filter((b) => b.status === 'pending').length;
-      const approvedBusinesses = businesses.filter((b) => b.status === 'approved').length;
+      const pendingBusinesses = businesses.filter(
+        (b) => b.status === 'pending'
+      ).length;
+      const approvedBusinesses = businesses.filter(
+        (b) => b.status === 'approved'
+      ).length;
       const featuredBusinesses = businesses.filter((b) => b.is_featured).length;
 
-      const typeDistribution = businesses.reduce((acc: Record<string, number>, business) => {
-        acc[business.business_type] = (acc[business.business_type] || 0) + 1;
-        return acc;
-      }, {});
+      const typeDistribution = businesses.reduce(
+        (acc: Record<string, number>, business) => {
+          acc[business.business_type] = (acc[business.business_type] || 0) + 1;
+          return acc;
+        },
+        {}
+      );
 
       return {
         totalBusinesses,
@@ -576,7 +669,10 @@ export function useBusinessAnalytics(businessId?: string, timeframe: string = 'm
         approvedBusinesses,
         featuredBusinesses,
         typeDistribution,
-        approvalRate: totalBusinesses > 0 ? (approvedBusinesses / totalBusinesses) * 100 : 0,
+        approvalRate:
+          totalBusinesses > 0
+            ? (approvedBusinesses / totalBusinesses) * 100
+            : 0,
       };
     },
     enabled: true,
@@ -586,7 +682,10 @@ export function useBusinessAnalytics(businessId?: string, timeframe: string = 'm
   // Business reviews (if businessId provided)
   const reviewsQuery = useQuery({
     queryKey: businessId
-      ? businessQueryKeys.reviews?.(businessId) || ['business-reviews', businessId]
+      ? businessQueryKeys.reviews?.(businessId) || [
+          'business-reviews',
+          businessId,
+        ]
       : ['business-reviews', 'none'],
     queryFn: async () => {
       if (!businessId) return [];
@@ -613,8 +712,10 @@ export function useBusinessAnalytics(businessId?: string, timeframe: string = 'm
     business: businessQuery,
     stats: statsQuery,
     reviews: reviewsQuery,
-    isLoading: businessQuery.isLoading || statsQuery.isLoading || reviewsQuery.isLoading,
-    isError: businessQuery.isError || statsQuery.isError || reviewsQuery.isError,
+    isLoading:
+      businessQuery.isLoading || statsQuery.isLoading || reviewsQuery.isLoading,
+    isError:
+      businessQuery.isError || statsQuery.isError || reviewsQuery.isError,
     error: businessQuery.error || statsQuery.error || reviewsQuery.error,
   };
 }

@@ -139,7 +139,6 @@ export default function StaffManagement({
 
   return (
     <View style={styles.container}>
-      {' '}
       {/* Statistics Header */}
       <StaffStatistics
         staffMembers={staffMembers}
