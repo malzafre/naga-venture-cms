@@ -1,11 +1,7 @@
 // filepath: hooks/useStableBusinessFilter.ts
 import { useMemo } from 'react';
 
-import {
-  useBusinessFilterActions,
-  useBusinessFilters,
-  useBusinessSearch,
-} from '@/stores';
+import { useBusinessFilterActions, useBusinessFilters, useBusinessSearch } from '@/stores';
 
 /**
  * Modern stable business filter hook using Zustand best practices

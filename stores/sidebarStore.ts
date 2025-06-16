@@ -72,10 +72,7 @@ export const useSidebarStore = create<SidebarStore>()(
         console.log(
           `[SidebarStore] Toggle section: ${sectionId}, was ${isExpanded ? 'expanded' : 'collapsed'}, now ${!isExpanded ? 'expanded' : 'collapsed'}`
         );
-        console.log(
-          '[SidebarStore] New expanded sections:',
-          newExpandedSections
-        );
+        console.log('[SidebarStore] New expanded sections:', newExpandedSections);
 
         return {
           ...state,
@@ -147,9 +144,7 @@ export const useSidebarStore = create<SidebarStore>()(
     }, // Internal persistence methods - FIXED
     _loadPersistedState: async (userId: string | null | undefined) => {
       try {
-        const AsyncStorage = await import(
-          '@react-native-async-storage/async-storage'
-        );
+        const AsyncStorage = await import('@react-native-async-storage/async-storage');
         const key = `@TourismCMS:ExpandedSections:${userId || 'anonymous'}`;
         const stored = await AsyncStorage.default.getItem(key);
 
@@ -165,10 +160,7 @@ export const useSidebarStore = create<SidebarStore>()(
               ...state,
               expandedSections: parsed,
             }));
-            console.log(
-              `[SidebarStore] Loaded ${parsed.length} expanded sections:`,
-              parsed
-            );
+            console.log(`[SidebarStore] Loaded ${parsed.length} expanded sections:`, parsed);
           }
         } else {
           // FIX: Reset to empty if no stored state
@@ -185,16 +177,11 @@ export const useSidebarStore = create<SidebarStore>()(
 
     _persistState: async (userId: string | null | undefined) => {
       try {
-        const AsyncStorage = await import(
-          '@react-native-async-storage/async-storage'
-        );
+        const AsyncStorage = await import('@react-native-async-storage/async-storage');
         const key = `@TourismCMS:ExpandedSections:${userId || 'anonymous'}`;
         const { expandedSections } = get();
 
-        await AsyncStorage.default.setItem(
-          key,
-          JSON.stringify(expandedSections)
-        );
+        await AsyncStorage.default.setItem(key, JSON.stringify(expandedSections));
 
         console.log(
           `[SidebarStore] Persisted state for user: ${userId || 'anonymous'}, sections:`,
@@ -212,16 +199,13 @@ export const useSidebarStore = create<SidebarStore>()(
  */
 
 // Get only expanded sections (most commonly used)
-export const useExpandedSections = () =>
-  useSidebarStore((state) => state.expandedSections);
+export const useExpandedSections = () => useSidebarStore((state) => state.expandedSections);
 
 // Get only active section
-export const useActiveSection = () =>
-  useSidebarStore((state) => state.activeSection);
+export const useActiveSection = () => useSidebarStore((state) => state.activeSection);
 
 // Get user role only
-export const useSidebarUserRole = () =>
-  useSidebarStore((state) => state.userRole);
+export const useSidebarUserRole = () => useSidebarStore((state) => state.userRole);
 
 // Get complete sidebar state (use sparingly) - Updated with useShallow
 export const useSidebarState = () =>

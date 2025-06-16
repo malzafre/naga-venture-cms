@@ -2,15 +2,16 @@
 
 **Following New Coding Guidelines & Production Standards**
 
-_Created: June 12, 2025_
-_Last Updated: June 12, 2025_
-_Status: Phase 2 Complete ✅_
+_Created: June 12, 2025_ _Last Updated: June 12, 2025_ _Status: Phase 2 Complete ✅_
 
 ---
 
 ## 📋 **EXECUTIVE SUMMARY**
 
-This comprehensive refactoring plan transforms the NAGA VENTURE Tourism CMS to fully comply with the new coding guidelines, emphasizing production-level code quality, maintainability, and performance. The plan follows a systematic, phased approach to minimize disruption while ensuring all changes align with modern React Native development best practices.
+This comprehensive refactoring plan transforms the NAGA VENTURE Tourism CMS to fully comply with the new coding
+guidelines, emphasizing production-level code quality, maintainability, and performance. The plan follows a systematic,
+phased approach to minimize disruption while ensuring all changes align with modern React Native development best
+practices.
 
 ### **Key Objectives:**
 
@@ -508,9 +509,7 @@ export function useUpdateBusinessOptimistic() {
       await queryClient.cancelQueries({ queryKey: businessQueryKeys.all });
 
       // Snapshot previous value
-      const previousData = queryClient.getQueryData(
-        businessQueryKeys.detail(newData.id)
-      );
+      const previousData = queryClient.getQueryData(businessQueryKeys.detail(newData.id));
 
       // Optimistically update
       queryClient.setQueryData(businessQueryKeys.detail(newData.id), {
@@ -522,10 +521,7 @@ export function useUpdateBusinessOptimistic() {
     },
     onError: (err, newData, context) => {
       // Rollback on error
-      queryClient.setQueryData(
-        businessQueryKeys.detail(newData.id),
-        context?.previousData
-      );
+      queryClient.setQueryData(businessQueryKeys.detail(newData.id), context?.previousData);
     },
     onSettled: () => {
       // Always refetch after error or success
@@ -771,9 +767,7 @@ const typeCheckScript = `
 | 7     | 1 week   | MEDIUM   | Advanced Features           |
 | 8     | 1 week   | HIGH     | Testing & QA                |
 
-**Total Duration: 9 weeks**
-**Start Date: June 12, 2025**
-**Estimated Completion: August 14, 2025**
+**Total Duration: 9 weeks** **Start Date: June 12, 2025** **Estimated Completion: August 14, 2025**
 
 ---
 
@@ -797,4 +791,5 @@ const typeCheckScript = `
 
 ---
 
-**This refactoring plan ensures the NAGA VENTURE Tourism CMS becomes a production-ready, maintainable, and scalable application while following industry best practices and the project's specific coding guidelines.**
+**This refactoring plan ensures the NAGA VENTURE Tourism CMS becomes a production-ready, maintainable, and scalable
+application while following industry best practices and the project's specific coding guidelines.**

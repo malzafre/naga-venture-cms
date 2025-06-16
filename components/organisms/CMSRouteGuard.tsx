@@ -23,10 +23,7 @@ interface CMSRouteGuardProps {
  * @param routePath - The current route path for authorization checking
  * @param children - The content to render if authorized
  */
-const CMSRouteGuard: React.FC<CMSRouteGuardProps> = ({
-  routePath,
-  children,
-}) => {
+const CMSRouteGuard: React.FC<CMSRouteGuardProps> = ({ routePath, children }) => {
   const { user, userProfile, isLoading: authLoading } = useAuth();
   const { hasAccess, isLoading: routeLoading } = useRouteGuard(routePath);
 
@@ -46,12 +43,7 @@ const CMSRouteGuard: React.FC<CMSRouteGuardProps> = ({
   if (!user) {
     return (
       <View style={styles.errorContainer}>
-        <FontAwesome
-          name="lock"
-          size={48}
-          color="#FF3B30"
-          style={styles.errorIcon}
-        />
+        <FontAwesome name="lock" size={48} color="#FF3B30" style={styles.errorIcon} />
         <CMSText type="title" darkColor="#000" style={styles.errorTitle}>
           Authentication Required
         </CMSText>
@@ -71,12 +63,7 @@ const CMSRouteGuard: React.FC<CMSRouteGuardProps> = ({
   if (!hasAccess) {
     return (
       <View style={styles.errorContainer}>
-        <FontAwesome
-          name="ban"
-          size={48}
-          color="#FF9500"
-          style={styles.errorIcon}
-        />
+        <FontAwesome name="ban" size={48} color="#FF9500" style={styles.errorIcon} />
         <CMSText type="title" darkColor="#000" style={styles.errorTitle}>
           Access Denied
         </CMSText>

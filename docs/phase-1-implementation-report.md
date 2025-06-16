@@ -8,7 +8,9 @@
 
 ## 📋 **PHASE 1 SUMMARY**
 
-Phase 1 of the major refactoring plan has been successfully completed, establishing a solid foundation for the entire codebase transformation. All objectives were met with production-level quality and adherence to the new coding guidelines.
+Phase 1 of the major refactoring plan has been successfully completed, establishing a solid foundation for the entire
+codebase transformation. All objectives were met with production-level quality and adherence to the new coding
+guidelines.
 
 ### **Key Achievements:**
 
@@ -74,11 +76,9 @@ tabWidth: 2,
      DASHBOARD: { MAIN: '/(sidebar)/dashboard' },
      BUSINESS_MANAGEMENT: {
        BUSINESS_LISTINGS: {
-         ALL_BUSINESSES:
-           '/(sidebar)/business-management/business-listings/all-businesses',
+         ALL_BUSINESSES: '/(sidebar)/business-management/business-listings/all-businesses',
          CREATE: '/(sidebar)/business-management/business-listings/create',
-         EDIT: (id: string) =>
-           `/(sidebar)/business-management/business-listings/edit/${id}`,
+         EDIT: (id: string) => `/(sidebar)/business-management/business-listings/edit/${id}`,
        },
      },
    } as const;
@@ -199,8 +199,7 @@ tabWidth: 2,
 export const ROUTES = {
   TOURISM_CMS: {
     BUSINESS_MANAGEMENT: {
-      ALL_BUSINESSES:
-        ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS.ALL_BUSINESSES,
+      ALL_BUSINESSES: ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS.ALL_BUSINESSES,
       // ... other legacy routes
     },
   },

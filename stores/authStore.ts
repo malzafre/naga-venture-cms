@@ -159,9 +159,7 @@ export const useAuthStore = create<AuthStore>()(
         }
       } catch (err) {
         console.error('[AuthStore] Initialize auth exception:', err);
-        get().setAuthError(
-          err instanceof Error ? err : new Error('Auth initialization failed')
-        );
+        get().setAuthError(err instanceof Error ? err : new Error('Auth initialization failed'));
       } finally {
         get().setIsLoadingInitial(false);
       }
@@ -182,9 +180,7 @@ supabase.auth.onAuthStateChange((event, newSession) => {
     return;
   }
 
-  console.log(
-    `[AuthStore] Auth event: ${event}, User: ${newSession?.user?.id || 'none'}`
-  );
+  console.log(`[AuthStore] Auth event: ${event}, User: ${newSession?.user?.id || 'none'}`);
 
   // Get the actions directly from the store and update the state
   useAuthStore.getState().setSession(newSession);
@@ -232,6 +228,4 @@ export const useAuthActions = () =>
 
 // Combined loading state for convenience
 export const useAuthIsLoading = () =>
-  useAuthStore(
-    (state) => state.isLoadingInitial || (!!state.user && state.isSigningIn)
-  );
+  useAuthStore((state) => state.isLoadingInitial || (!!state.user && state.isSigningIn));

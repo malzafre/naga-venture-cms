@@ -12,11 +12,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CMSButton } from '@/components/atoms';
 import { errorService } from '@/services/ErrorService';
 
-import {
-  ErrorBoundaryProps,
-  ErrorBoundaryState,
-  ErrorFallbackProps,
-} from './types';
+import { ErrorBoundaryProps, ErrorBoundaryState, ErrorFallbackProps } from './types';
 
 /**
  * Global Error Boundary Class Component
@@ -24,10 +20,7 @@ import {
  * Catches all unhandled React component errors and provides a fallback UI.
  * Reports errors to external services and allows for application recovery.
  */
-class GlobalErrorBoundary extends Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-> {
+class GlobalErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   private retryTimeoutId: number | null = null;
 
   constructor(props: ErrorBoundaryProps) {
@@ -192,8 +185,8 @@ const GlobalErrorFallback: React.FC<ErrorFallbackProps> = ({
         <Text style={styles.errorIcon}>💥</Text>
         <Text style={styles.errorTitle}>Something went wrong</Text>
         <Text style={styles.errorSubtitle}>
-          We&apos;re sorry, but the application encountered an unexpected error.
-          Please try again or contact support if the problem persists.
+          We&apos;re sorry, but the application encountered an unexpected error. Please try again or
+          contact support if the problem persists.
         </Text>
       </View>
 
@@ -255,8 +248,7 @@ const GlobalErrorFallback: React.FC<ErrorFallbackProps> = ({
 
       <View style={styles.errorFooter}>
         <Text style={styles.errorFooterText}>
-          If this error continues to occur, please contact our support team with
-          the error ID above.
+          If this error continues to occur, please contact our support team with the error ID above.
         </Text>
       </View>
     </ScrollView>

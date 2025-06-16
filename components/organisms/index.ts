@@ -6,7 +6,9 @@ export { default as CMSDashboardLayout } from './CMSDashboardLayout';
 export { CMSPlaceholderPage } from './CMSPlaceholderPage';
 export { default as CMSRouteGuard } from './CMSRouteGuard';
 export { CMSSidebar } from './CMSSidebar';
-export { default as StaffDataTable } from './StaffDataTable';
+export { default as ModernStaffCard } from './ModernStaffCard';
+export { default as StaffGrid } from './StaffGrid';
+export { default as StaffManagement } from './StaffManagement';
 
 // Export types
 export type { CMSDashboardLayoutProps, StatData } from './CMSDashboardLayout';

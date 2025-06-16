@@ -8,7 +8,9 @@ _Last Updated: June 10, 2025_
 
 ## 🎯 **Project Overview**
 
-The Tourism CMS is a comprehensive management system for the Naga Venture tourism platform, featuring role-based access control and hierarchical navigation for multiple user types including Tourism Admins, Business Listing Managers, Tourism Content Managers, and Business Registration Managers.
+The Tourism CMS is a comprehensive management system for the Naga Venture tourism platform, featuring role-based access
+control and hierarchical navigation for multiple user types including Tourism Admins, Business Listing Managers, Tourism
+Content Managers, and Business Registration Managers.
 
 ---
 
@@ -403,4 +405,5 @@ components/TourismCMS/
 
 ---
 
-**Next Phase Priority**: Begin Phase 1 (Dashboard Foundation) immediately, focusing on the Tourism Admin dashboard and core analytics framework.
+**Next Phase Priority**: Begin Phase 1 (Dashboard Foundation) immediately, focusing on the Tourism Admin dashboard and
+core analytics framework.

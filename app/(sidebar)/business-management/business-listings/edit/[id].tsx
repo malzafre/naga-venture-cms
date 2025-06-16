@@ -33,12 +33,7 @@ export default function EditBusinessScreen() {
   const [errorMessage, setErrorMessage] = useState('');
 
   // Fetch business data
-  const {
-    data: business,
-    isLoading: businessLoading,
-    isError,
-    error,
-  } = useBusiness(id);
+  const { data: business, isLoading: businessLoading, isError, error } = useBusiness(id);
 
   const updateBusinessMutation = useUpdateBusiness();
 
@@ -50,8 +45,7 @@ export default function EditBusinessScreen() {
           <View style={styles.errorContainer}>
             <Text style={styles.errorTitle}>Invalid Business ID</Text>
             <Text style={styles.errorMessage}>
-              No business ID was provided. Please select a valid business to
-              edit.
+              No business ID was provided. Please select a valid business to edit.
             </Text>
             <CMSButton
               title="Go Back"
@@ -93,9 +87,7 @@ export default function EditBusinessScreen() {
   };
 
   const confirmCancel = () => {
-    console.log(
-      '✅ [EditBusinessScreen] User confirmed cancel - navigating back'
-    );
+    console.log('✅ [EditBusinessScreen] User confirmed cancel - navigating back');
     setCancelModalVisible(false);
     try {
       NavigationService.toAllBusinesses();

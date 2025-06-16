@@ -5,11 +5,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { CMSButton } from '@/components/atoms';
 import { errorService } from '@/services/ErrorService';
 
-import {
-  ErrorBoundaryProps,
-  ErrorBoundaryState,
-  ErrorFallbackProps,
-} from './types';
+import { ErrorBoundaryProps, ErrorBoundaryState, ErrorFallbackProps } from './types';
 
 /**
  * Feature Error Boundary - Phase 4 Implementation
@@ -18,10 +14,7 @@ import {
  * Provides targeted error handling and recovery without affecting the entire application.
  */
 
-class FeatureErrorBoundary extends Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-> {
+class FeatureErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   private retryTimeoutId: number | null = null;
 
   constructor(props: ErrorBoundaryProps) {
@@ -82,9 +75,7 @@ class FeatureErrorBoundary extends Component<
     const { retryCount } = this.state;
 
     if (retryCount >= maxRetries) {
-      console.warn(
-        `Feature [${this.props.featureName}] maximum retry attempts reached`
-      );
+      console.warn(`Feature [${this.props.featureName}] maximum retry attempts reached`);
       return;
     }
 

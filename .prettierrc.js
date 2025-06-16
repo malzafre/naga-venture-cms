@@ -1,16 +1,50 @@
 module.exports = {
-  semi: true, // Add a semicolon at the end of statements
-  singleQuote: true, // Use single quotes instead of double quotes
-  jsxSingleQuote: false, // Use double quotes in JSX
-  trailingComma: 'es5', // Add trailing commas where valid in ES5 (objects, arrays, etc.)
-  arrowParens: 'always', // Always include parens around arrow function parameters.
-  printWidth: 80, // Specify the line length that the printer will wrap on.
-  useTabs: false, // Indent lines with spaces instead of tabs.
-  bracketSpacing: true, // Print spaces between brackets in object literals.
-  bracketSameLine: false, // Put the closing bracket on a new line (replaces jsxBracketSameLine)
-  endOfLine: 'auto', // Use auto line endings to avoid conflicts
-  quoteProps: 'as-needed', // Only quote object properties when necessary
-  proseWrap: 'preserve', // Preserve markdown text wrapping
+  // Basic formatting - matches my style
+  semi: true,
+  singleQuote: true,
+  jsxSingleQuote: false,
+  quoteProps: 'as-needed',
+
+  // Line length and wrapping - longer lines for readability
+  printWidth: 100,
+  proseWrap: 'preserve',
+
+  // Indentation - 2 spaces
+  tabWidth: 2,
+  useTabs: false,
+
+  // Trailing commas and brackets
+  trailingComma: 'es5',
+  bracketSpacing: true,
+  bracketSameLine: false,
+  arrowParens: 'always',
+
+  // Line endings - consistent across platforms
+  endOfLine: 'lf',
+
+  // File-specific overrides
+  overrides: [
+    {
+      files: '*.md',
+      options: {
+        proseWrap: 'always',
+        printWidth: 120,
+      },
+    },
+    {
+      files: '*.json',
+      options: {
+        trailingComma: 'none',
+      },
+    },
+    {
+      files: ['*.ts', '*.tsx'],
+      options: {
+        printWidth: 100,
+        trailingComma: 'es5',
+      },
+    },
+  ],
 };
 // This configuration file is for Prettier, a code formatter.
 // It specifies various formatting rules such as semicolons, quotes, trailing commas, and more.

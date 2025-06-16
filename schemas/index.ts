@@ -44,9 +44,7 @@ export const createValidator = <T extends z.ZodTypeAny>(schema: T) => {
 export const createSafeValidator = <T extends z.ZodTypeAny>(schema: T) => {
   return (
     data: unknown
-  ):
-    | { success: true; data: z.infer<T> }
-    | { success: false; error: z.ZodError } => {
+  ): { success: true; data: z.infer<T> } | { success: false; error: z.ZodError } => {
     const result = schema.safeParse(data);
     return result;
   };
@@ -58,17 +56,11 @@ export const createSafeValidator = <T extends z.ZodTypeAny>(schema: T) => {
 export const EnvironmentSchema = z.object({
   // Supabase Configuration
   EXPO_PUBLIC_SUPABASE_URL: z.string().url('Invalid Supabase URL'),
-  EXPO_PUBLIC_SUPABASE_ANON_KEY: z
-    .string()
-    .min(1, 'Supabase anon key is required'),
+  EXPO_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1, 'Supabase anon key is required'),
 
   // Optional Environment Settings
-  NODE_ENV: z
-    .enum(['development', 'production', 'test'])
-    .default('development'),
-  EXPO_PUBLIC_APP_ENV: z
-    .enum(['development', 'staging', 'production'])
-    .default('development'),
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  EXPO_PUBLIC_APP_ENV: z.enum(['development', 'staging', 'production']).default('development'),
 
   // API Configuration
   EXPO_PUBLIC_API_BASE_URL: z.string().url().optional(),
@@ -92,19 +84,13 @@ export const EnvironmentSchema = z.object({
 /**
  * Validates environment variables
  */
-export const validateEnvironment = (
-  env: Record<string, string | undefined>
-) => {
+export const validateEnvironment = (env: Record<string, string | undefined>) => {
   try {
     return EnvironmentSchema.parse(env);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const missingVars = error.errors.map(
-        (err) => `${err.path.join('.')}: ${err.message}`
-      );
-      throw new Error(
-        `Environment validation failed:\n${missingVars.join('\n')}`
-      );
+      const missingVars = error.errors.map((err) => `${err.path.join('.')}: ${err.message}`);
+      throw new Error(`Environment validation failed:\n${missingVars.join('\n')}`);
     }
     throw error;
   }
@@ -186,8 +172,7 @@ export const FormValidationPresets = {
   /**
    * Required field validation
    */
-  required: (fieldName: string) =>
-    z.string().min(1, `${fieldName} is required`),
+  required: (fieldName: string) => z.string().min(1, `${fieldName} is required`),
 
   /**
    * Optional field validation
@@ -203,8 +188,7 @@ export const FormValidationPresets = {
   /**
    * Non-negative number validation
    */
-  nonNegativeNumber: (fieldName: string) =>
-    z.number().min(0, `${fieldName} cannot be negative`),
+  nonNegativeNumber: (fieldName: string) => z.number().min(0, `${fieldName} cannot be negative`),
 
   /**
    * String length validation
@@ -252,6 +236,5 @@ export const DatabaseValidationPresets = {
   /**
    * Optional with null validation
    */
-  optionalNullable: <T extends z.ZodTypeAny>(schema: T) =>
-    schema.optional().nullable(),
+  optionalNullable: <T extends z.ZodTypeAny>(schema: T) => schema.optional().nullable(),
 };

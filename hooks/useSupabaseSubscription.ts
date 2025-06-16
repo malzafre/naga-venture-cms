@@ -35,21 +35,12 @@ export function useSupabaseSubscription(
   const channelRef = useRef<any>(null);
   const isSubscribedRef = useRef(false);
 
-  const {
-    table,
-    schema = 'public',
-    event = '*',
-    filter,
-    invalidateQueries = [],
-    onData,
-  } = config;
+  const { table, schema = 'public', event = '*', filter, invalidateQueries = [], onData } = config;
 
   const cleanup = useCallback(() => {
     try {
       if (channelRef.current) {
-        console.log(
-          `🧹 [useSupabaseSubscription] Cleaning up subscription for ${table}`
-        );
+        console.log(`🧹 [useSupabaseSubscription] Cleaning up subscription for ${table}`);
 
         // Mark as unsubscribed
         isSubscribedRef.current = false;
@@ -64,15 +55,10 @@ export function useSupabaseSubscription(
         channelRef.current = null;
         subscriptionRef.current = null;
 
-        console.log(
-          `✅ [useSupabaseSubscription] Successfully cleaned up ${table} subscription`
-        );
+        console.log(`✅ [useSupabaseSubscription] Successfully cleaned up ${table} subscription`);
       }
     } catch (error) {
-      console.error(
-        `❌ [useSupabaseSubscription] Cleanup error for ${table}:`,
-        error
-      );
+      console.error(`❌ [useSupabaseSubscription] Cleanup error for ${table}:`, error);
     }
   }, [table]);
   // Keep track of the last subscription attempt time
@@ -87,9 +73,7 @@ export function useSupabaseSubscription(
     // Prevent rapid subscription attempts (debounce of 500ms)
     const now = Date.now();
     if (now - lastSubscriptionAttemptRef.current < 500) {
-      console.log(
-        `🔄 [useSupabaseSubscription] Throttling subscription request for ${table}`
-      );
+      console.log(`🔄 [useSupabaseSubscription] Throttling subscription request for ${table}`);
       return;
     }
 
@@ -98,9 +82,7 @@ export function useSupabaseSubscription(
 
     try {
       // Create unique channel name to prevent conflicts
-      const channelName = `${table}-${Date.now()}-${Math.random()
-        .toString(36)
-        .substr(2, 9)}`;
+      const channelName = `${table}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
       console.log(
         `📡 [useSupabaseSubscription] Setting up subscription for ${table} on channel: ${channelName}`
@@ -137,36 +119,18 @@ export function useSupabaseSubscription(
       // Subscribe with status callback
       subscription.subscribe((status, error) => {
         if (error) {
-          console.error(
-            `❌ [useSupabaseSubscription] ${table} subscription error:`,
-            error
-          );
+          console.error(`❌ [useSupabaseSubscription] ${table} subscription error:`, error);
           isSubscribedRef.current = false;
         } else {
-          console.log(
-            `📡 [useSupabaseSubscription] ${table} subscription status:`,
-            status
-          );
+          console.log(`📡 [useSupabaseSubscription] ${table} subscription status:`, status);
           isSubscribedRef.current = status === 'SUBSCRIBED';
         }
       });
     } catch (error) {
-      console.error(
-        `❌ [useSupabaseSubscription] Failed to setup ${table} subscription:`,
-        error
-      );
+      console.error(`❌ [useSupabaseSubscription] Failed to setup ${table} subscription:`, error);
       isSubscribedRef.current = false;
     }
-  }, [
-    table,
-    schema,
-    event,
-    filter,
-    enabled,
-    onData,
-    invalidateQueries,
-    queryClient,
-  ]);
+  }, [table, schema, event, filter, enabled, onData, invalidateQueries, queryClient]);
 
   // Create a ref to track the current effect instance to prevent cleanup race conditions
   const effectInstanceRef = useRef(0);

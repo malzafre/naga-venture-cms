@@ -55,17 +55,11 @@ export function usePersistentState<T>(
       if (!isLoaded) return;
 
       setState((prev) => {
-        const newState =
-          typeof value === 'function' ? (value as (prev: T) => T)(prev) : value;
+        const newState = typeof value === 'function' ? (value as (prev: T) => T)(prev) : value;
 
-        AsyncStorage.setItem(dynamicKey, JSON.stringify(newState)).catch(
-          (error) => {
-            console.warn(
-              `Failed to persist state for key "${dynamicKey}":`,
-              error
-            );
-          }
-        );
+        AsyncStorage.setItem(dynamicKey, JSON.stringify(newState)).catch((error) => {
+          console.warn(`Failed to persist state for key "${dynamicKey}":`, error);
+        });
 
         return newState;
       });

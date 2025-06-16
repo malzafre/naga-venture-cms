@@ -41,12 +41,9 @@ export const BusinessTypeSchema = z.enum(['accommodation', 'shop', 'service'], {
 /**
  * Business status validation
  */
-export const BusinessStatusSchema = z.enum(
-  ['pending', 'approved', 'rejected', 'inactive'],
-  {
-    errorMap: () => ({ message: 'Invalid business status' }),
-  }
-);
+export const BusinessStatusSchema = z.enum(['pending', 'approved', 'rejected', 'inactive'], {
+  errorMap: () => ({ message: 'Invalid business status' }),
+});
 
 // ============================================================================
 // CORE BUSINESS SCHEMAS
@@ -78,10 +75,7 @@ export const BusinessSchema = z.object({
   owner_id: UuidSchema.nullable(),
   business_name: NameSchema,
   business_type: BusinessTypeSchema,
-  description: TextContentSchema.min(
-    200,
-    'Description must be at least 200 characters'
-  ),
+  description: TextContentSchema.min(200, 'Description must be at least 200 characters'),
   address: AddressSchema,
   city: CitySchema,
   province: ProvinceSchema,
@@ -117,10 +111,7 @@ export const BusinessCreateFormSchema = z.object({
   // Step 1: Basic Information
   business_name: NameSchema,
   business_type: BusinessTypeSchema,
-  description: TextContentSchema.min(
-    200,
-    'Description must be at least 200 characters'
-  ),
+  description: TextContentSchema.min(200, 'Description must be at least 200 characters'),
 
   // Step 2: Location Information
   address: AddressSchema,
@@ -386,16 +377,10 @@ export type BusinessUpdate = z.infer<typeof BusinessUpdateSchema>;
 export type BusinessFilters = z.infer<typeof BusinessFiltersSchema>;
 export type BusinessSearch = z.infer<typeof BusinessSearchSchema>;
 export type BusinessApiResponse = z.infer<typeof BusinessApiResponseSchema>;
-export type BusinessListApiResponse = z.infer<
-  typeof BusinessListApiResponseSchema
->;
-export type BusinessMutationResponse = z.infer<
-  typeof BusinessMutationResponseSchema
->;
+export type BusinessListApiResponse = z.infer<typeof BusinessListApiResponseSchema>;
+export type BusinessMutationResponse = z.infer<typeof BusinessMutationResponseSchema>;
 export type BusinessCategory = z.infer<typeof BusinessCategorySchema>;
-export type BusinessCategoryAssign = z.infer<
-  typeof BusinessCategoryAssignSchema
->;
+export type BusinessCategoryAssign = z.infer<typeof BusinessCategoryAssignSchema>;
 export type BusinessHours = z.infer<typeof BusinessHoursSchema>;
 export type BusinessHoursForm = z.infer<typeof BusinessHoursFormSchema>;
 export type BusinessImage = z.infer<typeof BusinessImageSchema>;

@@ -5,7 +5,7 @@
  * Follows the smart hook/dumb component pattern.
  */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { CMSButton, CMSText } from '@/components/atoms';

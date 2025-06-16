@@ -142,12 +142,8 @@ export const CMSNavigationItem: React.FC<CMSNavigationItemProps> = ({
     };
 
     return (
-      <View
-        style={[styles.badge, { backgroundColor: badgeColors[badge.type] }]}
-      >
-        <Text style={styles.badgeText}>
-          {badge.count > 99 ? '99+' : badge.count.toString()}
-        </Text>
+      <View style={[styles.badge, { backgroundColor: badgeColors[badge.type] }]}>
+        <Text style={styles.badgeText}>{badge.count > 99 ? '99+' : badge.count.toString()}</Text>
       </View>
     );
   };

@@ -1,22 +1,12 @@
 import React from 'react';
-import {
-  Animated,
-  LayoutAnimation,
-  Platform,
-  StyleSheet,
-  UIManager,
-  View,
-} from 'react-native';
+import { Animated, LayoutAnimation, Platform, StyleSheet, UIManager, View } from 'react-native';
 
 import { NavigationItem } from '@/types/navigation';
 
 import { CMSNavigationDropdownIndicator, CMSNavigationItem } from '../atoms';
 
 // Enable LayoutAnimation on Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -55,9 +45,7 @@ export const CMSNavigationSection: React.FC<CMSNavigationSectionProps> = ({
   onToggleExpand,
   onNavigate,
 }) => {
-  const [subsectionHeight] = React.useState(
-    new Animated.Value(isExpanded ? 1 : 0)
-  );
+  const [subsectionHeight] = React.useState(new Animated.Value(isExpanded ? 1 : 0));
 
   const hasSubsections = section.subsections && section.subsections.length > 0;
 
@@ -131,9 +119,7 @@ export const CMSNavigationSection: React.FC<CMSNavigationSectionProps> = ({
 
           if (subsection.type === 'dropdown' && subsection.subsections) {
             // Nested dropdown section - check if this specific subsection is expanded
-            const isSubsectionExpanded = expandedSections.includes(
-              subsection.id
-            );
+            const isSubsectionExpanded = expandedSections.includes(subsection.id);
 
             return (
               <CMSNavigationSection

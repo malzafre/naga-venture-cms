@@ -24,10 +24,7 @@ export const CategoryTreeItem: React.FC<CategoryTreeItemProps> = ({
   onToggleExpand,
 }) => {
   return (
-    <TouchableOpacity
-      style={[styles.container, isSelected && styles.selected]}
-      onPress={onPress}
-    >
+    <TouchableOpacity style={[styles.container, isSelected && styles.selected]} onPress={onPress}>
       <View style={styles.icon}>
         <Text style={styles.iconText}>📁</Text>
       </View>
@@ -36,10 +33,7 @@ export const CategoryTreeItem: React.FC<CategoryTreeItemProps> = ({
         <Text style={styles.expandIcon}>{isExpanded ? '▼' : '▶'}</Text>
       </TouchableOpacity>
       <View
-        style={[
-          styles.statusDot,
-          category.is_active ? styles.activeDot : styles.inactiveDot,
-        ]}
+        style={[styles.statusDot, category.is_active ? styles.activeDot : styles.inactiveDot]}
       />
     </TouchableOpacity>
   );

@@ -54,11 +54,7 @@ const CMSButton: React.FC<CMSButtonProps> = memo(
       fullWidth && styles.fullWidth,
       (disabled || loading) && styles.disabled,
       // Web hover effect
-      Platform.OS === 'web' &&
-        isHovered &&
-        !disabled &&
-        !loading &&
-        styles.webHover,
+      Platform.OS === 'web' && isHovered && !disabled && !loading && styles.webHover,
       style,
     ];
 
@@ -118,9 +114,7 @@ const CMSButton: React.FC<CMSButtonProps> = memo(
         {loading ? (
           <ActivityIndicator
             size="small"
-            color={
-              variant === 'primary' || variant === 'danger' ? '#fff' : '#007AFF'
-            }
+            color={variant === 'primary' || variant === 'danger' ? '#fff' : '#007AFF'}
           />
         ) : (
           <>

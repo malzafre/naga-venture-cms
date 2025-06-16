@@ -261,10 +261,7 @@ export const PaginationQuerySchema = z.object({
     .min(1, 'Limit must be at least 1')
     .max(100, 'Limit cannot exceed 100')
     .default(20),
-  search: z
-    .string()
-    .max(255, 'Search query must be less than 255 characters')
-    .optional(),
+  search: z.string().max(255, 'Search query must be less than 255 characters').optional(),
 });
 
 /**
@@ -329,12 +326,9 @@ export const StatusSchema = z.enum(['active', 'inactive'], {
 /**
  * Approval status validation
  */
-export const ApprovalStatusSchema = z.enum(
-  ['pending', 'approved', 'rejected'],
-  {
-    errorMap: () => ({ message: 'Invalid approval status' }),
-  }
-);
+export const ApprovalStatusSchema = z.enum(['pending', 'approved', 'rejected'], {
+  errorMap: () => ({ message: 'Invalid approval status' }),
+});
 
 // ============================================================================
 // EXPORT TYPES

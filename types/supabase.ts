@@ -12,16 +12,12 @@ export type ProfileInsert = Database['public']['Tables']['profiles']['Insert'];
 export type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
 
 export type Business = Database['public']['Tables']['businesses']['Row'];
-export type BusinessInsert =
-  Database['public']['Tables']['businesses']['Insert'];
-export type BusinessUpdate =
-  Database['public']['Tables']['businesses']['Update'];
+export type BusinessInsert = Database['public']['Tables']['businesses']['Insert'];
+export type BusinessUpdate = Database['public']['Tables']['businesses']['Update'];
 
 export type TouristSpot = Database['public']['Tables']['tourist_spots']['Row'];
-export type TouristSpotInsert =
-  Database['public']['Tables']['tourist_spots']['Insert'];
-export type TouristSpotUpdate =
-  Database['public']['Tables']['tourist_spots']['Update'];
+export type TouristSpotInsert = Database['public']['Tables']['tourist_spots']['Insert'];
+export type TouristSpotUpdate = Database['public']['Tables']['tourist_spots']['Update'];
 
 export type Event = Database['public']['Tables']['events']['Row'];
 export type EventInsert = Database['public']['Tables']['events']['Insert'];
@@ -36,10 +32,8 @@ export type BookingInsert = Database['public']['Tables']['bookings']['Insert'];
 export type BookingUpdate = Database['public']['Tables']['bookings']['Update'];
 
 export type RoomType = Database['public']['Tables']['room_types']['Row'];
-export type RoomTypeInsert =
-  Database['public']['Tables']['room_types']['Insert'];
-export type RoomTypeUpdate =
-  Database['public']['Tables']['room_types']['Update'];
+export type RoomTypeInsert = Database['public']['Tables']['room_types']['Insert'];
+export type RoomTypeUpdate = Database['public']['Tables']['room_types']['Update'];
 
 // Enum types - convenient aliases
 export type UserRole = Database['public']['Enums']['user_role'];
@@ -50,8 +44,7 @@ export type PaymentStatus = Database['public']['Enums']['payment_status'];
 export type PaymentMethod = Database['public']['Enums']['payment_method'];
 export type EventStatus = Database['public']['Enums']['event_status'];
 export type TouristSpotType = Database['public']['Enums']['tourist_spot_type'];
-export type TouristSpotStatus =
-  Database['public']['Enums']['tourist_spot_status'];
+export type TouristSpotStatus = Database['public']['Enums']['tourist_spot_status'];
 export type ReviewType = Database['public']['Enums']['review_type'];
 export type ContentStatus = Database['public']['Enums']['content_status'];
 export type ContentType = Database['public']['Enums']['content_type'];
@@ -60,8 +53,7 @@ export type PageViewType = Database['public']['Enums']['page_view_type'];
 
 // Utility types for common patterns
 export type DbResult<T> = T extends PromiseLike<infer U> ? U : never;
-export type DbResultOk<T> =
-  T extends PromiseLike<{ data: infer U }> ? NonNullable<U> : never;
+export type DbResultOk<T> = T extends PromiseLike<{ data: infer U }> ? NonNullable<U> : never;
 export type DbResultErr = { error: string };
 
 // Helper type for Supabase queries
@@ -80,15 +72,9 @@ export type StaffRoles = Extract<
   | 'business_registration_manager'
 >;
 
-export type ContentManagerRoles = Extract<
-  UserRole,
-  'tourism_admin' | 'tourism_content_manager'
->;
+export type ContentManagerRoles = Extract<UserRole, 'tourism_admin' | 'tourism_content_manager'>;
 
-export type BusinessManagerRoles = Extract<
-  UserRole,
-  'tourism_admin' | 'business_listing_manager'
->;
+export type BusinessManagerRoles = Extract<UserRole, 'tourism_admin' | 'business_listing_manager'>;
 
 // Business-related types with relationships
 export type BusinessWithImages = Business & {

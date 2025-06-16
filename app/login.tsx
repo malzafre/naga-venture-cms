@@ -15,22 +15,14 @@ import { useAuth } from '@/hooks/useAuthModern';
 // Zod schema for login form validation
 const LoginSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
-  password: z
-    .string()
-    .min(6, { message: 'Password must be at least 6 characters' }),
+  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
 });
 
 type LoginFormInputs = z.infer<typeof LoginSchema>;
 
 const LoginWeb = () => {
-  const {
-    signInWithEmail,
-    isLoading,
-    authError,
-    user,
-    userProfile,
-    isUserProfileLoading,
-  } = useAuth();
+  const { signInWithEmail, isLoading, authError, user, userProfile, isUserProfileLoading } =
+    useAuth();
 
   const {
     control,
@@ -59,23 +51,12 @@ const LoginWeb = () => {
   }; // Show error alert when authError state changes
   React.useEffect(() => {
     if (authError) {
-      Alert.alert(
-        'Login Failed',
-        authError.message || 'Authentication failed.'
-      );
+      Alert.alert('Login Failed', authError.message || 'Authentication failed.');
     }
   }, [authError]); // Navigate to admin panel when user is successfully authenticated
   React.useEffect(() => {
-    if (
-      user &&
-      userProfile &&
-      !isLoading &&
-      !isUserProfileLoading &&
-      !authError
-    ) {
-      console.log(
-        '[Login] User authenticated with profile, navigating to dashboard'
-      );
+    if (user && userProfile && !isLoading && !isUserProfileLoading && !authError) {
+      console.log('[Login] User authenticated with profile, navigating to dashboard');
       router.replace('/(sidebar)/dashboard');
     }
   }, [user, userProfile, isLoading, isUserProfileLoading, authError]);
@@ -131,9 +112,7 @@ const LoginWeb = () => {
                   name="email"
                 />
               </View>
-              {errors.email && (
-                <Text style={styles.errorText}>{errors.email.message}</Text>
-              )}
+              {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
 
               <View style={styles.inputContainer}>
                 <Controller
@@ -155,9 +134,7 @@ const LoginWeb = () => {
                   name="password"
                 />
               </View>
-              {errors.password && (
-                <Text style={styles.errorText}>{errors.password.message}</Text>
-              )}
+              {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
 
               {/* TODO: Create forgot password page for Tourism CMS */}
               <Text

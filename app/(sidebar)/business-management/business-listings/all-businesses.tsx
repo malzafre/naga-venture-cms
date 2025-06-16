@@ -677,9 +677,9 @@ export default function AllBusinessesScreen() {
       <View style={styles.paginationContainer}>
         <View style={styles.paginationInfoSection}>
           <Text style={styles.paginationInfo}>
-            Showing <Text style={styles.paginationHighlight}>{startItem}</Text>{' '}
-            to <Text style={styles.paginationHighlight}>{endItem}</Text> of{' '}
-            <Text style={styles.paginationHighlight}>{totalItems}</Text>{' '}
+            Showing <Text style={styles.paginationHighlight}>{startItem}</Text>
+            to <Text style={styles.paginationHighlight}>{endItem}</Text> of
+            <Text style={styles.paginationHighlight}>{totalItems}</Text>
             businesses
           </Text>
         </View>
@@ -983,10 +983,7 @@ const getStyles = (theme: any) =>
       flex: 1, // DataTable should grow/shrink within contentContainer
       backgroundColor: '#FFFFFF',
       borderRadius: Platform.OS === 'web' ? 12 : 16, // Slightly smaller radius for web consistency
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 }, // Softer shadow
-      shadowOpacity: 0.05, // Softer shadow
-      shadowRadius: 8, // Softer shadow
+      boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.05)', // Softer shadow
       elevation: 3, // Adjusted elevation
       overflow: 'hidden', // Keep this to respect borderRadius
     },

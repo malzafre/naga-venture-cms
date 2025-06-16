@@ -2,13 +2,16 @@
 
 ## Project Overview
 
-NAGA VENTURE is a centralized tourism platform for Naga City that aims to provide tourists with easy access to accommodations, tourist spots, local shops, and events. The platform includes features such as interactive maps, booking systems, directories, and user reviews.
+NAGA VENTURE is a centralized tourism platform for Naga City that aims to provide tourists with easy access to
+accommodations, tourist spots, local shops, and events. The platform includes features such as interactive maps, booking
+systems, directories, and user reviews.
 
 ## Core Entities Identified
 
 ### 1. Users and Authentication
 
-- Multiple user roles: Tourism Admin, Business Listing CMS Manager, Tourism Content CMS Manager, Business Registration Manager, Business Owners, and Tourists
+- Multiple user roles: Tourism Admin, Business Listing CMS Manager, Tourism Content CMS Manager, Business Registration
+  Manager, Business Owners, and Tourists
 - Role-based access control
 - Authentication and password recovery
 

@@ -1,14 +1,7 @@
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, router } from 'expo-router';
 import { useEffect } from 'react';
-import {
-  ActivityIndicator,
-  Dimensions,
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Dimensions, Platform, StyleSheet, Text, View } from 'react-native';
 
 import { CMSSidebar } from '@/components';
 import { useAuth } from '@/hooks/useAuthModern';
@@ -62,9 +55,7 @@ export default function AdminLayout() {
         <CMSSidebar userRole={userProfile?.role} />
         {/* Main Content Area */}
         <View style={styles.content}>
-          <Stack
-            screenOptions={{ headerShown: false, headerBackVisible: false }}
-          />
+          <Stack screenOptions={{ headerShown: false, headerBackVisible: false }} />
         </View>
       </View>
     </ThemeProvider>

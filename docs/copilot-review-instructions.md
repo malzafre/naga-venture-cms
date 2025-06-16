@@ -1,6 +1,7 @@
 # Code Review Instructions for NAGA VENTURE Tourism CMS
 
-You are reviewing code for the NAGA VENTURE Tourism CMS, a React Native (Expo) application with Supabase backend. Follow these specific review criteria:
+You are reviewing code for the NAGA VENTURE Tourism CMS, a React Native (Expo) application with Supabase backend. Follow
+these specific review criteria:
 
 ## Architecture & Design Patterns
 
@@ -161,4 +162,5 @@ Before approving, ensure:
 - [ ] Proper error handling
 - [ ] No magic strings or hardcoded values
 
-Focus on maintainability, security, and adherence to project-specific patterns. Prioritize architectural consistency and type safety above minor style issues.
+Focus on maintainability, security, and adherence to project-specific patterns. Prioritize architectural consistency and
+type safety above minor style issues.

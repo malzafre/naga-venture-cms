@@ -129,8 +129,7 @@ export function useCacheManagement() {
       totalQueries: queries.length,
       activeQueries: queries.filter((q) => q.state.status === 'success').length,
       errorQueries: queries.filter((q) => q.state.status === 'error').length,
-      loadingQueries: queries.filter((q) => q.state.status === 'pending')
-        .length,
+      loadingQueries: queries.filter((q) => q.state.status === 'pending').length,
       staleQueries: queries.filter((q) => q.isStale()).length,
     };
   }, [queryClient]);
@@ -279,9 +278,7 @@ export function useQueryPerformance() {
 
     const totalQueries = queryClient.getQueryCache().getAll().length;
     if (totalQueries > 100) {
-      suggestions.push(
-        'High number of cached queries. Consider implementing cache size limits.'
-      );
+      suggestions.push('High number of cached queries. Consider implementing cache size limits.');
     }
 
     return suggestions;
@@ -307,9 +304,7 @@ export function useQueryErrorRecovery() {
   const retryFailedQueries = useCallback(
     (maxRetries: number = 3) => {
       const cache = queryClient.getQueryCache();
-      const failedQueries = cache
-        .getAll()
-        .filter((query) => query.state.status === 'error');
+      const failedQueries = cache.getAll().filter((query) => query.state.status === 'error');
 
       failedQueries.forEach((query) => {
         const retryCount = query.state.errorUpdateCount || 0;
@@ -333,9 +328,7 @@ export function useQueryErrorRecovery() {
         queryClient.resetQueries({ queryKey: queryKeyPattern });
       } else {
         const cache = queryClient.getQueryCache();
-        const errorQueries = cache
-          .getAll()
-          .filter((query) => query.state.status === 'error');
+        const errorQueries = cache.getAll().filter((query) => query.state.status === 'error');
 
         errorQueries.forEach((query) => {
           queryClient.resetQueries({ queryKey: query.queryKey });
@@ -348,9 +341,7 @@ export function useQueryErrorRecovery() {
   // Get error summary
   const getErrorSummary = useCallback(() => {
     const cache = queryClient.getQueryCache();
-    const errorQueries = cache
-      .getAll()
-      .filter((query) => query.state.status === 'error');
+    const errorQueries = cache.getAll().filter((query) => query.state.status === 'error');
 
     const errorsByType = new Map<string, number>();
 

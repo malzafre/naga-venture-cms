@@ -1,6 +1,7 @@
 # TourismCMS Components
 
-This directory contains Tourism CMS-specific components organized using Atomic Design principles following KISS, DRY, and SOLID principles.
+This directory contains Tourism CMS-specific components organized using Atomic Design principles following KISS, DRY,
+and SOLID principles.
 
 ## Structure
 
@@ -98,12 +99,7 @@ components/TourismCMS/
 
 ```typescript
 // Import individual components
-import {
-  CMSButton,
-  CMSText,
-  CMSHeader,
-  CMSRouteGuard,
-} from '@/components/TourismCMS';
+import { CMSButton, CMSText, CMSHeader, CMSRouteGuard } from '@/components/TourismCMS';
 
 // Or import from specific levels
 import { CMSButton } from '@/components/TourismCMS/atoms';
@@ -115,14 +111,7 @@ import { CMSHeader } from '@/components/TourismCMS/molecules';
 #### CMSButton
 
 ```tsx
-<CMSButton
-  title="Save Changes"
-  variant="primary"
-  size="large"
-  onPress={handleSave}
-  loading={isLoading}
-  fullWidth
-/>
+<CMSButton title="Save Changes" variant="primary" size="large" onPress={handleSave} loading={isLoading} fullWidth />
 ```
 
 #### CMSText
@@ -162,12 +151,7 @@ import { CMSHeader } from '@/components/TourismCMS/molecules';
 #### CMSStatCard
 
 ```tsx
-<CMSStatCard
-  title="Total Bookings"
-  value="1,234"
-  subtitle="This month"
-  color="#34C759"
-/>
+<CMSStatCard title="Total Bookings" value="1,234" subtitle="This month" color="#34C759" />
 ```
 
 #### CMSRouteGuard

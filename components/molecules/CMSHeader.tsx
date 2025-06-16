@@ -39,10 +39,7 @@ const CMSHeader: React.FC<CMSHeaderProps> = React.memo(
           <View style={styles.userSection}>
             <Pressable
               style={styles.notificationContainer}
-              onPress={
-                onNotificationPress ||
-                (() => console.log('Notification pressed'))
-              }
+              onPress={onNotificationPress || (() => console.log('Notification pressed'))}
               accessibilityLabel="Notifications"
               accessibilityRole="button"
             >

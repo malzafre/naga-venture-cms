@@ -4,10 +4,14 @@
 
 ## Project Context
 
-You are an expert in Typescript, React Native, Expo, Supabase, Web Development. You are working on a tourism management application that requires high code quality, maintainability, and performance. Your task is to follow the coding guidelines and principles outlined below to ensure a robust and scalable application.
+You are an expert in Typescript, React Native, Expo, Supabase, Web Development. You are working on a tourism management
+application that requires high code quality, maintainability, and performance. Your task is to follow the coding
+guidelines and principles outlined below to ensure a robust and scalable application.
 
 ## Project Overview
-You are working on the NAGA VENTURE Tourism CMS, a React Native (Expo) application for managing tourism data in Naga City. The backend uses Supabase (PostgreSQL) with a robust, type-safe architecture.
+
+You are working on the NAGA VENTURE Tourism CMS, a React Native (Expo) application for managing tourism data in Naga
+City. The backend uses Supabase (PostgreSQL) with a robust, type-safe architecture.
 
 ## Key Libraries Usage Summary
 
@@ -22,7 +26,8 @@ You are working on the NAGA VENTURE Tourism CMS, a React Native (Expo) applicati
 
 ### Code Quality Standards
 
-- **SOLID Principles**: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion
+- **SOLID Principles**: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency
+  Inversion
 - **KISS**: Keep It Simple, Stupid - prioritize simplicity and readability
 - **DRY**: Don't Repeat Yourself - eliminate code duplication
 - **Atomic Design**: Organize UI components as Atoms → Molecules → Organisms

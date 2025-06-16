@@ -18,10 +18,7 @@ export interface BusinessFilterState {
 
 export interface BusinessFilterStore extends BusinessFilterState {
   // Filter actions
-  setFilter: <K extends keyof BusinessFilters>(
-    key: K,
-    value: BusinessFilters[K]
-  ) => void;
+  setFilter: <K extends keyof BusinessFilters>(key: K, value: BusinessFilters[K]) => void;
   updateFilters: (updates: Partial<BusinessFilters>) => void;
   resetFilters: () => void;
 

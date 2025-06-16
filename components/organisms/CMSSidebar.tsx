@@ -187,10 +187,7 @@ const styles = StyleSheet.create({
       },
       default: {
         elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 2, height: 0 },
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
+        boxShadow: '2px 0px 10px rgba(0, 0, 0, 0.1)',
       },
     }),
   },

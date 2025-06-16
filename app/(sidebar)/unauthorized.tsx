@@ -25,12 +25,7 @@ export default function UnauthorizedScreen() {
 
   return (
     <View style={styles.container}>
-      <FontAwesome
-        name="exclamation-triangle"
-        size={60}
-        color="#FFA000"
-        style={styles.icon}
-      />
+      <FontAwesome name="exclamation-triangle" size={60} color="#FFA000" style={styles.icon} />
       <Text style={styles.title}>Access Denied</Text>
       <Text style={styles.message}>
         You do not have the necessary permissions to access this section.
@@ -39,17 +34,12 @@ export default function UnauthorizedScreen() {
       {userProfile?.role && (
         <View style={styles.roleInfo}>
           <Text style={styles.roleTitle}>Your Current Role:</Text>
-          <Text style={styles.roleDescription}>
-            {getRoleDescription(userProfile.role)}
-          </Text>
+          <Text style={styles.roleDescription}>{getRoleDescription(userProfile.role)}</Text>
         </View>
       )}
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => router.replace('/dashboard')}
-        >
+        <TouchableOpacity style={styles.button} onPress={() => router.replace('/dashboard')}>
           <Text style={styles.buttonText}>Go to Dashboard</Text>
         </TouchableOpacity>
 
@@ -57,9 +47,7 @@ export default function UnauthorizedScreen() {
           style={[styles.button, styles.secondaryButton]}
           onPress={() => router.replace('/login')}
         >
-          <Text style={[styles.buttonText, styles.secondaryButtonText]}>
-            Switch Account
-          </Text>
+          <Text style={[styles.buttonText, styles.secondaryButtonText]}>Switch Account</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -1,12 +1,13 @@
 'use client';
 
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 
 import { CMSButton, CMSText } from '@/components/atoms';
 import { StaffFormModal } from '@/components/molecules';
-import { StaffDataTable } from '@/components/organisms';
+import { StaffManagement } from '@/components/organisms';
+import { useTheme } from '@/constants/useTheme';
 import { useStaffListings } from '@/hooks/useUserManagement';
 import { type UserRole } from '@/schemas';
 
@@ -29,19 +30,42 @@ const STAFF_ROLES: UserRole[] = [
  */
 export default function StaffManagementScreen() {
   const _router = useRouter();
+  const { theme } = useTheme();
+  const styles = useMemo(() => getStyles(theme), [theme]);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState<UserRole | ''>('');
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  // Get initial data to show count
-  const { data: staffData, isLoading } = useStaffListings({
-    searchQuery: searchQuery.trim() || undefined,
-    role: selectedRole || undefined,
+  // Get staff data for statistics
+  const { data: allStaffData, isLoading } = useStaffListings({
     page: 1,
-    limit: 10,
+    limit: 1000, // Get all for statistics
   });
 
-  const totalStaff = staffData?.count || 0;
+  // Calculate statistics
+  const stats = useMemo(() => {
+    const allStaff = allStaffData?.data || [];
+
+    const totalStaff = allStaff.length;
+    const adminCount = allStaff.filter(
+      (staff) => staff.role === 'tourism_admin'
+    ).length;
+    const managerCount = allStaff.filter(
+      (staff) =>
+        staff.role === 'business_listing_manager' ||
+        staff.role === 'tourism_content_manager' ||
+        staff.role === 'business_registration_manager'
+    ).length;
+    const activeCount = allStaff.filter((staff) => staff.is_verified).length;
+
+    return {
+      total: totalStaff,
+      admins: adminCount,
+      managers: managerCount,
+      active: activeCount,
+    };
+  }, [allStaffData]);
 
   const handleCreateSuccess = () => {
     setShowCreateModal(false);
@@ -49,38 +73,94 @@ export default function StaffManagementScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
-      <ScrollView style={{ flex: 1 }}>
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollView}>
         {/* Header Section */}
-        <View style={{ padding: 16, backgroundColor: '#fff', marginBottom: 2 }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: 8,
-            }}
-          >
-            <CMSText type="title" style={{ fontWeight: '600' }}>
-              Staff Management
-            </CMSText>
+        <View style={styles.header}>
+          <View style={styles.headerTop}>
+            <View style={styles.headerText}>
+              <CMSText type="title" style={styles.title}>
+                Staff Management
+              </CMSText>
+              <CMSText type="body" style={styles.subtitle}>
+                Manage your team members and their permissions
+              </CMSText>
+            </View>
             <CMSButton
-              title="Add Staff"
+              title="+ Add Staff Member"
               onPress={() => setShowCreateModal(true)}
-              style={{ minWidth: 100 }}
+              style={styles.addButton}
             />
           </View>
 
-          <CMSText type="body" style={{ color: '#666' }}>
-            {isLoading
-              ? 'Loading staff members...'
-              : `Manage ${totalStaff} staff member${totalStaff !== 1 ? 's' : ''} and their permissions`}
-          </CMSText>
+          {/* Statistics Cards */}
+          <View style={styles.statsContainer}>
+            <View style={styles.statCard}>
+              <View
+                style={[
+                  styles.statIcon,
+                  { backgroundColor: theme.colors.primaryLight },
+                ]}
+              >
+                <CMSText
+                  type="title"
+                  style={[styles.statNumber, { color: theme.colors.primary }]}
+                >
+                  {stats.total}
+                </CMSText>
+              </View>
+              <CMSText type="caption" style={styles.statLabel}>
+                Total Staff
+              </CMSText>
+            </View>
+
+            <View style={styles.statCard}>
+              <View style={[styles.statIcon, { backgroundColor: '#FFF4E6' }]}>
+                <CMSText
+                  type="title"
+                  style={[styles.statNumber, { color: '#E58A3B' }]}
+                >
+                  {stats.admins}
+                </CMSText>
+              </View>
+              <CMSText type="caption" style={styles.statLabel}>
+                Admins
+              </CMSText>
+            </View>
+
+            <View style={styles.statCard}>
+              <View style={[styles.statIcon, { backgroundColor: '#E8F5E8' }]}>
+                <CMSText
+                  type="title"
+                  style={[styles.statNumber, { color: theme.colors.success }]}
+                >
+                  {stats.managers}
+                </CMSText>
+              </View>
+              <CMSText type="caption" style={styles.statLabel}>
+                Managers
+              </CMSText>
+            </View>
+
+            <View style={styles.statCard}>
+              <View style={[styles.statIcon, { backgroundColor: '#E3F2FD' }]}>
+                <CMSText
+                  type="title"
+                  style={[styles.statNumber, { color: theme.colors.accent }]}
+                >
+                  {stats.active}
+                </CMSText>
+              </View>
+              <CMSText type="caption" style={styles.statLabel}>
+                Active
+              </CMSText>
+            </View>
+          </View>
         </View>
 
-        {/* Staff Data Table */}
-        <View style={{ flex: 1, backgroundColor: '#fff' }}>
-          <StaffDataTable
+        {/* Staff Management Container */}
+        <View style={styles.contentContainer}>
+          <StaffManagement
             searchQuery={searchQuery}
             selectedRole={selectedRole}
             onSearchChange={setSearchQuery}
@@ -98,3 +178,78 @@ export default function StaffManagementScreen() {
     </View>
   );
 }
+
+const getStyles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.backgroundSecondary,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    header: {
+      backgroundColor: theme.colors.background,
+      padding: 16,
+      marginBottom: 2,
+    },
+    headerTop: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: 20,
+    },
+    headerText: {
+      flex: 1,
+      marginRight: 16,
+    },
+    title: {
+      fontWeight: '600',
+      color: theme.colors.text,
+      marginBottom: 4,
+    },
+    subtitle: {
+      color: theme.colors.textSecondary,
+    },
+    addButton: {
+      backgroundColor: theme.colors.accent,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 8,
+    },
+    statsContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      gap: 12,
+    },
+    statCard: {
+      flex: 1,
+      backgroundColor: theme.colors.backgroundCard,
+      padding: 16,
+      borderRadius: 12,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    statIcon: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    statNumber: {
+      fontSize: 20,
+      fontWeight: '600',
+    },
+    statLabel: {
+      color: theme.colors.textSecondary,
+      textAlign: 'center',
+    },
+    contentContainer: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+      paddingTop: 16,
+    },
+  });

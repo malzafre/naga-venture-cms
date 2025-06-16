@@ -28,8 +28,7 @@ interface CreateStaffResponse {
 
 // Generate secure random password
 function generateRandomPassword(length: number = 16): string {
-  const chars =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*!';
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&*!';
   let password = '';
 
   for (let i = 0; i < length; i++) {
@@ -42,8 +41,7 @@ function generateRandomPassword(length: number = 16): string {
 Deno.serve(async (req: Request) => {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers':
-      'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
   };
 
@@ -193,22 +191,21 @@ Deno.serve(async (req: Request) => {
     const randomPassword = generateRandomPassword();
 
     // Create the user using admin API
-    const { data: authUser, error: authError } =
-      await supabase.auth.admin.createUser({
-        email: email,
-        password: randomPassword,
-        email_confirm: true, // Auto-confirm email since admin is creating
-        user_metadata: {
-          first_name: firstName,
-          last_name: lastName,
-          role: role,
-          phone_number: phoneNumber,
-          created_by: 'admin',
-        },
-        app_metadata: {
-          user_role: role,
-        },
-      });
+    const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+      email: email,
+      password: randomPassword,
+      email_confirm: true, // Auto-confirm email since admin is creating
+      user_metadata: {
+        first_name: firstName,
+        last_name: lastName,
+        role: role,
+        phone_number: phoneNumber,
+        created_by: 'admin',
+      },
+      app_metadata: {
+        user_role: role,
+      },
+    });
 
     if (authError || !authUser.user) {
       return new Response(
@@ -263,12 +260,10 @@ Deno.serve(async (req: Request) => {
 
     // Create staff permissions if provided
     if (Object.keys(permissions).length > 0) {
-      const { error: permissionsError } = await supabase
-        .from('staff_permissions')
-        .insert({
-          profile_id: userId,
-          ...permissions,
-        });
+      const { error: permissionsError } = await supabase.from('staff_permissions').insert({
+        profile_id: userId,
+        ...permissions,
+      });
 
       if (permissionsError) {
         console.warn('Failed to create staff permissions:', permissionsError);
@@ -278,18 +273,15 @@ Deno.serve(async (req: Request) => {
 
     // Send credentials email
     try {
-      const { error: emailError } = await supabase.functions.invoke(
-        'send-staff-credentials',
-        {
-          body: {
-            email: email,
-            temporaryPassword: randomPassword,
-            firstName: firstName,
-            lastName: lastName,
-            role: role,
-          },
-        }
-      );
+      const { error: emailError } = await supabase.functions.invoke('send-staff-credentials', {
+        body: {
+          email: email,
+          temporaryPassword: randomPassword,
+          firstName: firstName,
+          lastName: lastName,
+          role: role,
+        },
+      });
 
       if (emailError) {
         console.warn('Failed to send credentials email:', emailError);

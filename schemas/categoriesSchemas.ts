@@ -65,9 +65,7 @@ export type SubCategoryWithMain = z.infer<typeof SubCategoryWithMainSchema>;
 export const MainCategoryWithSubCategoriesSchema = MainCategorySchema.extend({
   sub_categories: z.array(SubCategorySchema).optional().default([]),
 });
-export type MainCategoryWithSubCategories = z.infer<
-  typeof MainCategoryWithSubCategoriesSchema
->;
+export type MainCategoryWithSubCategories = z.infer<typeof MainCategoryWithSubCategoriesSchema>;
 
 // Filters for fetching main categories
 export const MainCategoryFiltersSchema = z.object({
@@ -76,10 +74,7 @@ export const MainCategoryFiltersSchema = z.object({
   created_by: z.string().uuid().optional(),
   page: z.number().int().min(1).optional().default(1),
   limit: z.number().int().min(1).max(100).optional().default(20),
-  sortBy: z
-    .enum(['name', 'display_order', 'created_at'])
-    .optional()
-    .default('display_order'),
+  sortBy: z.enum(['name', 'display_order', 'created_at']).optional().default('display_order'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('asc'),
 });
 export type MainCategoryFilters = z.infer<typeof MainCategoryFiltersSchema>;
@@ -92,10 +87,7 @@ export const SubCategoryFiltersSchema = z.object({
   created_by: z.string().uuid().optional(),
   page: z.number().int().min(1).optional().default(1),
   limit: z.number().int().min(1).max(100).optional().default(20),
-  sortBy: z
-    .enum(['name', 'display_order', 'created_at'])
-    .optional()
-    .default('display_order'),
+  sortBy: z.enum(['name', 'display_order', 'created_at']).optional().default('display_order'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('asc'),
 });
 export type SubCategoryFilters = z.infer<typeof SubCategoryFiltersSchema>;

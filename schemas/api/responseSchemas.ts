@@ -8,11 +8,7 @@
 
 import { z } from 'zod';
 
-import {
-  DateSchema,
-  PaginationResponseSchema,
-  UuidSchema,
-} from '../common/baseSchemas';
+import { DateSchema, PaginationResponseSchema, UuidSchema } from '../common/baseSchemas';
 
 // ============================================================================
 // GENERIC API RESPONSE SCHEMAS
@@ -32,9 +28,7 @@ export const ApiErrorSchema = z.object({
 /**
  * Generic API success response
  */
-export const ApiSuccessResponseSchema = <T extends z.ZodTypeAny>(
-  dataSchema: T
-) =>
+export const ApiSuccessResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
   z.object({
     data: dataSchema,
     error: z.null(),
@@ -75,9 +69,7 @@ export const PostgresErrorSchema = z.object({
 /**
  * Supabase single record response
  */
-export const SupabaseSingleResponseSchema = <T extends z.ZodTypeAny>(
-  dataSchema: T
-) =>
+export const SupabaseSingleResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
   z.object({
     data: dataSchema.nullable(),
     error: PostgresErrorSchema.nullable(),
@@ -89,9 +81,7 @@ export const SupabaseSingleResponseSchema = <T extends z.ZodTypeAny>(
 /**
  * Supabase multiple records response
  */
-export const SupabaseListResponseSchema = <T extends z.ZodTypeAny>(
-  dataSchema: T
-) =>
+export const SupabaseListResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
   z.object({
     data: z.array(dataSchema).nullable(),
     error: PostgresErrorSchema.nullable(),
@@ -103,9 +93,7 @@ export const SupabaseListResponseSchema = <T extends z.ZodTypeAny>(
 /**
  * Supabase mutation response (insert/update/delete)
  */
-export const SupabaseMutationResponseSchema = <T extends z.ZodTypeAny>(
-  dataSchema: T
-) =>
+export const SupabaseMutationResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
   z.object({
     data: z.array(dataSchema).nullable(),
     error: PostgresErrorSchema.nullable(),
@@ -121,9 +109,7 @@ export const SupabaseMutationResponseSchema = <T extends z.ZodTypeAny>(
 /**
  * Paginated API response schema
  */
-export const PaginatedApiResponseSchema = <T extends z.ZodTypeAny>(
-  dataSchema: T
-) =>
+export const PaginatedApiResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
   z.object({
     data: z.array(dataSchema),
     pagination: PaginationResponseSchema,
@@ -133,9 +119,7 @@ export const PaginatedApiResponseSchema = <T extends z.ZodTypeAny>(
 /**
  * Infinite query response schema
  */
-export const InfiniteQueryResponseSchema = <T extends z.ZodTypeAny>(
-  dataSchema: T
-) =>
+export const InfiniteQueryResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
   z.object({
     data: z.array(dataSchema),
     nextCursor: z.string().nullable(),
@@ -387,15 +371,11 @@ export type SearchResultItem = z.infer<typeof SearchResultItemSchema>;
 export type SearchResponse = z.infer<typeof SearchResponseSchema>;
 export type HealthCheckResponse = z.infer<typeof HealthCheckResponseSchema>;
 export type ValidationErrorDetail = z.infer<typeof ValidationErrorDetailSchema>;
-export type ValidationErrorResponse = z.infer<
-  typeof ValidationErrorResponseSchema
->;
+export type ValidationErrorResponse = z.infer<typeof ValidationErrorResponseSchema>;
 export type AuthTokenResponse = z.infer<typeof AuthTokenResponseSchema>;
 export type AuthSessionResponse = z.infer<typeof AuthSessionResponseSchema>;
 export type FileUploadResponse = z.infer<typeof FileUploadResponseSchema>;
-export type MultipleFileUploadResponse = z.infer<
-  typeof MultipleFileUploadResponseSchema
->;
+export type MultipleFileUploadResponse = z.infer<typeof MultipleFileUploadResponseSchema>;
 export type BulkOperationResponse = z.infer<typeof BulkOperationResponseSchema>;
 
 // ============================================================================

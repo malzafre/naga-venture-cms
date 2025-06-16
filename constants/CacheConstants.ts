@@ -241,9 +241,7 @@ export const CACHE_CONSTANTS = {
 } as const;
 
 // Cache Configuration Helpers
-export const getCacheConfig = (
-  preset: keyof typeof CACHE_CONSTANTS.PRESETS
-) => {
+export const getCacheConfig = (preset: keyof typeof CACHE_CONSTANTS.PRESETS) => {
   return CACHE_CONSTANTS.PRESETS[preset];
 };
 
@@ -282,15 +280,9 @@ export const cacheUtils = {
   ) => {
     switch (connectionQuality) {
       case 'slow':
-        return (
-          baseStaleTime *
-          CACHE_CONSTANTS.NETWORK_AWARE.SLOW_CONNECTION.staleTimeMultiplier
-        );
+        return baseStaleTime * CACHE_CONSTANTS.NETWORK_AWARE.SLOW_CONNECTION.staleTimeMultiplier;
       case 'offline':
-        return (
-          baseStaleTime *
-          CACHE_CONSTANTS.NETWORK_AWARE.OFFLINE_MODE.staleTimeMultiplier
-        );
+        return baseStaleTime * CACHE_CONSTANTS.NETWORK_AWARE.OFFLINE_MODE.staleTimeMultiplier;
       default:
         return baseStaleTime;
     }
@@ -308,10 +300,7 @@ export const cacheUtils = {
   },
 
   // Invalidate all queries for a specific domain
-  invalidateDomainQueries: (
-    queryClient: any,
-    domain: keyof typeof DOMAIN_CACHE_CONFIG
-  ) => {
+  invalidateDomainQueries: (queryClient: any, domain: keyof typeof DOMAIN_CACHE_CONFIG) => {
     const domainMappings = {
       businesses: ['businesses'],
       users: ['users', 'profiles'],
@@ -336,10 +325,7 @@ export const cacheUtils = {
   },
 
   // Invalidate specific list queries for a domain
-  invalidateListQueries: (
-    queryClient: any,
-    domain: keyof typeof DOMAIN_CACHE_CONFIG
-  ) => {
+  invalidateListQueries: (queryClient: any, domain: keyof typeof DOMAIN_CACHE_CONFIG) => {
     const domainMappings = {
       businesses: ['businesses'],
       users: ['users', 'profiles'],
@@ -364,10 +350,7 @@ export const cacheUtils = {
   },
 
   // Remove stale data from cache
-  removeStaleQueries: (
-    queryClient: any,
-    maxAge: number = 24 * 60 * 60 * 1000
-  ) => {
+  removeStaleQueries: (queryClient: any, maxAge: number = 24 * 60 * 60 * 1000) => {
     queryClient.getQueryCache().clear();
   },
 } as const;

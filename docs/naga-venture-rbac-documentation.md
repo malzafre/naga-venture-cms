@@ -21,7 +21,8 @@
 
 ## Introduction
 
-This document outlines the Role-Based Access Control (RBAC) structure for the NAGA VENTURE tourism platform. It details the sidebar navigation elements and permissions for each user role in the system.
+This document outlines the Role-Based Access Control (RBAC) structure for the NAGA VENTURE tourism platform. It details
+the sidebar navigation elements and permissions for each user role in the system.
 
 ## User Roles Overview
 
@@ -406,4 +407,6 @@ The NAGA VENTURE platform has the following user roles:
 
 ## Conclusion
 
-This RBAC structure provides a comprehensive security model for the NAGA VENTURE tourism platform. By clearly defining roles, sidebar sections, and permissions, the platform ensures that users can only access and modify data appropriate to their role while providing an intuitive and focused user experience.
+This RBAC structure provides a comprehensive security model for the NAGA VENTURE tourism platform. By clearly defining
+roles, sidebar sections, and permissions, the platform ensures that users can only access and modify data appropriate to
+their role while providing an intuitive and focused user experience.

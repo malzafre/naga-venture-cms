@@ -177,9 +177,7 @@ export const useThemeStore = create<ThemeStore>()(
     // Persistence methods
     _loadPersistedPreferences: async () => {
       try {
-        const AsyncStorage = await import(
-          '@react-native-async-storage/async-storage'
-        );
+        const AsyncStorage = await import('@react-native-async-storage/async-storage');
         const key = '@TourismCMS:ThemePreferences';
         const stored = await AsyncStorage.default.getItem(key);
 
@@ -202,18 +200,13 @@ export const useThemeStore = create<ThemeStore>()(
           }));
         }
       } catch (error) {
-        console.warn(
-          '[ThemeStore] Failed to load persisted preferences:',
-          error
-        );
+        console.warn('[ThemeStore] Failed to load persisted preferences:', error);
       }
     },
 
     _persistPreferences: async () => {
       try {
-        const AsyncStorage = await import(
-          '@react-native-async-storage/async-storage'
-        );
+        const AsyncStorage = await import('@react-native-async-storage/async-storage');
         const key = '@TourismCMS:ThemePreferences';
         const {
           mode,
@@ -248,8 +241,7 @@ export const useThemeStore = create<ThemeStore>()(
  */
 
 // Get current theme (most commonly used)
-export const useCurrentTheme = () =>
-  useThemeStore((state) => state.getCurrentTheme());
+export const useCurrentTheme = () => useThemeStore((state) => state.getCurrentTheme());
 
 // Get theme mode and color scheme
 export const useThemeSettings = () =>

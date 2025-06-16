@@ -2,7 +2,8 @@
 
 ## Overview
 
-The NAGA VENTURE CMS implements a practical staff creation and authentication flow using auto-generated passwords sent via email. This approach provides immediate access while maintaining security.
+The NAGA VENTURE CMS implements a practical staff creation and authentication flow using auto-generated passwords sent
+via email. This approach provides immediate access while maintaining security.
 
 ## Flow Description
 
@@ -21,6 +22,7 @@ When a Tourism Admin uses the "Add Staff" modal:
 ### 2. Staff Member Receives Credentials
 
 The admin securely shares:
+
 - **Email**: Staff member's login email
 - **Temporary Password**: Auto-generated secure password
 - **Login URL**: Direct link to CMS login page
@@ -42,7 +44,7 @@ When staff logs in for the first time:
 ✅ **Simple**: Standard login flow, no complex onboarding  
 ✅ **Practical**: Admin can immediately share credentials  
 ✅ **Production-Ready**: Uses Supabase's core authentication  
-✅ **Role-Based**: JWT claims are automatically synced  
+✅ **Role-Based**: JWT claims are automatically synced
 
 ## Implementation Details
 
@@ -69,7 +71,7 @@ export function useCreateStaff() {
       // 4. Update profile with role and metadata
       // 5. Create staff permissions
       // 6. Return success with temporary password
-    }
+    },
   });
 }
 ```
@@ -165,4 +167,5 @@ SELECT email, email_confirmed_at FROM auth.users WHERE email = 'staff@example.co
 SELECT raw_app_meta_data FROM auth.users WHERE email = 'staff@example.com';
 ```
 
-This implementation provides a practical, secure, and immediate staff onboarding solution that's perfect for CMS environments.
+This implementation provides a practical, secure, and immediate staff onboarding solution that's perfect for CMS
+environments.

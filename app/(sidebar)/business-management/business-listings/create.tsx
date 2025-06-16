@@ -30,9 +30,7 @@ export default function CreateBusinessScreen() {
   const handleSubmit = (data: BusinessInsert) => {
     createBusinessMutation.mutate(data, {
       onSuccess: (newBusiness) => {
-        setSuccessMessage(
-          `Business "${newBusiness.business_name}" has been created successfully!`
-        );
+        setSuccessMessage(`Business "${newBusiness.business_name}" has been created successfully!`);
         setSuccessModalVisible(true);
       },
       onError: (error) => {
@@ -51,9 +49,7 @@ export default function CreateBusinessScreen() {
   };
 
   const confirmCancel = () => {
-    console.log(
-      '✅ [CreateBusinessScreen] User confirmed cancel - navigating back'
-    );
+    console.log('✅ [CreateBusinessScreen] User confirmed cancel - navigating back');
     setCancelModalVisible(false);
     try {
       NavigationService.toAllBusinesses();

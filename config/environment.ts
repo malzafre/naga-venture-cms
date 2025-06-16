@@ -34,8 +34,7 @@ export const env = validateEnvironment({
 
   // Feature Flags
   EXPO_PUBLIC_ENABLE_ANALYTICS: process.env.EXPO_PUBLIC_ENABLE_ANALYTICS,
-  EXPO_PUBLIC_ENABLE_NOTIFICATIONS:
-    process.env.EXPO_PUBLIC_ENABLE_NOTIFICATIONS,
+  EXPO_PUBLIC_ENABLE_NOTIFICATIONS: process.env.EXPO_PUBLIC_ENABLE_NOTIFICATIONS,
   EXPO_PUBLIC_ENABLE_DEBUG_MODE: process.env.EXPO_PUBLIC_ENABLE_DEBUG_MODE,
 });
 
@@ -110,15 +109,11 @@ export const apiConfig = {
  * Log environment validation success in development
  */
 if (isDevelopment && isDebugMode) {
-  console.log(
-    '✅ [Environment] All environment variables validated successfully'
-  );
+  console.log('✅ [Environment] All environment variables validated successfully');
   console.log('🔧 [Environment] Current configuration:', {
     nodeEnv: env.NODE_ENV,
     appEnv: env.EXPO_PUBLIC_APP_ENV,
     features,
-    hasSupabaseConfig: !!(
-      env.EXPO_PUBLIC_SUPABASE_URL && env.EXPO_PUBLIC_SUPABASE_ANON_KEY
-    ),
+    hasSupabaseConfig: !!(env.EXPO_PUBLIC_SUPABASE_URL && env.EXPO_PUBLIC_SUPABASE_ANON_KEY),
   });
 }

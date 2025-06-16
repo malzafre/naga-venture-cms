@@ -1,13 +1,6 @@
 // filepath: components/TourismCMS/atoms/CMSInput.tsx
 import React from 'react';
-import {
-  StyleSheet,
-  TextInput,
-  TextInputProps,
-  TextStyle,
-  View,
-  ViewStyle,
-} from 'react-native';
+import { StyleSheet, TextInput, TextInputProps, TextStyle, View, ViewStyle } from 'react-native';
 
 import CMSText from './CMSText';
 
@@ -35,15 +28,7 @@ export interface CMSInputProps extends Omit<TextInputProps, 'style'> {
  * @param inputStyle - Style for the input field
  */
 const CMSInput: React.FC<CMSInputProps> = React.memo(
-  ({
-    label,
-    error,
-    hint,
-    required = false,
-    containerStyle,
-    inputStyle,
-    ...props
-  }) => {
+  ({ label, error, hint, required = false, containerStyle, inputStyle, ...props }) => {
     const hasError = Boolean(error);
 
     return (

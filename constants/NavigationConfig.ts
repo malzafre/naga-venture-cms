@@ -24,11 +24,7 @@ export const tourismAdminNavigation: NavigationItem[] = [
     label: 'User Management',
     icon: 'users',
     type: 'dropdown',
-    permissions: [
-      'tourism_admin',
-      'business_registration_manager',
-      'business_listing_manager',
-    ],
+    permissions: ['tourism_admin', 'business_registration_manager', 'business_listing_manager'],
     subsections: [
       {
         id: 'staff-management',
@@ -44,11 +40,7 @@ export const tourismAdminNavigation: NavigationItem[] = [
         icon: 'briefcase',
         type: 'single',
         path: '/(sidebar)/user-management/business-owners',
-        permissions: [
-          'tourism_admin',
-          'business_registration_manager',
-          'business_listing_manager',
-        ],
+        permissions: ['tourism_admin', 'business_registration_manager', 'business_listing_manager'],
       },
       {
         id: 'tourist-accounts',
@@ -65,11 +57,7 @@ export const tourismAdminNavigation: NavigationItem[] = [
     label: 'Business Management',
     icon: 'building',
     type: 'dropdown',
-    permissions: [
-      'tourism_admin',
-      'business_listing_manager',
-      'business_registration_manager',
-    ],
+    permissions: ['tourism_admin', 'business_listing_manager', 'business_registration_manager'],
     subsections: [
       {
         id: 'all-businesses',
@@ -136,11 +124,7 @@ export const tourismAdminNavigation: NavigationItem[] = [
     label: 'Content Management',
     icon: 'file-text',
     type: 'dropdown',
-    permissions: [
-      'tourism_admin',
-      'tourism_content_manager',
-      'business_listing_manager',
-    ],
+    permissions: ['tourism_admin', 'tourism_content_manager', 'business_listing_manager'],
     subsections: [
       {
         id: 'content-approval',
@@ -148,11 +132,7 @@ export const tourismAdminNavigation: NavigationItem[] = [
         icon: 'check-circle',
         type: 'single',
         path: '/(sidebar)/content-management/content-approval',
-        permissions: [
-          'tourism_admin',
-          'tourism_content_manager',
-          'business_listing_manager',
-        ],
+        permissions: ['tourism_admin', 'tourism_content_manager', 'business_listing_manager'],
       },
       {
         id: 'reviews-ratings',
@@ -160,11 +140,7 @@ export const tourismAdminNavigation: NavigationItem[] = [
         icon: 'star',
         type: 'single',
         path: '/(sidebar)/content-management/reviews-ratings',
-        permissions: [
-          'tourism_admin',
-          'tourism_content_manager',
-          'business_listing_manager',
-        ],
+        permissions: ['tourism_admin', 'tourism_content_manager', 'business_listing_manager'],
       },
     ],
   },
@@ -173,11 +149,7 @@ export const tourismAdminNavigation: NavigationItem[] = [
     label: 'Categories',
     icon: 'tag',
     type: 'dropdown',
-    permissions: [
-      'tourism_admin',
-      'tourism_content_manager',
-      'business_listing_manager',
-    ],
+    permissions: ['tourism_admin', 'tourism_content_manager', 'business_listing_manager'],
     subsections: [
       {
         id: 'category-management',
@@ -185,11 +157,7 @@ export const tourismAdminNavigation: NavigationItem[] = [
         icon: 'tag',
         type: 'single',
         path: '/(sidebar)/categories/category-management',
-        permissions: [
-          'tourism_admin',
-          'tourism_content_manager',
-          'business_listing_manager',
-        ],
+        permissions: ['tourism_admin', 'tourism_content_manager', 'business_listing_manager'],
       },
     ],
   },
@@ -223,11 +191,7 @@ export const tourismAdminNavigation: NavigationItem[] = [
     label: 'Analytics & Reporting',
     icon: 'bar-chart',
     type: 'dropdown',
-    permissions: [
-      'tourism_admin',
-      'business_listing_manager',
-      'business_registration_manager',
-    ],
+    permissions: ['tourism_admin', 'business_listing_manager', 'business_registration_manager'],
     subsections: [
       {
         id: 'platform-analytics',

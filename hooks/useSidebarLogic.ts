@@ -41,9 +41,7 @@ export function useSidebarLogic(userRole?: UserRole) {
         .filter((item) => item.permissions.includes(userRole))
         .map((item) => ({
           ...item,
-          subsections: item.subsections
-            ? filterByPermissions(item.subsections)
-            : undefined,
+          subsections: item.subsections ? filterByPermissions(item.subsections) : undefined,
         }))
         .filter((item) => !item.subsections || item.subsections.length > 0);
     };
@@ -63,10 +61,7 @@ export function useSidebarLogic(userRole?: UserRole) {
 
   // Auto-expand and set active section based on current route
   React.useEffect(() => {
-    const findActiveSection = (
-      items: NavigationItem[],
-      path: string
-    ): string => {
+    const findActiveSection = (items: NavigationItem[], path: string): string => {
       for (const item of items) {
         if (item.path === path) {
           actions.setActiveSection(item.id);
@@ -106,17 +101,14 @@ export function useSidebarLogic(userRole?: UserRole) {
   }, [userRole, actions]);
 
   // Navigation handlers
-  const handleNavigate = React.useCallback(
-    (path: string, onNavigate?: (path: string) => void) => {
-      if (onNavigate) {
-        onNavigate(path);
-      } else {
-        // Use centralized NavigationService following guidelines
-        NavigationService.navigate(path);
-      }
-    },
-    []
-  );
+  const handleNavigate = React.useCallback((path: string, onNavigate?: (path: string) => void) => {
+    if (onNavigate) {
+      onNavigate(path);
+    } else {
+      // Use centralized NavigationService following guidelines
+      NavigationService.navigate(path);
+    }
+  }, []);
 
   // Stable toggle function using Zustand actions
   const handleToggleExpand = React.useCallback(

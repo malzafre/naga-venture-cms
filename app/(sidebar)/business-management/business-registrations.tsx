@@ -25,12 +25,9 @@ export default function BusinessRegistrationsScreen() {
           {/* TODO: Add your business registration management components here */}
           <View style={styles.placeholder}>
             <Text style={styles.placeholderText}>
-              Business registration management interface will be implemented
-              here.
+              Business registration management interface will be implemented here.
             </Text>
-            <Text style={styles.placeholderText}>
-              This can include tabs or sections for:
-            </Text>
+            <Text style={styles.placeholderText}>This can include tabs or sections for:</Text>
             <Text style={styles.placeholderText}>• Pending Approvals</Text>
             <Text style={styles.placeholderText}>• Registration History</Text>
             <Text style={styles.placeholderText}>• Rejected Applications</Text>

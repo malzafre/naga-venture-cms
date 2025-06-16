@@ -33,15 +33,9 @@ const BUSINESS_MANAGEMENT_ROLES: UserRole[] = [
   'business_registration_manager',
 ];
 
-const BUSINESS_REGISTRATION_ROLES: UserRole[] = [
-  'tourism_admin',
-  'business_registration_manager',
-];
+const BUSINESS_REGISTRATION_ROLES: UserRole[] = ['tourism_admin', 'business_registration_manager'];
 
-const TOURISM_CONTENT_ROLES: UserRole[] = [
-  'tourism_admin',
-  'tourism_content_manager',
-];
+const TOURISM_CONTENT_ROLES: UserRole[] = ['tourism_admin', 'tourism_content_manager'];
 
 const USER_MANAGEMENT_ROLES: UserRole[] = [
   'tourism_admin',
@@ -351,9 +345,7 @@ export function useRoutePermission(routePath: string) {
   const hasAccess = () => {
     if (!userProfile?.role) return false;
 
-    const routePermission = ROUTE_PERMISSIONS.find(
-      (permission) => permission.path === routePath
-    );
+    const routePermission = ROUTE_PERMISSIONS.find((permission) => permission.path === routePath);
 
     if (!routePermission) {
       // If route is not in permissions config, deny access by default
@@ -395,14 +387,7 @@ export function useRouteGuard(routePath: string) {
       redirectToUnauthorized();
       return;
     }
-  }, [
-    user,
-    userProfile,
-    isLoading,
-    isUserProfileLoading,
-    hasAccess,
-    redirectToUnauthorized,
-  ]);
+  }, [user, userProfile, isLoading, isUserProfileLoading, hasAccess, redirectToUnauthorized]);
 
   return {
     isLoading: isLoading || isUserProfileLoading,
@@ -419,15 +404,10 @@ export function useRouteGuard(routePath: string) {
  * @param routePath - The route path to check
  * @returns boolean indicating if the role has access
  */
-export function checkRouteAccess(
-  userRole: UserRole | null,
-  routePath: string
-): boolean {
+export function checkRouteAccess(userRole: UserRole | null, routePath: string): boolean {
   if (!userRole) return false;
 
-  const routePermission = ROUTE_PERMISSIONS.find(
-    (permission) => permission.path === routePath
-  );
+  const routePermission = ROUTE_PERMISSIONS.find((permission) => permission.path === routePath);
 
   if (!routePermission) return false;
 

@@ -1,11 +1,7 @@
 // filepath: services/ErrorService.ts
 import { ErrorInfo } from 'react';
 
-import {
-  ErrorLogEntry,
-  ErrorReportData,
-  ErrorSeverity,
-} from '@/components/errorBoundaries/types';
+import { ErrorLogEntry, ErrorReportData, ErrorSeverity } from '@/components/errorBoundaries/types';
 
 import { errorReportingService } from './ErrorReporting';
 
@@ -67,9 +63,7 @@ class ErrorService {
   /**
    * Report error to external monitoring service
    */
-  private async reportToExternalService(
-    logEntry: ErrorLogEntry
-  ): Promise<void> {
+  private async reportToExternalService(logEntry: ErrorLogEntry): Promise<void> {
     try {
       // Use the new error reporting service
       await errorReportingService.reportError({
@@ -236,9 +230,7 @@ class ErrorService {
   /**
    * Get current user information for error reporting
    */
-  public getCurrentUser():
-    | { id: string; email?: string; role?: string }
-    | undefined {
+  public getCurrentUser(): { id: string; email?: string; role?: string } | undefined {
     try {
       // This would integrate with your auth system
       // For now, return undefined or mock data

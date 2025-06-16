@@ -12,10 +12,6 @@ export { default as FeatureErrorBoundary } from './FeatureErrorBoundary';
 export { default as GlobalErrorBoundary } from './GlobalErrorBoundary';
 
 // Re-export types for convenience
-export type {
-  ErrorBoundaryProps,
-  ErrorBoundaryState,
-  ErrorFallbackProps,
-} from './types';
+export type { ErrorBoundaryProps, ErrorBoundaryState, ErrorFallbackProps } from './types';
 
 export type { ErrorStateProps, ErrorStateVariant } from './ErrorState';

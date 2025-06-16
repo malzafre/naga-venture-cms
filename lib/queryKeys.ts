@@ -27,37 +27,28 @@ const queryKeys = {
     detail: (id: string) => [...queryKeys.businesses.details(), id] as const,
 
     // Business-specific relationships
-    images: (businessId: string) =>
-      [...queryKeys.businesses.detail(businessId), 'images'] as const,
+    images: (businessId: string) => [...queryKeys.businesses.detail(businessId), 'images'] as const,
     categories: (businessId: string) =>
       [...queryKeys.businesses.detail(businessId), 'categories'] as const,
     reviews: (businessId: string) =>
       [...queryKeys.businesses.detail(businessId), 'reviews'] as const,
     amenities: (businessId: string) =>
       [...queryKeys.businesses.detail(businessId), 'amenities'] as const,
-    hours: (businessId: string) =>
-      [...queryKeys.businesses.detail(businessId), 'hours'] as const,
+    hours: (businessId: string) => [...queryKeys.businesses.detail(businessId), 'hours'] as const,
 
     // Business filtering and search
-    byStatus: (status: string) =>
-      [...queryKeys.businesses.lists(), { status }] as const,
-    byType: (type: string) =>
-      [...queryKeys.businesses.lists(), { business_type: type }] as const,
+    byStatus: (status: string) => [...queryKeys.businesses.lists(), { status }] as const,
+    byType: (type: string) => [...queryKeys.businesses.lists(), { business_type: type }] as const,
     byCategory: (categoryId: string) =>
       [...queryKeys.businesses.lists(), { category: categoryId }] as const,
-    byOwner: (ownerId: string) =>
-      [...queryKeys.businesses.lists(), { owner: ownerId }] as const,
-    search: (query: string) =>
-      [...queryKeys.businesses.all, 'search', query] as const,
-    featured: () =>
-      [...queryKeys.businesses.lists(), { featured: true }] as const,
-    pending: () =>
-      [...queryKeys.businesses.lists(), { status: 'pending' }] as const,
+    byOwner: (ownerId: string) => [...queryKeys.businesses.lists(), { owner: ownerId }] as const,
+    search: (query: string) => [...queryKeys.businesses.all, 'search', query] as const,
+    featured: () => [...queryKeys.businesses.lists(), { featured: true }] as const,
+    pending: () => [...queryKeys.businesses.lists(), { status: 'pending' }] as const,
 
     // Analytics and statistics
     analytics: () => [...queryKeys.businesses.all, 'analytics'] as const,
-    stats: (timeframe?: string) =>
-      [...queryKeys.businesses.all, 'stats', timeframe] as const,
+    stats: (timeframe?: string) => [...queryKeys.businesses.all, 'stats', timeframe] as const,
   },
 
   // Category Management Domain
@@ -69,23 +60,18 @@ const queryKeys = {
     mainList: (filters: Record<string, unknown>) =>
       [...queryKeys.categories.mainLists(), { ...filters }] as const,
     mainDetails: () => [...queryKeys.categories.all, 'main', 'detail'] as const,
-    mainDetail: (id: string) =>
-      [...queryKeys.categories.mainDetails(), id] as const,
+    mainDetail: (id: string) => [...queryKeys.categories.mainDetails(), id] as const,
 
     // Sub Categories
     subLists: () => [...queryKeys.categories.all, 'sub', 'list'] as const,
     subList: (filters: Record<string, unknown>) =>
       [...queryKeys.categories.subLists(), { ...filters }] as const,
     subDetails: () => [...queryKeys.categories.all, 'sub', 'detail'] as const,
-    subDetail: (id: string) =>
-      [...queryKeys.categories.subDetails(), id] as const,
+    subDetail: (id: string) => [...queryKeys.categories.subDetails(), id] as const,
 
     // Category relationships
     subsByMain: (mainCategoryId: string) =>
-      [
-        ...queryKeys.categories.mainDetail(mainCategoryId),
-        'subcategories',
-      ] as const,
+      [...queryKeys.categories.mainDetail(mainCategoryId), 'subcategories'] as const,
 
     // Category analytics and usage
     analytics: () => [...queryKeys.categories.all, 'analytics'] as const,
@@ -111,8 +97,7 @@ const queryKeys = {
     byRole: (role: string) => [...queryKeys.users.lists(), { role }] as const,
     byStatus: (isVerified: boolean) =>
       [...queryKeys.users.lists(), { is_verified: isVerified }] as const,
-    search: (query: string) =>
-      [...queryKeys.users.all, 'search', query] as const,
+    search: (query: string) => [...queryKeys.users.all, 'search', query] as const,
   },
 
   // Analytics Domain

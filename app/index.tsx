@@ -115,13 +115,7 @@ const Index = () => {
                 backgroundColor: 'rgba(222, 227, 242, 0.95)',
                 borderColor: '#007AFF',
                 borderWidth: 2,
-                shadowColor: '#000',
-                shadowOffset: {
-                  width: 0,
-                  height: 2,
-                },
-                shadowOpacity: 0.25,
-                shadowRadius: 3.84,
+                boxShadow: '0px 2px 3.84px rgba(0, 0, 0, 0.25)',
                 elevation: 5,
                 pointerEvents: 'auto', // Ensure button receives pointer events
                 cursor: 'pointer', // Web-specific cursor

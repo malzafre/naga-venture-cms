@@ -28,12 +28,7 @@ import {
 /**
  * Event status enumeration
  */
-export const EventStatusSchema = z.enum([
-  'upcoming',
-  'ongoing',
-  'completed',
-  'cancelled',
-]);
+export const EventStatusSchema = z.enum(['upcoming', 'ongoing', 'completed', 'cancelled']);
 
 /**
  * Event type definitions
@@ -58,12 +53,8 @@ const EventBaseSchema = z.object({
     .min(100, 'Event description must be at least 100 characters')
     .max(2000, 'Event description must be less than 2000 characters')
     .trim(),
-  start_date: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Start date must be in YYYY-MM-DD format'),
-  end_date: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'End date must be in YYYY-MM-DD format'),
+  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Start date must be in YYYY-MM-DD format'),
+  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'End date must be in YYYY-MM-DD format'),
   start_time: z
     .string()
     .regex(/^\d{2}:\d{2}$/, 'Start time must be in HH:MM format')
@@ -126,8 +117,7 @@ export const EventSchema = EventBaseSchema.refine(
     return true;
   },
   {
-    message:
-      'End time must be after or equal to start time for same-day events',
+    message: 'End time must be after or equal to start time for same-day events',
     path: ['end_time'],
   }
 );
@@ -207,10 +197,7 @@ export const CreateEventSchema = EventBaseSchema.pick({
 }).extend({
   // Additional creation-specific fields
   category_ids: z.array(UUIDSchema).min(1, 'At least one category is required'),
-  image_urls: z
-    .array(z.string().url())
-    .max(10, 'Maximum 10 images allowed')
-    .optional(),
+  image_urls: z.array(z.string().url()).max(10, 'Maximum 10 images allowed').optional(),
 });
 
 /**
@@ -307,14 +294,7 @@ export const EventFiltersSchema = z
 
     // Sorting
     sort_by: z
-      .enum([
-        'name',
-        'start_date',
-        'end_date',
-        'created_at',
-        'updated_at',
-        'entry_fee',
-      ])
+      .enum(['name', 'start_date', 'end_date', 'created_at', 'updated_at', 'entry_fee'])
       .default('start_date'),
     sort_order: z.enum(['asc', 'desc']).default('asc'),
   })
@@ -339,12 +319,7 @@ export const CalendarEventsFiltersSchema = z.object({
  */
 export const BulkEventOperationsSchema = z.object({
   event_ids: z.array(UUIDSchema).min(1, 'At least one event must be selected'),
-  operation: z.enum([
-    'update_status',
-    'toggle_featured',
-    'delete',
-    'bulk_edit',
-  ]),
+  operation: z.enum(['update_status', 'toggle_featured', 'delete', 'bulk_edit']),
   data: z
     .object({
       status: EventStatusSchema.optional(),

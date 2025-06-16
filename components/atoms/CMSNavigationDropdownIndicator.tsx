@@ -19,12 +19,12 @@ interface CMSNavigationDropdownIndicatorProps {
  * @param onPress - Handler for indicator press
  * @param hasItems - Whether the section has items (affects visibility)
  */
-export const CMSNavigationDropdownIndicator: React.FC<
-  CMSNavigationDropdownIndicatorProps
-> = ({ isExpanded, onPress, hasItems = true }) => {
-  const rotateValue = React.useRef(
-    new Animated.Value(isExpanded ? 1 : 0)
-  ).current;
+export const CMSNavigationDropdownIndicator: React.FC<CMSNavigationDropdownIndicatorProps> = ({
+  isExpanded,
+  onPress,
+  hasItems = true,
+}) => {
+  const rotateValue = React.useRef(new Animated.Value(isExpanded ? 1 : 0)).current;
 
   React.useEffect(() => {
     Animated.timing(rotateValue, {
@@ -44,14 +44,8 @@ export const CMSNavigationDropdownIndicator: React.FC<
   }
 
   return (
-    <TouchableOpacity
-      style={styles.container}
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
-      <Animated.View
-        style={[styles.iconContainer, { transform: [{ rotate: rotation }] }]}
-      >
+    <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.7}>
+      <Animated.View style={[styles.iconContainer, { transform: [{ rotate: rotation }] }]}>
         <CaretRight size={14} color="rgba(255, 255, 255, 0.6)" weight="bold" />
       </Animated.View>
     </TouchableOpacity>

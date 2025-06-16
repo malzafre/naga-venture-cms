@@ -467,13 +467,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     backgroundColor: '#3b82f6',
     borderRadius: 12,
-    shadowColor: '#3b82f6',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    boxShadow: '0px 4px 8px rgba(59, 130, 246, 0.3)',
     elevation: 8,
   },
   addButtonContent: {

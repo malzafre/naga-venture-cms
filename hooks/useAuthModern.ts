@@ -3,12 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 import { supabase } from '@/lib/supabaseClient';
-import {
-  useAuthActions,
-  useAuthError,
-  useAuthLoading,
-  useAuthSession,
-} from '@/stores/authStore';
+import { useAuthActions, useAuthError, useAuthLoading, useAuthSession } from '@/stores/authStore';
 import { Profile as UserProfile, UserRole } from '@/types/supabase';
 
 /**
@@ -101,16 +96,11 @@ export function useAuth() {
 
   // Legacy compatibility methods
   const login = (userData: any) => {
-    console.warn(
-      "[useAuth] Legacy 'login' method called. Please use 'signInWithEmail'.",
-      userData
-    );
+    console.warn("[useAuth] Legacy 'login' method called. Please use 'signInWithEmail'.", userData);
   };
 
   const logout = () => {
-    console.warn(
-      "[useAuth] Legacy 'logout' method called. Please use 'signOut'."
-    );
+    console.warn("[useAuth] Legacy 'logout' method called. Please use 'signOut'.");
     signOut();
   };
 

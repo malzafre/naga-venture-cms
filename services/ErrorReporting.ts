@@ -103,9 +103,7 @@ class CustomAPIProvider implements ErrorReportingProvider {
   private storeErrorForRetry(data: ErrorReportData): void {
     try {
       if (typeof localStorage === 'undefined' || localStorage === null) {
-        console.warn(
-          '[CustomAPI] localStorage not available. Skipping storing error for retry.'
-        );
+        console.warn('[CustomAPI] localStorage not available. Skipping storing error for retry.');
         return;
       }
       const stored = localStorage.getItem('pendingErrorReports') || '[]';
@@ -126,15 +124,9 @@ class CustomAPIProvider implements ErrorReportingProvider {
         pendingReports.splice(0, pendingReports.length - 50);
       }
 
-      localStorage.setItem(
-        'pendingErrorReports',
-        JSON.stringify(pendingReports)
-      );
+      localStorage.setItem('pendingErrorReports', JSON.stringify(pendingReports));
     } catch (storageError) {
-      console.error(
-        '[CustomAPI] Failed to store error for retry:',
-        storageError
-      );
+      console.error('[CustomAPI] Failed to store error for retry:', storageError);
     }
   }
 }
@@ -149,9 +141,7 @@ class ConsoleProvider implements ErrorReportingProvider {
   async reportError(data: ErrorReportData): Promise<void> {
     const logLevel = this.getLogLevel(data.severity);
 
-    console.group(
-      `🚨 [${this.name}] Error Report - ${data.severity.toUpperCase()}`
-    );
+    console.group(`🚨 [${this.name}] Error Report - ${data.severity.toUpperCase()}`);
     console[logLevel]('Error:', data.error);
     console.log('Context:', data.context);
     console.log('User:', data.user);
@@ -163,9 +153,7 @@ class ConsoleProvider implements ErrorReportingProvider {
     console.groupEnd();
   }
 
-  private getLogLevel(
-    severity: ErrorReportData['severity']
-  ): 'log' | 'warn' | 'error' {
+  private getLogLevel(severity: ErrorReportData['severity']): 'log' | 'warn' | 'error' {
     switch (severity) {
       case 'low':
         return 'log';
@@ -195,11 +183,7 @@ export class ErrorReportingService {
     this.platform = 'react-native';
 
     // Initialize providers
-    this.providers = [
-      new ConsoleProvider(),
-      new SentryProvider(),
-      new CustomAPIProvider(),
-    ];
+    this.providers = [new ConsoleProvider(), new SentryProvider(), new CustomAPIProvider()];
 
     // Retry pending error reports on initialization
     this.retryPendingReports();
@@ -209,10 +193,7 @@ export class ErrorReportingService {
    * Report an error to all enabled providers
    */
   async reportError(
-    data: Omit<
-      ErrorReportData,
-      'timestamp' | 'sessionId' | 'appVersion' | 'platform'
-    >
+    data: Omit<ErrorReportData, 'timestamp' | 'sessionId' | 'appVersion' | 'platform'>
   ): Promise<void> {
     const fullData: ErrorReportData = {
       ...data,
@@ -233,10 +214,7 @@ export class ErrorReportingService {
   /**
    * Safely report to a provider with error handling
    */
-  private async safeReport(
-    provider: ErrorReportingProvider,
-    data: ErrorReportData
-  ): Promise<void> {
+  private async safeReport(provider: ErrorReportingProvider, data: ErrorReportData): Promise<void> {
     try {
       await provider.reportError(data);
     } catch (error) {
@@ -248,9 +226,7 @@ export class ErrorReportingService {
    * Add or update a reporting provider
    */
   addProvider(provider: ErrorReportingProvider): void {
-    const existingIndex = this.providers.findIndex(
-      (p) => p.name === provider.name
-    );
+    const existingIndex = this.providers.findIndex((p) => p.name === provider.name);
 
     if (existingIndex >= 0) {
       this.providers[existingIndex] = provider;
@@ -338,10 +314,7 @@ export class ErrorReportingService {
       );
 
       if (typeof localStorage !== 'undefined' && localStorage !== null) {
-        localStorage.setItem(
-          'pendingErrorReports',
-          JSON.stringify(remainingReports)
-        );
+        localStorage.setItem('pendingErrorReports', JSON.stringify(remainingReports));
       }
     } catch (error) {
       console.error('[ErrorReporting] Failed to retry pending reports:', error);

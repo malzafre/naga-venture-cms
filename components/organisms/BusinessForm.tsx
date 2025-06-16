@@ -91,9 +91,7 @@ export default function BusinessForm({
   const renderBasicInfoStep = () => (
     <View style={styles.stepContent}>
       <Text style={styles.stepTitle}>Basic Information</Text>
-      <Text style={styles.stepDescription}>
-        Provide the basic details about your business
-      </Text>
+      <Text style={styles.stepDescription}>Provide the basic details about your business</Text>
       <Controller
         key="business_name"
         control={control}
@@ -164,9 +162,7 @@ export default function BusinessForm({
   const renderLocationStep = () => (
     <View style={styles.stepContent}>
       <Text style={styles.stepTitle}>Location Details</Text>
-      <Text style={styles.stepDescription}>
-        Provide the location and address information
-      </Text>
+      <Text style={styles.stepDescription}>Provide the location and address information</Text>
       <Controller
         key="address"
         control={control}
@@ -441,17 +437,12 @@ export default function BusinessForm({
               ]}
             >
               <Text
-                style={[
-                  styles.stepNumber,
-                  (isActive || isCompleted) && styles.stepNumberActive,
-                ]}
+                style={[styles.stepNumber, (isActive || isCompleted) && styles.stepNumberActive]}
               >
                 {stepNumber}
               </Text>
             </View>
-            <Text
-              style={[styles.stepLabel, isActive && styles.stepLabelActive]}
-            >
+            <Text style={[styles.stepLabel, isActive && styles.stepLabelActive]}>
               {stepNumber === 1 && 'Basic Info'}
               {stepNumber === 2 && 'Location'}
               {stepNumber === 3 && 'Contact'}

@@ -19,28 +19,27 @@ module.exports = defineConfig([
   },
   {
     rules: {
-      // Prettier conflicts - configure to handle line endings automatically
+      // Prettier integration - use .prettierrc.js for all formatting rules
       'prettier/prettier': [
         'error',
+        {},
         {
-          endOfLine: 'auto', // Use auto line endings to avoid conflicts
-          useTabs: false, // Use spaces instead of tabs
-          singleQuote: true,
-          semi: true,
-          trailingComma: 'es5',
-          printWidth: 80,
-        },
-        {
-          usePrettierrc: true, // Use .prettierrc.js file for configuration
+          usePrettierrc: true,
         },
       ],
 
-      // Disable line ending enforcement
+      // Disable conflicting ESLint rules that Prettier handles
       'linebreak-style': 'off',
+      'max-len': 'off',
+      indent: 'off',
+      quotes: 'off',
+      semi: 'off',
+      'comma-dangle': 'off',
 
-      // General React rules
-      'react/prop-types': 'off', // Using TypeScript for prop validation
-      'react/react-in-jsx-scope': 'off', // Not needed in React 17+
+      // React rules
+      'react/prop-types': 'off',
+      'react/react-in-jsx-scope': 'off',
+      'react/jsx-uses-react': 'off',
 
       // TypeScript rules
       '@typescript-eslint/no-unused-vars': [
@@ -51,14 +50,18 @@ module.exports = defineConfig([
           caughtErrorsIgnorePattern: '^_',
         },
       ],
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      '@typescript-eslint/no-explicit-any': 'off', // anny
 
-      // Common JavaScript/TypeScript rules
-      'no-unused-vars': 'off', // Turn off base rule in favor of TypeScript version
-      'no-console': 'off', // Warn on console usage instead of error
+      // JavaScript/TypeScript best practices
+      'no-unused-vars': 'off',
+      'no-console': 'off', // Allow console statements for debugging
       'prefer-const': 'error',
       'no-var': 'error',
+      'no-debugger': 'warn',
 
-      // Import rules
+      // Import organization
       'import/order': [
         'error',
         {
@@ -77,6 +80,8 @@ module.exports = defineConfig([
           },
         },
       ],
+      'import/no-unresolved': 'off', // TypeScript handles this
+      'import/extensions': 'off', // TypeScript handles this
     },
   },
 ]);

@@ -50,11 +50,7 @@ export const useNavigationStore = create<NavigationStore>()(
 
     setFilteredNavigation: (navigation: NavigationItem[]) => {
       if (__DEV__) {
-        console.log(
-          '[NavigationStore] Setting filtered navigation:',
-          navigation.length,
-          'items'
-        );
+        console.log('[NavigationStore] Setting filtered navigation:', navigation.length, 'items');
       }
       set({ filteredNavigation: navigation });
     },
@@ -86,12 +82,10 @@ export const useNavigationStore = create<NavigationStore>()(
  */
 
 // Get loading state
-export const useNavigationLoading = () =>
-  useNavigationStore((state) => state.isLoading);
+export const useNavigationLoading = () => useNavigationStore((state) => state.isLoading);
 
 // Get filtered navigation
-export const useFilteredNavigation = () =>
-  useNavigationStore((state) => state.filteredNavigation);
+export const useFilteredNavigation = () => useNavigationStore((state) => state.filteredNavigation);
 
 // Get navigation actions (stable reference)
 export const useNavigationActions = () =>
@@ -117,9 +111,7 @@ export const useNavigationFilter = (
         .filter((item) => item.permissions.includes(userRole))
         .map((item) => ({
           ...item,
-          subsections: item.subsections
-            ? filterByPermissions(item.subsections)
-            : undefined,
+          subsections: item.subsections ? filterByPermissions(item.subsections) : undefined,
         }))
         .filter((item) => !item.subsections || item.subsections.length > 0);
     },

@@ -350,16 +350,12 @@ export type Profile = z.infer<typeof ProfileSchema>;
 export type ProfileUpdateForm = z.infer<typeof ProfileUpdateFormSchema>;
 export type ProfileInsert = z.infer<typeof ProfileInsertSchema>;
 export type StaffPermissions = z.infer<typeof StaffPermissionsSchema>;
-export type StaffPermissionsUpdate = z.infer<
-  typeof StaffPermissionsUpdateSchema
->;
+export type StaffPermissionsUpdate = z.infer<typeof StaffPermissionsUpdateSchema>;
 export type AuthSession = z.infer<typeof AuthSessionSchema>;
 export type AuthUser = z.infer<typeof AuthUserSchema>;
 export type LoginApiResponse = z.infer<typeof LoginApiResponseSchema>;
 export type ProfileApiResponse = z.infer<typeof ProfileApiResponseSchema>;
-export type ProfileListApiResponse = z.infer<
-  typeof ProfileListApiResponseSchema
->;
+export type ProfileListApiResponse = z.infer<typeof ProfileListApiResponseSchema>;
 export type AuthOperationResponse = z.infer<typeof AuthOperationResponseSchema>;
 export type RoutePermission = z.infer<typeof RoutePermissionSchema>;
 export type PermissionContext = z.infer<typeof PermissionContextSchema>;

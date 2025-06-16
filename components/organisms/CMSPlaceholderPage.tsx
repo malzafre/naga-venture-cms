@@ -117,10 +117,7 @@ export const CMSPlaceholderPage: React.FC<CMSPlaceholderPageProps> = ({
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Status Badge */}
       <View style={[styles.statusBadge, { backgroundColor: getStatusColor() }]}>
-        <CMSText
-          type="caption"
-          style={[styles.statusText, { color: '#FFFFFF' }]}
-        >
+        <CMSText type="caption" style={[styles.statusText, { color: '#FFFFFF' }]}>
           {getStatusText()}
         </CMSText>
       </View>
@@ -132,16 +129,8 @@ export const CMSPlaceholderPage: React.FC<CMSPlaceholderPageProps> = ({
             <CMSText type="subtitle" style={styles.phaseTitle}>
               Development Phase {phase.number}
             </CMSText>
-            <View
-              style={[
-                styles.priorityBadge,
-                { backgroundColor: getPriorityColor() },
-              ]}
-            >
-              <CMSText
-                type="caption"
-                style={[styles.priorityText, { color: '#FFFFFF' }]}
-              >
+            <View style={[styles.priorityBadge, { backgroundColor: getPriorityColor() }]}>
+              <CMSText type="caption" style={[styles.priorityText, { color: '#FFFFFF' }]}>
                 {phase.priority} PRIORITY
               </CMSText>
             </View>
@@ -155,10 +144,9 @@ export const CMSPlaceholderPage: React.FC<CMSPlaceholderPageProps> = ({
       {/* Description */}
       <View style={styles.descriptionContainer}>
         <CMSText type="body" style={styles.description}>
-          This page is part of the Tourism CMS system and will provide
-          comprehensive tools for managing {title.toLowerCase()} functionality.
-          The interface will include modern data tables, filtering options, and
-          streamlined workflows designed for optimal user experience.
+          This page is part of the Tourism CMS system and will provide comprehensive tools for
+          managing {title.toLowerCase()} functionality. The interface will include modern data
+          tables, filtering options, and streamlined workflows designed for optimal user experience.
         </CMSText>
       </View>
 
@@ -207,10 +195,7 @@ export const CMSPlaceholderPage: React.FC<CMSPlaceholderPageProps> = ({
     <CMSRouteGuard routePath={routePath}>
       <CMSDashboardLayout
         title={title}
-        subtitle={
-          subtitle ||
-          `Manage and monitor ${title.toLowerCase()} in the Tourism CMS`
-        }
+        subtitle={subtitle || `Manage and monitor ${title.toLowerCase()} in the Tourism CMS`}
       >
         {renderContent()}
       </CMSDashboardLayout>

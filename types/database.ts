@@ -1,10 +1,4 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[];
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
   public: {
@@ -1712,15 +1706,11 @@ export type Database = {
         Returns: boolean;
       };
       _st_coveredby: {
-        Args:
-          | { geog1: unknown; geog2: unknown }
-          | { geom1: unknown; geom2: unknown };
+        Args: { geog1: unknown; geog2: unknown } | { geom1: unknown; geom2: unknown };
         Returns: boolean;
       };
       _st_covers: {
-        Args:
-          | { geog1: unknown; geog2: unknown }
-          | { geom1: unknown; geom2: unknown };
+        Args: { geog1: unknown; geog2: unknown } | { geom1: unknown; geom2: unknown };
         Returns: boolean;
       };
       _st_crosses: {
@@ -2276,9 +2266,7 @@ export type Database = {
         Returns: unknown;
       };
       populate_geometry_columns: {
-        Args:
-          | { tbl_oid: unknown; use_typmod?: boolean }
-          | { use_typmod?: boolean };
+        Args: { tbl_oid: unknown; use_typmod?: boolean } | { use_typmod?: boolean };
         Returns: string;
       };
       postgis_addbbox: {
@@ -2464,10 +2452,7 @@ export type Database = {
         Returns: number;
       };
       st_area: {
-        Args:
-          | { '': string }
-          | { '': unknown }
-          | { geog: unknown; use_spheroid?: boolean };
+        Args: { '': string } | { '': unknown } | { geog: unknown; use_spheroid?: boolean };
         Returns: number;
       };
       st_area2d: {
@@ -2598,9 +2583,7 @@ export type Database = {
         Returns: string;
       };
       st_azimuth: {
-        Args:
-          | { geog1: unknown; geog2: unknown }
-          | { geom1: unknown; geom2: unknown };
+        Args: { geog1: unknown; geog2: unknown } | { geom1: unknown; geom2: unknown };
         Returns: number;
       };
       st_boundary: {
@@ -2678,15 +2661,11 @@ export type Database = {
         Returns: number;
       };
       st_coveredby: {
-        Args:
-          | { geog1: unknown; geog2: unknown }
-          | { geom1: unknown; geom2: unknown };
+        Args: { geog1: unknown; geog2: unknown } | { geom1: unknown; geom2: unknown };
         Returns: boolean;
       };
       st_covers: {
-        Args:
-          | { geog1: unknown; geog2: unknown }
-          | { geom1: unknown; geom2: unknown };
+        Args: { geog1: unknown; geog2: unknown } | { geom1: unknown; geom2: unknown };
         Returns: boolean;
       };
       st_crosses: {
@@ -2826,9 +2805,7 @@ export type Database = {
         Returns: unknown;
       };
       st_generatepoints: {
-        Args:
-          | { area: unknown; npoints: number }
-          | { area: unknown; npoints: number; seed: number };
+        Args: { area: unknown; npoints: number } | { area: unknown; npoints: number; seed: number };
         Returns: unknown;
       };
       st_geogfromtext: {
@@ -2844,9 +2821,7 @@ export type Database = {
         Returns: unknown;
       };
       st_geohash: {
-        Args:
-          | { geog: unknown; maxchars?: number }
-          | { geom: unknown; maxchars?: number };
+        Args: { geog: unknown; maxchars?: number } | { geom: unknown; maxchars?: number };
         Returns: string;
       };
       st_geomcollfromtext: {
@@ -2944,9 +2919,7 @@ export type Database = {
         Returns: unknown;
       };
       st_intersects: {
-        Args:
-          | { geog1: unknown; geog2: unknown }
-          | { geom1: unknown; geom2: unknown };
+        Args: { geog1: unknown; geog2: unknown } | { geom1: unknown; geom2: unknown };
         Returns: boolean;
       };
       st_isclosed: {
@@ -2994,10 +2967,7 @@ export type Database = {
         Returns: boolean;
       };
       st_length: {
-        Args:
-          | { '': string }
-          | { '': unknown }
-          | { geog: unknown; use_spheroid?: boolean };
+        Args: { '': string } | { '': unknown } | { geog: unknown; use_spheroid?: boolean };
         Returns: number;
       };
       st_length2d: {
@@ -3508,12 +3478,7 @@ export type Database = {
       };
     };
     Enums: {
-      booking_status:
-        | 'pending'
-        | 'confirmed'
-        | 'cancelled'
-        | 'completed'
-        | 'no_show';
+      booking_status: 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'no_show';
       business_status: 'pending' | 'approved' | 'rejected' | 'inactive';
       business_type: 'accommodation' | 'shop' | 'service';
       content_status: 'pending' | 'approved' | 'rejected';
@@ -3521,19 +3486,10 @@ export type Database = {
       event_status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
       page_view_type: 'business' | 'tourist_spot' | 'event' | 'promotion';
       payment_method: 'gcash' | 'paypal' | 'xendit' | 'credit_card' | 'cash';
-      payment_status:
-        | 'pending'
-        | 'paid'
-        | 'failed'
-        | 'refunded'
-        | 'partially_refunded';
+      payment_status: 'pending' | 'paid' | 'failed' | 'refunded' | 'partially_refunded';
       promotion_status: 'active' | 'scheduled' | 'expired' | 'cancelled';
       review_type: 'business' | 'tourist_spot' | 'event';
-      tourist_spot_status:
-        | 'active'
-        | 'inactive'
-        | 'under_maintenance'
-        | 'coming_soon';
+      tourist_spot_status: 'active' | 'inactive' | 'under_maintenance' | 'coming_soon';
       tourist_spot_type:
         | 'natural'
         | 'cultural'
@@ -3582,10 +3538,8 @@ export type Tables<
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] &
-        DefaultSchema['Views'])
-    ? (DefaultSchema['Tables'] &
-        DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    ? (DefaultSchema['Tables'] & DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R;
       }
       ? R
@@ -3639,9 +3593,7 @@ export type TablesUpdate<
     : never;
 
 export type Enums<
-  DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema['Enums']
-    | { schema: keyof Database },
+  DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums'] | { schema: keyof Database },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof Database;
   }
@@ -3671,13 +3623,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      booking_status: [
-        'pending',
-        'confirmed',
-        'cancelled',
-        'completed',
-        'no_show',
-      ],
+      booking_status: ['pending', 'confirmed', 'cancelled', 'completed', 'no_show'],
       business_status: ['pending', 'approved', 'rejected', 'inactive'],
       business_type: ['accommodation', 'shop', 'service'],
       content_status: ['pending', 'approved', 'rejected'],
@@ -3685,21 +3631,10 @@ export const Constants = {
       event_status: ['upcoming', 'ongoing', 'completed', 'cancelled'],
       page_view_type: ['business', 'tourist_spot', 'event', 'promotion'],
       payment_method: ['gcash', 'paypal', 'xendit', 'credit_card', 'cash'],
-      payment_status: [
-        'pending',
-        'paid',
-        'failed',
-        'refunded',
-        'partially_refunded',
-      ],
+      payment_status: ['pending', 'paid', 'failed', 'refunded', 'partially_refunded'],
       promotion_status: ['active', 'scheduled', 'expired', 'cancelled'],
       review_type: ['business', 'tourist_spot', 'event'],
-      tourist_spot_status: [
-        'active',
-        'inactive',
-        'under_maintenance',
-        'coming_soon',
-      ],
+      tourist_spot_status: ['active', 'inactive', 'under_maintenance', 'coming_soon'],
       tourist_spot_type: [
         'natural',
         'cultural',

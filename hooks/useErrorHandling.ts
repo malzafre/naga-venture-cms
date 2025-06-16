@@ -155,14 +155,7 @@ export const useErrorState = (options: ErrorHandlingOptions = {}) => {
         retryTimeouts.current.push(timeout);
       });
     },
-    [
-      errorState.retryCount,
-      errorState.error,
-      maxRetries,
-      retryDelay,
-      onRetry,
-      onMaxRetriesReached,
-    ]
+    [errorState.retryCount, errorState.error, maxRetries, retryDelay, onRetry, onMaxRetriesReached]
   );
 
   return {
@@ -177,11 +170,8 @@ export const useErrorState = (options: ErrorHandlingOptions = {}) => {
 /**
  * Hook for wrapping async operations with error handling
  */
-export const useAsyncErrorHandler = <T = any>(
-  options: ErrorHandlingOptions = {}
-) => {
-  const { setError, clearError, retry, errorState, canRetry } =
-    useErrorState(options);
+export const useAsyncErrorHandler = <T = any>(options: ErrorHandlingOptions = {}) => {
+  const { setError, clearError, retry, errorState, canRetry } = useErrorState(options);
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<T | null>(null);
 
@@ -189,10 +179,7 @@ export const useAsyncErrorHandler = <T = any>(
    * Execute async operation with error handling
    */
   const execute = useCallback(
-    async (
-      asyncFn: () => Promise<T>,
-      context?: Record<string, any>
-    ): Promise<T | null> => {
+    async (asyncFn: () => Promise<T>, context?: Record<string, any>): Promise<T | null> => {
       try {
         setIsLoading(true);
         clearError();
