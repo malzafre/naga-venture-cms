@@ -48,9 +48,7 @@ export default function StaffManagementScreen() {
     const allStaff = allStaffData?.data || [];
 
     const totalStaff = allStaff.length;
-    const adminCount = allStaff.filter(
-      (staff) => staff.role === 'tourism_admin'
-    ).length;
+    const adminCount = allStaff.filter((staff) => staff.role === 'tourism_admin').length;
     const managerCount = allStaff.filter(
       (staff) =>
         staff.role === 'business_listing_manager' ||
@@ -96,16 +94,8 @@ export default function StaffManagementScreen() {
           {/* Statistics Cards */}
           <View style={styles.statsContainer}>
             <View style={styles.statCard}>
-              <View
-                style={[
-                  styles.statIcon,
-                  { backgroundColor: theme.colors.primaryLight },
-                ]}
-              >
-                <CMSText
-                  type="title"
-                  style={[styles.statNumber, { color: theme.colors.primary }]}
-                >
+              <View style={[styles.statIcon, { backgroundColor: theme.colors.primaryLight }]}>
+                <CMSText type="title" style={[styles.statNumber, { color: theme.colors.primary }]}>
                   {stats.total}
                 </CMSText>
               </View>
@@ -116,10 +106,7 @@ export default function StaffManagementScreen() {
 
             <View style={styles.statCard}>
               <View style={[styles.statIcon, { backgroundColor: '#FFF4E6' }]}>
-                <CMSText
-                  type="title"
-                  style={[styles.statNumber, { color: '#E58A3B' }]}
-                >
+                <CMSText type="title" style={[styles.statNumber, { color: '#E58A3B' }]}>
                   {stats.admins}
                 </CMSText>
               </View>
@@ -130,10 +117,7 @@ export default function StaffManagementScreen() {
 
             <View style={styles.statCard}>
               <View style={[styles.statIcon, { backgroundColor: '#E8F5E8' }]}>
-                <CMSText
-                  type="title"
-                  style={[styles.statNumber, { color: theme.colors.success }]}
-                >
+                <CMSText type="title" style={[styles.statNumber, { color: theme.colors.success }]}>
                   {stats.managers}
                 </CMSText>
               </View>
@@ -144,10 +128,7 @@ export default function StaffManagementScreen() {
 
             <View style={styles.statCard}>
               <View style={[styles.statIcon, { backgroundColor: '#E3F2FD' }]}>
-                <CMSText
-                  type="title"
-                  style={[styles.statNumber, { color: theme.colors.accent }]}
-                >
+                <CMSText type="title" style={[styles.statNumber, { color: theme.colors.accent }]}>
                   {stats.active}
                 </CMSText>
               </View>
@@ -158,7 +139,7 @@ export default function StaffManagementScreen() {
           </View>
         </View>
 
-        {/* Staff Management Container */}
+        {/* Staff Data Table */}
         <View style={styles.contentContainer}>
           <StaffManagement
             searchQuery={searchQuery}

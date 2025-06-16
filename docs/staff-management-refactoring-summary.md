@@ -2,7 +2,7 @@
 
 ## Overview
 
-Successfully refactored the large, monolithic `StaffDataTable.tsx` component (1200+ lines) into a collection of smaller, maintainable components following atomic design principles and the project's coding guidelines. The main component has been renamed to `StaffManagement.tsx` to better reflect its card-based layout.
+Successfully refactored the large, monolithic `StaffDataTable.tsx` component (1200+ lines) into a collection of smaller, maintainable components following atomic design principles and the project's coding guidelines.
 
 ## Architecture Changes
 
@@ -51,7 +51,7 @@ Successfully refactored the large, monolithic `StaffDataTable.tsx` component (12
    - Header with counts and filters
    - Sub-components: EmptyState, StaffHeader, PaginationControls
 
-3. **`StaffManagement.tsx` (Refactored)** - Main container
+3. **`StaffDataTable.tsx` (Refactored)** - Main container
    - Now only 170 lines (down from 1200+)
    - Purely compositional - assembles smaller components
    - All logic delegated to smart hooks
@@ -127,7 +127,7 @@ components/
 │   ├── StaffStatistics.tsx           # NEW
 │   └── StaffFilterControls.tsx       # NEW
 └── organisms/
-    ├── StaffManagement.tsx           # REFACTORED (renamed from StaffDataTable)
+    ├── StaffDataTable.tsx            # REFACTORED
     ├── ModernStaffCard.tsx           # NEW
     └── StaffGrid.tsx                 # NEW
 ```

@@ -29,7 +29,7 @@ interface StaffManagementProps {
 }
 
 /**
- * Staff Data Table Component - Refactored with Atomic Design
+ * Staff Management Component - Refactored with Atomic Design
  *
  * Now uses smaller, reusable components following atomic design principles.
  * All business logic is handled by the smart hooks.
@@ -174,8 +174,7 @@ export default function StaffManagement({
         message={
           confirmDeleteModal.staff
             ? `Are you sure you want to delete ${
-                confirmDeleteModal.staff.first_name &&
-                confirmDeleteModal.staff.last_name
+                confirmDeleteModal.staff.first_name && confirmDeleteModal.staff.last_name
                   ? `${confirmDeleteModal.staff.first_name} ${confirmDeleteModal.staff.last_name}`
                   : 'this staff member'
               }? This action cannot be undone and will permanently remove their access to the system.`
