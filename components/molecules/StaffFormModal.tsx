@@ -1,14 +1,8 @@
 'use client';
 
+import { Buildings, Check, Compass, Crown, FileText, User, Users, X } from 'phosphor-react-native';
 import React, { useState } from 'react';
-import {
-  Alert,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Alert, Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { CMSInput, CMSText } from '@/components/atoms';
 import { useCreateStaff } from '@/hooks/useUserManagement';
@@ -36,6 +30,15 @@ const ROLE_LABELS: Record<UserRole, string> = {
   tourist: 'Tourist',
 };
 
+const ROLE_ICONS: Record<UserRole, React.ComponentType<any>> = {
+  tourism_admin: Crown,
+  business_listing_manager: Buildings,
+  tourism_content_manager: Compass,
+  business_registration_manager: FileText,
+  business_owner: User,
+  tourist: Users,
+};
+
 const PERMISSION_LABELS: Record<string, string> = {
   can_manage_users: 'Manage Users & Staff',
   can_manage_businesses: 'Manage Businesses',
@@ -54,11 +57,7 @@ const PERMISSION_LABELS: Record<string, string> = {
  * - Professional card-like appearance
  * - Responsive design for different screen sizes
  */
-export default function StaffFormModal({
-  visible,
-  onClose,
-  onSuccess,
-}: StaffFormModalProps) {
+export default function StaffFormModal({ visible, onClose, onSuccess }: StaffFormModalProps) {
   const createStaffMutation = useCreateStaff();
 
   // Form state
@@ -243,17 +242,8 @@ export default function StaffFormModal({
   };
 
   return (
-    <Modal
-      visible={visible}
-      animationType="fade"
-      transparent={true}
-      onRequestClose={handleClose}
-    >
-      <TouchableOpacity
-        style={styles.modalOverlay}
-        activeOpacity={1}
-        onPress={handleClose}
-      >
+    <Modal visible={visible} animationType="fade" transparent={true} onRequestClose={handleClose}>
+      <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={handleClose}>
         <TouchableOpacity
           style={styles.modalContainer}
           activeOpacity={1}
@@ -262,10 +252,8 @@ export default function StaffFormModal({
           <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-              <TouchableOpacity
-                onPress={handleClose}
-                style={styles.closeButton}
-              >
+              <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+                <X size={20} color="#666" />
                 <CMSText type="body" style={styles.closeText}>
                   Cancel
                 </CMSText>
@@ -280,6 +268,7 @@ export default function StaffFormModal({
                 style={styles.saveButton}
                 disabled={createStaffMutation.isPending}
               >
+                <Check size={20} color={createStaffMutation.isPending ? '#999' : '#007AFF'} />
                 <CMSText
                   type="body"
                   style={[
@@ -292,10 +281,7 @@ export default function StaffFormModal({
               </TouchableOpacity>
             </View>
 
-            <ScrollView
-              style={styles.content}
-              showsVerticalScrollIndicator={false}
-            >
+            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
               {/* Basic Information */}
               <View style={styles.section}>
                 <CMSText type="subtitle" style={styles.sectionTitle}>
@@ -307,9 +293,7 @@ export default function StaffFormModal({
                     label="Email Address *"
                     placeholder="john.doe@example.com"
                     value={formData.email}
-                    onChangeText={(text) =>
-                      setFormData((prev) => ({ ...prev, email: text }))
-                    }
+                    onChangeText={(text) => setFormData((prev) => ({ ...prev, email: text }))}
                     error={errors.email}
                     keyboardType="email-address"
                     autoCapitalize="none"
@@ -321,9 +305,7 @@ export default function StaffFormModal({
                     label="First Name *"
                     placeholder="John"
                     value={formData.firstName}
-                    onChangeText={(text) =>
-                      setFormData((prev) => ({ ...prev, firstName: text }))
-                    }
+                    onChangeText={(text) => setFormData((prev) => ({ ...prev, firstName: text }))}
                     error={errors.firstName}
                   />
                 </View>
@@ -333,9 +315,7 @@ export default function StaffFormModal({
                     label="Last Name *"
                     placeholder="Doe"
                     value={formData.lastName}
-                    onChangeText={(text) =>
-                      setFormData((prev) => ({ ...prev, lastName: text }))
-                    }
+                    onChangeText={(text) => setFormData((prev) => ({ ...prev, lastName: text }))}
                     error={errors.lastName}
                   />
                 </View>
@@ -345,9 +325,7 @@ export default function StaffFormModal({
                     label="Phone Number"
                     placeholder="+63 912 345 6789"
                     value={formData.phoneNumber}
-                    onChangeText={(text) =>
-                      setFormData((prev) => ({ ...prev, phoneNumber: text }))
-                    }
+                    onChangeText={(text) => setFormData((prev) => ({ ...prev, phoneNumber: text }))}
                     keyboardType="phone-pad"
                   />
                 </View>
@@ -365,34 +343,41 @@ export default function StaffFormModal({
                   </CMSText>
                 )}
 
-                {STAFF_ROLES.map((role) => (
-                  <TouchableOpacity
-                    key={role}
-                    style={styles.roleOption}
-                    onPress={() => handleRoleChange(role)}
-                  >
-                    <View style={styles.roleContent}>
-                      <View
-                        style={[
-                          styles.roleRadio,
-                          formData.role === role && styles.roleRadioSelected,
-                        ]}
-                      >
-                        {formData.role === role && (
-                          <View style={styles.roleRadioInner} />
-                        )}
+                {STAFF_ROLES.map((role) => {
+                  const IconComponent = ROLE_ICONS[role];
+                  return (
+                    <TouchableOpacity
+                      key={role}
+                      style={styles.roleOption}
+                      onPress={() => handleRoleChange(role)}
+                    >
+                      <View style={styles.roleContent}>
+                        <View
+                          style={[
+                            styles.roleRadio,
+                            formData.role === role && styles.roleRadioSelected,
+                          ]}
+                        >
+                          {formData.role === role && <View style={styles.roleRadioInner} />}
+                        </View>
+                        <View style={styles.roleIconContainer}>
+                          <IconComponent
+                            size={24}
+                            color={formData.role === role ? '#007AFF' : '#666'}
+                          />
+                        </View>
+                        <View style={styles.roleInfo}>
+                          <CMSText type="body" style={styles.roleTitle}>
+                            {ROLE_LABELS[role]}
+                          </CMSText>
+                          <CMSText type="body" style={styles.roleDescription}>
+                            {descriptions[role]}
+                          </CMSText>
+                        </View>
                       </View>
-                      <View style={styles.roleInfo}>
-                        <CMSText type="body" style={styles.roleTitle}>
-                          {ROLE_LABELS[role]}
-                        </CMSText>
-                        <CMSText type="body" style={styles.roleDescription}>
-                          {descriptions[role]}
-                        </CMSText>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                ))}
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
 
               {/* Permissions */}
@@ -405,9 +390,7 @@ export default function StaffFormModal({
                   <TouchableOpacity
                     key={key}
                     style={styles.permissionOption}
-                    onPress={() =>
-                      handlePermissionToggle(key as keyof StaffPermissions)
-                    }
+                    onPress={() => handlePermissionToggle(key as keyof StaffPermissions)}
                   >
                     <View style={styles.permissionContent}>
                       <View
@@ -471,7 +454,10 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f0f0f0',
   },
   closeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 8,
+    gap: 4,
   },
   closeText: {
     color: '#666',
@@ -480,7 +466,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   saveButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 8,
+    gap: 4,
   },
   saveText: {
     color: '#007AFF',
@@ -532,6 +521,10 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     backgroundColor: '#007AFF',
+  },
+  roleIconContainer: {
+    marginRight: 12,
+    marginTop: 2,
   },
   roleInfo: {
     flex: 1,

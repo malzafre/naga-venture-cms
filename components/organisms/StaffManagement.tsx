@@ -26,6 +26,7 @@ interface StaffManagementProps {
   selectedRole?: UserRole | '';
   onSearchChange?: (query: string) => void;
   onRoleFilterChange?: (role: UserRole | '') => void;
+  onAddStaff?: () => void;
 }
 
 /**
@@ -39,6 +40,7 @@ export default function StaffManagement({
   selectedRole = '',
   onSearchChange,
   onRoleFilterChange,
+  onAddStaff,
 }: StaffManagementProps) {
   // Local state for UI interactions
   const [currentPage, setCurrentPage] = useState(1);
@@ -137,9 +139,13 @@ export default function StaffManagement({
 
   return (
     <View style={styles.container}>
+      {' '}
       {/* Statistics Header */}
-      <StaffStatistics staffMembers={staffMembers} totalCount={totalCount} />
-
+      <StaffStatistics
+        staffMembers={staffMembers}
+        totalCount={totalCount}
+        onAddStaff={onAddStaff}
+      />
       {/* Search and Filters */}
       <StaffFilterControls
         searchQuery={searchQuery}
@@ -147,7 +153,6 @@ export default function StaffManagement({
         onSearchChange={onSearchChange || (() => {})}
         onRoleFilterChange={onRoleFilterChange || (() => {})}
       />
-
       {/* Staff Grid with Pagination */}
       <StaffGrid
         staffMembers={staffMembers}
@@ -166,7 +171,6 @@ export default function StaffManagement({
         onDelete={handleDeleteUser}
         onPageChange={setCurrentPage}
       />
-
       {/* Delete Confirmation Modal */}
       <ConfirmationModal
         visible={confirmDeleteModal.visible}
@@ -193,7 +197,7 @@ export default function StaffManagement({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 8,
   },
   errorText: {
     color: '#ff3b30',

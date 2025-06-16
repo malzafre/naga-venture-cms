@@ -1,141 +1,161 @@
 /**
  * Staff Statistics Header Component
  *
- * Displays statistics about staff members in card format.
+ * Displays statistics about staff members in compact dot format.
  * Part of the atomic design refactoring following the smart hook/dumb component pattern.
  */
 
 import React, { useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
-import { CMSText } from '@/components/atoms';
+import { CMSButton, CMSText } from '@/components/atoms';
 import { useTheme } from '@/constants/useTheme';
 import { type Profile } from '@/schemas';
-
-interface StatCardData {
-  icon: string;
-  value: number;
-  label: string;
-  color: string;
-}
 
 interface StaffStatisticsProps {
   staffMembers: Profile[];
   totalCount: number;
+  title?: string;
+  onAddStaff?: () => void;
 }
 
 export default function StaffStatistics({
   staffMembers,
   totalCount,
+  title = 'Staff Management',
+  onAddStaff,
 }: StaffStatisticsProps) {
   const { theme } = useTheme();
   const { colors } = theme;
   const styles = useMemo(() => getStyles(colors), [colors]);
 
-  const statistics: StatCardData[] = useMemo(
-    () => [
-      {
-        icon: '👥',
-        value: totalCount,
-        label: 'Total Staff',
-        color: colors.primary,
-      },
-      {
-        icon: '👑',
-        value: staffMembers.filter((s) => s.role === 'tourism_admin').length,
-        label: 'Admins',
-        color: colors.error,
-      },
-      {
-        icon: '✏️',
-        value: staffMembers.filter(
-          (s) => s.role.includes('content') || s.role.includes('listing')
-        ).length,
-        label: 'Editors',
-        color: colors.success,
-      },
-      {
-        icon: '📊',
-        value: staffMembers.filter((s) => s.is_verified).length,
-        label: 'Active',
-        color: colors.info,
-      },
-    ],
-    [staffMembers, totalCount, colors]
+  // Calculate statistics
+  const adminCount = useMemo(
+    () => staffMembers.filter((s) => s.role === 'tourism_admin').length,
+    [staffMembers]
   );
 
-  return (
-    <View style={styles.statsContainer}>
-      {statistics.map((stat, index) => (
-        <StatCard key={index} {...stat} />
-      ))}
-    </View>
+  const managerCount = useMemo(
+    () =>
+      staffMembers.filter(
+        (s) =>
+          s.role === 'business_listing_manager' ||
+          s.role === 'tourism_content_manager' ||
+          s.role === 'business_registration_manager'
+      ).length,
+    [staffMembers]
   );
-}
 
-type StatCardProps = StatCardData;
-
-function StatCard({ icon, value, label, color }: StatCardProps) {
-  const { theme } = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => getStyles(colors), [colors]);
-
+  const activeCount = useMemo(
+    () => staffMembers.filter((s) => s.is_verified).length,
+    [staffMembers]
+  );
   return (
-    <View style={styles.statCard}>
-      <View style={[styles.statIcon, { backgroundColor: color + '20' }]}>
-        <CMSText style={[styles.statIconText, { color }]}>{icon}</CMSText>
-      </View>
-      <View style={styles.statContent}>
-        <CMSText type="title" style={styles.statNumber}>
-          {value}
+    <View style={styles.container}>
+      {/* Title and Stats Section */}
+      <View style={styles.titleSection}>
+        <CMSText type="title" style={styles.title}>
+          {title}
         </CMSText>
-        <CMSText type="caption" style={styles.statLabel}>
-          {label}
-        </CMSText>
+
+        {/* Stats Indicators - positioned under title */}
+        <View style={styles.statsContainer}>
+          <View style={styles.statItem}>
+            <View style={[styles.statDot, styles.totalDot]} />
+            <Text style={styles.statText}>{totalCount} Total</Text>
+          </View>
+
+          <View style={styles.statItem}>
+            <View style={[styles.statDot, styles.adminDot]} />
+            <Text style={styles.statText}>{adminCount} Admins</Text>
+          </View>
+
+          <View style={styles.statItem}>
+            <View style={[styles.statDot, styles.managerDot]} />
+            <Text style={styles.statText}>{managerCount} Managers</Text>
+          </View>
+
+          <View style={styles.statItem}>
+            <View style={[styles.statDot, styles.activeDot]} />
+            <Text style={styles.statText}>{activeCount} Active</Text>
+          </View>
+        </View>
       </View>
+
+      {/* Add Button - positioned on the right */}
+      {onAddStaff && (
+        <CMSButton title="+ Add Staff Member" onPress={onAddStaff} style={styles.addButton} />
+      )}
     </View>
   );
 }
 
 const getStyles = (colors: any) =>
   StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: 16,
+      flexWrap: 'wrap',
+      gap: 16,
+    },
+
+    titleSection: {
+      flex: 1,
+      minWidth: 200,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 6,
+    },
+
     statsContainer: {
       flexDirection: 'row',
-      marginBottom: 20,
-      gap: 12,
+      flexWrap: 'wrap',
+      gap: 16,
     },
-    statCard: {
-      flex: 1,
-      backgroundColor: colors.surface,
-      padding: 16,
-      borderRadius: 12,
+
+    statItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      elevation: 2,
-      boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)',
+      gap: 6,
     },
-    statIcon: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginRight: 12,
+
+    statDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
     },
-    statIconText: {
-      fontSize: 18,
-    },
-    statContent: {
-      flex: 1,
-    },
-    statNumber: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      marginBottom: 2,
-      color: colors.text,
-    },
-    statLabel: {
-      fontSize: 12,
+
+    statText: {
+      fontSize: 13,
+      fontWeight: '500',
       color: colors.textSecondary,
+    },
+
+    addButton: {
+      backgroundColor: colors.accent,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 8,
+    },
+
+    totalDot: {
+      backgroundColor: '#3B82F6', // Blue
+    },
+
+    adminDot: {
+      backgroundColor: '#F59E0B', // Orange/Amber
+    },
+
+    managerDot: {
+      backgroundColor: '#10B981', // Green
+    },
+
+    activeDot: {
+      backgroundColor: '#06B6D4', // Cyan
     },
   });

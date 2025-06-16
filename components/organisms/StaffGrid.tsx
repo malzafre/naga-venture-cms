@@ -63,39 +63,32 @@ export default function StaffGrid({
 
   if (staffMembers.length === 0) {
     return (
-      <EmptyState
-        searchQuery={searchQuery}
-        selectedRole={selectedRole}
-        roleLabels={ROLE_LABELS}
-      />
+      <EmptyState searchQuery={searchQuery} selectedRole={selectedRole} roleLabels={ROLE_LABELS} />
     );
   }
 
   return (
     <View style={styles.container}>
-      <StaffHeader
-        totalCount={totalCount}
-        selectedRole={selectedRole}
-        roleLabels={ROLE_LABELS}
-      />
-
+      <StaffHeader totalCount={totalCount} selectedRole={selectedRole} roleLabels={ROLE_LABELS} />{' '}
       <ScrollView style={styles.staffGrid}>
-        {staffMembers.map((staff) => (
-          <ModernStaffCard
-            key={staff.id}
-            staff={staff}
-            isEditing={editingUserId === staff.id}
-            onEdit={() => onEdit(staff.id)}
-            onCancelEdit={onCancelEdit}
-            onRoleUpdate={(newRole) => onRoleUpdate(staff.id, newRole)}
-            onDelete={() => onDelete(staff)}
-            isUpdating={isUpdating}
-            isDeleting={isDeleting}
-            currentUserId={currentUserId}
-          />
-        ))}
+        <View style={styles.gridContainer}>
+          {staffMembers.map((staff) => (
+            <View key={staff.id} style={styles.gridItem}>
+              <ModernStaffCard
+                staff={staff}
+                isEditing={editingUserId === staff.id}
+                onEdit={() => onEdit(staff.id)}
+                onCancelEdit={onCancelEdit}
+                onRoleUpdate={(newRole) => onRoleUpdate(staff.id, newRole)}
+                onDelete={() => onDelete(staff)}
+                isUpdating={isUpdating}
+                isDeleting={isDeleting}
+                currentUserId={currentUserId}
+              />
+            </View>
+          ))}
+        </View>
       </ScrollView>
-
       {totalPages > 1 && (
         <PaginationControls
           currentPage={currentPage}
@@ -137,11 +130,7 @@ interface StaffHeaderProps {
   roleLabels: Record<UserRole, string>;
 }
 
-function StaffHeader({
-  totalCount,
-  selectedRole,
-  roleLabels,
-}: StaffHeaderProps) {
+function StaffHeader({ totalCount, selectedRole, roleLabels }: StaffHeaderProps) {
   const { theme } = useTheme();
   const { colors } = theme;
   const styles = useMemo(() => getStyles(colors), [colors]);
@@ -166,11 +155,7 @@ interface PaginationControlsProps {
   onPageChange: (page: number) => void;
 }
 
-function PaginationControls({
-  currentPage,
-  totalPages,
-  onPageChange,
-}: PaginationControlsProps) {
+function PaginationControls({ currentPage, totalPages, onPageChange }: PaginationControlsProps) {
   const { theme } = useTheme();
   const { colors } = theme;
   const styles = useMemo(() => getStyles(colors), [colors]);
@@ -225,6 +210,17 @@ const getStyles = (colors: any) =>
     },
     staffGrid: {
       flex: 1,
+    },
+    gridContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'flex-start',
+      alignItems: 'flex-start',
+      gap: 16,
+    },
+    gridItem: {
+      width: '31%', // Approximately 1/3 minus gaps
+      minWidth: 280, // Minimum width for readability
     },
     pagination: {
       flexDirection: 'row',
