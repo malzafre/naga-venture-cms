@@ -10,6 +10,11 @@ export { default as StaffFormModal } from './StaffFormModal';
 export { default as StaffStatistics } from './StaffStatistics';
 export { StatusBadge } from './StatusBadge';
 
+// Amenity Components
+export { AmenityCard } from './AmenityCard';
+export { AmenityFormModal } from './AmenityFormModal';
+export { AmenityStatsDashboard } from './AmenityStatsDashboard';
+
 // Export types
 export type { CMSHeaderProps } from './CMSHeader';
 export type { CMSStatCardProps } from './CMSStatCard';

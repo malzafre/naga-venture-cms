@@ -241,7 +241,9 @@ export const CACHE_CONSTANTS = {
 } as const;
 
 // Cache Configuration Helpers
-export const getCacheConfig = (preset: keyof typeof CACHE_CONSTANTS.PRESETS) => {
+export const getCacheConfig = (
+  preset: keyof typeof CACHE_CONSTANTS.PRESETS
+) => {
   return CACHE_CONSTANTS.PRESETS[preset];
 };
 
@@ -250,6 +252,7 @@ export const DOMAIN_CACHE_CONFIG = {
   businesses: getCacheConfig('DYNAMIC_DATA'),
   users: getCacheConfig('USER_DATA'),
   categories: getCacheConfig('STATIC_DATA'),
+  amenities: getCacheConfig('STATIC_DATA'),
   touristSpots: getCacheConfig('DYNAMIC_DATA'),
   events: getCacheConfig('DYNAMIC_DATA'),
   bookings: getCacheConfig('REAL_TIME_DATA'),
@@ -269,7 +272,9 @@ export const cacheUtils = {
 
   // Create optimistic update configuration
   createOptimisticConfig: (operation: string) => ({
-    enabled: CACHE_CONSTANTS.OPTIMISTIC.ENABLED_OPERATIONS.includes(operation),
+    enabled: CACHE_CONSTANTS.OPTIMISTIC.ENABLED_OPERATIONS.includes(
+      operation as any
+    ),
     rollbackTimeout: CACHE_CONSTANTS.OPTIMISTIC.ROLLBACK_TIMEOUT,
   }),
 
@@ -280,9 +285,15 @@ export const cacheUtils = {
   ) => {
     switch (connectionQuality) {
       case 'slow':
-        return baseStaleTime * CACHE_CONSTANTS.NETWORK_AWARE.SLOW_CONNECTION.staleTimeMultiplier;
+        return (
+          baseStaleTime *
+          CACHE_CONSTANTS.NETWORK_AWARE.SLOW_CONNECTION.staleTimeMultiplier
+        );
       case 'offline':
-        return baseStaleTime * CACHE_CONSTANTS.NETWORK_AWARE.OFFLINE_MODE.staleTimeMultiplier;
+        return (
+          baseStaleTime *
+          CACHE_CONSTANTS.NETWORK_AWARE.OFFLINE_MODE.staleTimeMultiplier
+        );
       default:
         return baseStaleTime;
     }
@@ -300,11 +311,15 @@ export const cacheUtils = {
   },
 
   // Invalidate all queries for a specific domain
-  invalidateDomainQueries: (queryClient: any, domain: keyof typeof DOMAIN_CACHE_CONFIG) => {
+  invalidateDomainQueries: (
+    queryClient: any,
+    domain: keyof typeof DOMAIN_CACHE_CONFIG
+  ) => {
     const domainMappings = {
       businesses: ['businesses'],
       users: ['users', 'profiles'],
       categories: ['categories'],
+      amenities: ['amenities'],
       touristSpots: ['tourist-spots'],
       events: ['events'],
       bookings: ['bookings'],
@@ -325,11 +340,15 @@ export const cacheUtils = {
   },
 
   // Invalidate specific list queries for a domain
-  invalidateListQueries: (queryClient: any, domain: keyof typeof DOMAIN_CACHE_CONFIG) => {
+  invalidateListQueries: (
+    queryClient: any,
+    domain: keyof typeof DOMAIN_CACHE_CONFIG
+  ) => {
     const domainMappings = {
       businesses: ['businesses'],
       users: ['users', 'profiles'],
       categories: ['categories'],
+      amenities: ['amenities'],
       touristSpots: ['tourist-spots'],
       events: ['events'],
       bookings: ['bookings'],
@@ -350,7 +369,10 @@ export const cacheUtils = {
   },
 
   // Remove stale data from cache
-  removeStaleQueries: (queryClient: any, maxAge: number = 24 * 60 * 60 * 1000) => {
+  removeStaleQueries: (
+    queryClient: any,
+    maxAge: number = 24 * 60 * 60 * 1000
+  ) => {
     queryClient.getQueryCache().clear();
   },
 } as const;

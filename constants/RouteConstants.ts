@@ -42,17 +42,24 @@ export const ROUTE_CONSTANTS = {
     BASE: '/(sidebar)/business-management',
     BUSINESS_LISTINGS: {
       BASE: '/(sidebar)/business-management/business-listings',
-      ALL_BUSINESSES: '/(sidebar)/business-management/business-listings/all-businesses',
-      ACCOMMODATIONS: '/(sidebar)/business-management/business-listings/accommodations',
-      SHOPS_SERVICES: '/(sidebar)/business-management/business-listings/shops-services',
-      FEATURED_BUSINESSES: '/(sidebar)/business-management/business-listings/featured-businesses',
+      ALL_BUSINESSES:
+        '/(sidebar)/business-management/business-listings/all-businesses',
+      ACCOMMODATIONS:
+        '/(sidebar)/business-management/business-listings/accommodations',
+      SHOPS_SERVICES:
+        '/(sidebar)/business-management/business-listings/shops-services',
+      FEATURED_BUSINESSES:
+        '/(sidebar)/business-management/business-listings/featured-businesses',
       CREATE: '/(sidebar)/business-management/business-listings/create',
-      EDIT: (id: string) => `/(sidebar)/business-management/business-listings/edit/${id}`,
-      VIEW: (id: string) => `/(sidebar)/business-management/business-listings/view/${id}`,
+      EDIT: (id: string) =>
+        `/(sidebar)/business-management/business-listings/edit/${id}`,
+      VIEW: (id: string) =>
+        `/(sidebar)/business-management/business-listings/view/${id}`,
     },
     BUSINESS_REGISTRATIONS: {
       BASE: '/(sidebar)/business-management/business-registrations',
-      PENDING_APPROVALS: '/(sidebar)/business-management/business-registrations/pending-approvals',
+      PENDING_APPROVALS:
+        '/(sidebar)/business-management/business-registrations/pending-approvals',
       REGISTRATION_HISTORY:
         '/(sidebar)/business-management/business-registrations/registration-history',
       REJECTED_APPLICATIONS:
@@ -79,6 +86,7 @@ export const ROUTE_CONSTANTS = {
   CATEGORIES: {
     BASE: '/(sidebar)/categories',
     CATEGORY_MANAGEMENT: '/(sidebar)/categories/category-management',
+    AMENITIES_MANAGEMENT: '/(sidebar)/categories/amenities-management',
   },
 
   // Bookings & Finance
@@ -92,9 +100,11 @@ export const ROUTE_CONSTANTS = {
   ANALYTICS_REPORTING: {
     BASE: '/(sidebar)/analytics-reporting',
     PLATFORM_ANALYTICS: '/(sidebar)/analytics-reporting/platform-analytics',
-    BUSINESS_ANALYTICS_DETAIL: '/(sidebar)/analytics-reporting/business-analytics-detail',
+    BUSINESS_ANALYTICS_DETAIL:
+      '/(sidebar)/analytics-reporting/business-analytics-detail',
     TOURISM_ANALYTICS: '/(sidebar)/analytics-reporting/tourism-analytics',
-    REGISTRATION_ANALYTICS: '/(sidebar)/analytics-reporting/registration-analytics',
+    REGISTRATION_ANALYTICS:
+      '/(sidebar)/analytics-reporting/registration-analytics',
   },
 
   // System Administration

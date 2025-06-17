@@ -27,28 +27,37 @@ const queryKeys = {
     detail: (id: string) => [...queryKeys.businesses.details(), id] as const,
 
     // Business-specific relationships
-    images: (businessId: string) => [...queryKeys.businesses.detail(businessId), 'images'] as const,
+    images: (businessId: string) =>
+      [...queryKeys.businesses.detail(businessId), 'images'] as const,
     categories: (businessId: string) =>
       [...queryKeys.businesses.detail(businessId), 'categories'] as const,
     reviews: (businessId: string) =>
       [...queryKeys.businesses.detail(businessId), 'reviews'] as const,
     amenities: (businessId: string) =>
       [...queryKeys.businesses.detail(businessId), 'amenities'] as const,
-    hours: (businessId: string) => [...queryKeys.businesses.detail(businessId), 'hours'] as const,
+    hours: (businessId: string) =>
+      [...queryKeys.businesses.detail(businessId), 'hours'] as const,
 
     // Business filtering and search
-    byStatus: (status: string) => [...queryKeys.businesses.lists(), { status }] as const,
-    byType: (type: string) => [...queryKeys.businesses.lists(), { business_type: type }] as const,
+    byStatus: (status: string) =>
+      [...queryKeys.businesses.lists(), { status }] as const,
+    byType: (type: string) =>
+      [...queryKeys.businesses.lists(), { business_type: type }] as const,
     byCategory: (categoryId: string) =>
       [...queryKeys.businesses.lists(), { category: categoryId }] as const,
-    byOwner: (ownerId: string) => [...queryKeys.businesses.lists(), { owner: ownerId }] as const,
-    search: (query: string) => [...queryKeys.businesses.all, 'search', query] as const,
-    featured: () => [...queryKeys.businesses.lists(), { featured: true }] as const,
-    pending: () => [...queryKeys.businesses.lists(), { status: 'pending' }] as const,
+    byOwner: (ownerId: string) =>
+      [...queryKeys.businesses.lists(), { owner: ownerId }] as const,
+    search: (query: string) =>
+      [...queryKeys.businesses.all, 'search', query] as const,
+    featured: () =>
+      [...queryKeys.businesses.lists(), { featured: true }] as const,
+    pending: () =>
+      [...queryKeys.businesses.lists(), { status: 'pending' }] as const,
 
     // Analytics and statistics
     analytics: () => [...queryKeys.businesses.all, 'analytics'] as const,
-    stats: (timeframe?: string) => [...queryKeys.businesses.all, 'stats', timeframe] as const,
+    stats: (timeframe?: string) =>
+      [...queryKeys.businesses.all, 'stats', timeframe] as const,
   },
 
   // Category Management Domain
@@ -60,18 +69,23 @@ const queryKeys = {
     mainList: (filters: Record<string, unknown>) =>
       [...queryKeys.categories.mainLists(), { ...filters }] as const,
     mainDetails: () => [...queryKeys.categories.all, 'main', 'detail'] as const,
-    mainDetail: (id: string) => [...queryKeys.categories.mainDetails(), id] as const,
+    mainDetail: (id: string) =>
+      [...queryKeys.categories.mainDetails(), id] as const,
 
     // Sub Categories
     subLists: () => [...queryKeys.categories.all, 'sub', 'list'] as const,
     subList: (filters: Record<string, unknown>) =>
       [...queryKeys.categories.subLists(), { ...filters }] as const,
     subDetails: () => [...queryKeys.categories.all, 'sub', 'detail'] as const,
-    subDetail: (id: string) => [...queryKeys.categories.subDetails(), id] as const,
+    subDetail: (id: string) =>
+      [...queryKeys.categories.subDetails(), id] as const,
 
     // Category relationships
     subsByMain: (mainCategoryId: string) =>
-      [...queryKeys.categories.mainDetail(mainCategoryId), 'subcategories'] as const,
+      [
+        ...queryKeys.categories.mainDetail(mainCategoryId),
+        'subcategories',
+      ] as const,
 
     // Category analytics and usage
     analytics: () => [...queryKeys.categories.all, 'analytics'] as const,
@@ -97,7 +111,8 @@ const queryKeys = {
     byRole: (role: string) => [...queryKeys.users.lists(), { role }] as const,
     byStatus: (isVerified: boolean) =>
       [...queryKeys.users.lists(), { is_verified: isVerified }] as const,
-    search: (query: string) => [...queryKeys.users.all, 'search', query] as const,
+    search: (query: string) =>
+      [...queryKeys.users.all, 'search', query] as const,
   },
 
   // Analytics Domain
@@ -106,6 +121,42 @@ const queryKeys = {
     userStats: () => [...queryKeys.analytics.all, 'users'] as const,
     businessStats: () => [...queryKeys.analytics.all, 'businesses'] as const,
     categoryStats: () => [...queryKeys.analytics.all, 'categories'] as const,
+    amenityStats: () => [...queryKeys.analytics.all, 'amenities'] as const,
+  },
+
+  // Amenities Management Domain
+  amenities: {
+    all: ['amenities'] as const,
+    lists: () => [...queryKeys.amenities.all, 'list'] as const,
+    list: (filters: Record<string, unknown>) =>
+      [...queryKeys.amenities.lists(), { ...filters }] as const,
+    details: () => [...queryKeys.amenities.all, 'detail'] as const,
+    detail: (id: string) => [...queryKeys.amenities.details(), id] as const,
+
+    // Amenity filtering and search
+    search: (query: string) =>
+      [...queryKeys.amenities.all, 'search', query] as const,
+    withUsage: () =>
+      [...queryKeys.amenities.lists(), { include_usage: true }] as const,
+    withAudit: () =>
+      [...queryKeys.amenities.lists(), { include_audit: true }] as const,
+    byCreator: (creatorId: string) =>
+      [...queryKeys.amenities.lists(), { created_by: creatorId }] as const,
+
+    // Usage analytics
+    usage: () => [...queryKeys.amenities.all, 'usage'] as const,
+    usageStats: (amenityId: string) =>
+      [...queryKeys.amenities.detail(amenityId), 'usage'] as const,
+    usageSummary: () => [...queryKeys.amenities.usage(), 'summary'] as const,
+    mostUsed: () => [...queryKeys.amenities.usage(), 'most-used'] as const,
+    leastUsed: () => [...queryKeys.amenities.usage(), 'least-used'] as const,
+    unused: () => [...queryKeys.amenities.usage(), 'unused'] as const,
+
+    // Business and room relationships
+    businessAmenities: (businessId: string) =>
+      [...queryKeys.businesses.detail(businessId), 'amenities'] as const,
+    roomAmenities: (roomId: string) =>
+      [...queryKeys.amenities.all, 'room', roomId] as const,
   },
 };
 

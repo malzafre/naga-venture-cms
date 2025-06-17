@@ -5,6 +5,7 @@ export { default as CMSInput } from './CMSInput';
 export { CMSNavigationDropdownIndicator } from './CMSNavigationDropdownIndicator';
 export { CMSNavigationItem } from './CMSNavigationItem';
 export { default as CMSText } from './CMSText';
+export { IconPicker } from './IconPicker';
 
 // Export types
 export type { CMSButtonProps } from './CMSButton';
