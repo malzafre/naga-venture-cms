@@ -28,7 +28,7 @@ import {
   type SortOption,
 } from '@/components/molecules/SortDropdown';
 import { useTheme } from '@/constants/useTheme';
-import { useAmenitiesManagementPage } from '@/hooks/useAmenitiesManagement';
+import { useAmenitiesManagementPage } from '@/hooks/features/amenities/useAmenitiesManagement';
 import { AmenityComplete } from '@/schemas/amenitiesSchemas';
 
 // ============================================================================

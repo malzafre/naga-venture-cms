@@ -8,21 +8,28 @@ import { TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
 
-import logo from '@/assets/images/logo.png';
-import { CMSButton, CMSText } from '@/components/';
-import { useAuth } from '@/hooks/useAuthModern';
+import { CMSButton, CMSText } from '@/components';
+import { useAuth } from '@/hooks/features/auth/useAuth';
 
 // Zod schema for login form validation
 const LoginSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
+  password: z
+    .string()
+    .min(6, { message: 'Password must be at least 6 characters' }),
 });
 
 type LoginFormInputs = z.infer<typeof LoginSchema>;
 
 const LoginWeb = () => {
-  const { signInWithEmail, isLoading, authError, user, userProfile, isUserProfileLoading } =
-    useAuth();
+  const {
+    signInWithEmail,
+    isLoading,
+    authError,
+    user,
+    userProfile,
+    isUserProfileLoading,
+  } = useAuth();
 
   const {
     control,
@@ -51,12 +58,23 @@ const LoginWeb = () => {
   }; // Show error alert when authError state changes
   React.useEffect(() => {
     if (authError) {
-      Alert.alert('Login Failed', authError.message || 'Authentication failed.');
+      Alert.alert(
+        'Login Failed',
+        authError.message || 'Authentication failed.'
+      );
     }
   }, [authError]); // Navigate to admin panel when user is successfully authenticated
   React.useEffect(() => {
-    if (user && userProfile && !isLoading && !isUserProfileLoading && !authError) {
-      console.log('[Login] User authenticated with profile, navigating to dashboard');
+    if (
+      user &&
+      userProfile &&
+      !isLoading &&
+      !isUserProfileLoading &&
+      !authError
+    ) {
+      console.log(
+        '[Login] User authenticated with profile, navigating to dashboard'
+      );
       router.replace('/(sidebar)/dashboard');
     }
   }, [user, userProfile, isLoading, isUserProfileLoading, authError]);
@@ -79,7 +97,10 @@ const LoginWeb = () => {
         <View style={styles.rightPanel}>
           <View style={styles.formContainer}>
             <View style={styles.logoContainer}>
-              <Image source={logo} style={styles.logo} />
+              <Image
+                source={require('@/assets/images/logo.png')}
+                style={styles.logo}
+              />
               <Text style={styles.logoText}>Naga Venture</Text>
             </View>
             <View style={{ marginBottom: 20 }}>
@@ -112,7 +133,9 @@ const LoginWeb = () => {
                   name="email"
                 />
               </View>
-              {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
+              {errors.email && (
+                <Text style={styles.errorText}>{errors.email.message}</Text>
+              )}
 
               <View style={styles.inputContainer}>
                 <Controller
@@ -134,7 +157,9 @@ const LoginWeb = () => {
                   name="password"
                 />
               </View>
-              {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
+              {errors.password && (
+                <Text style={styles.errorText}>{errors.password.message}</Text>
+              )}
 
               {/* TODO: Create forgot password page for Tourism CMS */}
               <Text

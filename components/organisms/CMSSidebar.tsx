@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 
-import { useSidebarLogic } from '@/hooks/useSidebarLogic';
+import { useSidebarLogic } from '@/hooks/shared/useSidebarLogic';
 import { UserRole } from '@/types/supabase';
 
 import { CMSText } from '../atoms';

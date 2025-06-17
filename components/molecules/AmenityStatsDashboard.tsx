@@ -4,7 +4,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { CMSText } from '@/components/atoms';
 import { CMSStatCard } from '@/components/molecules';
-import { useAmenityUsageAnalytics } from '@/hooks/useAmenitiesManagement';
+import { useAmenityUsageAnalytics } from '@/hooks/features/amenities/useAmenitiesManagement';
 
 /**
  * AmenityStatsDashboard - Molecule Component

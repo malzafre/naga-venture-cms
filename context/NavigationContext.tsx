@@ -9,14 +9,14 @@
  * Migration Steps:
  * 1. Replace useNavigationContext() with useNavigationManagement()
  * 2. Remove <NavigationProvider> wrapper from component tree
- * 3. Import from '@/hooks/useNavigationManagement' instead
+ * 3. Import from '@/hooks/shared/useNavigationManagement' instead
  *
  * Example:
  * Before: const { toggleExpand } = useNavigationContext();
  * After:  const { toggleExpand } = useNavigationManagement();
  */
 
-import { useNavigationManagement } from '@/hooks/useNavigationManagement';
+import { useNavigationManagement } from '@/hooks/shared/useNavigationManagement';
 import { NavigationItem } from '@/types/navigation';
 import { UserRole } from '@/types/supabase';
 
@@ -69,7 +69,7 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({
 /**
  * Hook to access navigation context - DEPRECATED
  *
- * @deprecated Use useNavigationManagement() from '@/hooks/useNavigationManagement' instead
+ * @deprecated Use useNavigationManagement() from '@/hooks/shared/useNavigationManagement' instead
  * @returns Navigation management hooks
  */
 export const useNavigationContext = (): NavigationContextType => {

@@ -10,13 +10,28 @@
  * Following "Smart Hook, Dumb Component" pattern - all business logic is in useStaffEdit hook
  */
 
-import { Buildings, Check, Compass, Crown, FileText, User, Users, X } from 'phosphor-react-native';
+import {
+  Buildings,
+  Check,
+  Compass,
+  Crown,
+  FileText,
+  User,
+  Users,
+  X,
+} from 'phosphor-react-native';
 import React, { useEffect, useMemo } from 'react';
-import { Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  Modal,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 import { CMSInput, CMSText } from '@/components/atoms';
 import { useTheme } from '@/constants/useTheme';
-import { useStaffEdit } from '@/hooks/useStaffEdit';
+import { useStaffEdit } from '@/hooks/features/staff/useStaffManagement';
 import { type Profile, type StaffPermissions, type UserRole } from '@/schemas';
 
 interface StaffEditModalProps {
@@ -129,8 +144,17 @@ export default function StaffEditModal({
   if (!staff) return null;
 
   return (
-    <Modal visible={visible} animationType="fade" transparent={true} onRequestClose={handleClose}>
-      <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={handleClose}>
+    <Modal
+      visible={visible}
+      animationType="fade"
+      transparent={true}
+      onRequestClose={handleClose}
+    >
+      <TouchableOpacity
+        style={styles.modalOverlay}
+        activeOpacity={1}
+        onPress={handleClose}
+      >
         <TouchableOpacity
           style={styles.modalContainer}
           activeOpacity={1}
@@ -139,7 +163,10 @@ export default function StaffEditModal({
           <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-              <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+              <TouchableOpacity
+                onPress={handleClose}
+                style={styles.closeButton}
+              >
                 <X size={20} color="#666" />
                 <CMSText type="body" style={styles.closeText}>
                   Cancel
@@ -152,20 +179,29 @@ export default function StaffEditModal({
 
               <TouchableOpacity
                 onPress={handleSubmit}
-                style={[styles.saveButton, !canSubmit && styles.saveButtonDisabled]}
+                style={[
+                  styles.saveButton,
+                  !canSubmit && styles.saveButtonDisabled,
+                ]}
                 disabled={!canSubmit}
               >
                 <Check size={20} color={canSubmit ? '#007AFF' : '#999'} />
                 <CMSText
                   type="body"
-                  style={[styles.saveText, !canSubmit && styles.saveTextDisabled]}
+                  style={[
+                    styles.saveText,
+                    !canSubmit && styles.saveTextDisabled,
+                  ]}
                 >
                   {isSubmitting ? 'Saving...' : 'Save'}
                 </CMSText>
               </TouchableOpacity>
             </View>
 
-            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+            <ScrollView
+              style={styles.content}
+              showsVerticalScrollIndicator={false}
+            >
               {/* Staff Info Header */}
               <View style={styles.staffInfoHeader}>
                 <CMSText type="subtitle" style={styles.staffEmail}>
@@ -196,7 +232,9 @@ export default function StaffEditModal({
                     label="First Name *"
                     placeholder="Enter first name"
                     value={formData.first_name}
-                    onChangeText={(text) => handleFieldChange('first_name', text)}
+                    onChangeText={(text) =>
+                      handleFieldChange('first_name', text)
+                    }
                     error={errors.first_name}
                   />
                 </View>
@@ -206,7 +244,9 @@ export default function StaffEditModal({
                     label="Last Name *"
                     placeholder="Enter last name"
                     value={formData.last_name}
-                    onChangeText={(text) => handleFieldChange('last_name', text)}
+                    onChangeText={(text) =>
+                      handleFieldChange('last_name', text)
+                    }
                     error={errors.last_name}
                   />
                 </View>
@@ -216,7 +256,9 @@ export default function StaffEditModal({
                     label="Phone Number"
                     placeholder="+63 912 345 6789"
                     value={formData.phone_number}
-                    onChangeText={(text) => handleFieldChange('phone_number', text)}
+                    onChangeText={(text) =>
+                      handleFieldChange('phone_number', text)
+                    }
                     error={errors.phone_number}
                     keyboardType="phone-pad"
                   />
@@ -242,26 +284,43 @@ export default function StaffEditModal({
                   return (
                     <TouchableOpacity
                       key={role}
-                      style={[styles.roleOption, isSelected && styles.roleOptionSelected]}
+                      style={[
+                        styles.roleOption,
+                        isSelected && styles.roleOptionSelected,
+                      ]}
                       onPress={() => handleRoleChange(role)}
                     >
                       <View style={styles.roleContent}>
-                        <View style={[styles.roleRadio, isSelected && styles.roleRadioSelected]}>
+                        <View
+                          style={[
+                            styles.roleRadio,
+                            isSelected && styles.roleRadioSelected,
+                          ]}
+                        >
                           {isSelected && <View style={styles.roleRadioInner} />}
                         </View>
 
                         <View style={styles.roleIconContainer}>
-                          <IconComponent size={24} color={isSelected ? '#007AFF' : '#666'} />
+                          <IconComponent
+                            size={24}
+                            color={isSelected ? '#007AFF' : '#666'}
+                          />
                         </View>
 
                         <View style={styles.roleInfo}>
                           <CMSText
                             type="body"
-                            style={[styles.roleTitle, isSelected && styles.roleTitleSelected]}
+                            style={[
+                              styles.roleTitle,
+                              isSelected && styles.roleTitleSelected,
+                            ]}
                           >
                             {ROLE_LABELS[role]}
                           </CMSText>
-                          <CMSText type="caption" style={styles.roleDescription}>
+                          <CMSText
+                            type="caption"
+                            style={styles.roleDescription}
+                          >
                             {ROLE_DESCRIPTIONS[role]}
                           </CMSText>
                         </View>
@@ -284,7 +343,8 @@ export default function StaffEditModal({
                   </CMSText>
 
                   <CMSText type="caption" style={styles.permissionsNote}>
-                    Permissions are set automatically based on role. You can customize them below.
+                    Permissions are set automatically based on role. You can
+                    customize them below.
                   </CMSText>
 
                   {Object.entries(PERMISSION_LABELS)
@@ -293,19 +353,24 @@ export default function StaffEditModal({
                       <TouchableOpacity
                         key={permission}
                         style={styles.permissionOption}
-                        onPress={() => handlePermissionToggle(permission as keyof StaffPermissions)}
+                        onPress={() =>
+                          handlePermissionToggle(
+                            permission as keyof StaffPermissions
+                          )
+                        }
                       >
                         <View style={styles.permissionContent}>
                           <View
                             style={[
                               styles.permissionCheckbox,
-                              permissions[permission as keyof StaffPermissions] &&
-                                styles.permissionCheckboxChecked,
+                              permissions[
+                                permission as keyof StaffPermissions
+                              ] && styles.permissionCheckboxChecked,
                             ]}
                           >
-                            {permissions[permission as keyof StaffPermissions] && (
-                              <Check size={16} color="#fff" />
-                            )}
+                            {permissions[
+                              permission as keyof StaffPermissions
+                            ] && <Check size={16} color="#fff" />}
                           </View>
                           <CMSText type="body" style={styles.permissionLabel}>
                             {label}

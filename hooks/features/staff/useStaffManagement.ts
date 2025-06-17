@@ -1,23 +1,28 @@
 /**
- * Smart Hook: Staff Edit Management
+ * Smart Hook: Staff Management
  *
- * Handles all business logic for editing staff members:
- * - Profile updates (name, email, phone)
- * - Role updates
- * - Permissions management
- * - Form validation using schemas
+ * Comprehensive staff management with both listing and editing capabilities:
+ * - Data fetching and caching
+ * - Role updates and permissions
+ * - Delete operations with confirmation
+ * - Search and filtering state
+ * - Individual staff editing with form validation
  *
+ * Consolidates functionality from useStaffEdit for better organization.
  * Following "Smart Hook, Dumb Component" pattern
  */
 
 import { useState } from 'react';
 import { Alert } from 'react-native';
 
+import { useAuth } from '@/hooks/features/auth/useAuth';
 import {
+  useQuickDeleteUser,
+  useStaffListings,
   useUpdateStaffPermissions,
   useUpdateStaffRole,
   useUpdateUserProfile,
-} from '@/hooks/useUserManagement';
+} from '@/hooks/features/user/useUserManagement';
 import {
   type Profile,
   type ProfileUpdateForm,
@@ -28,6 +33,19 @@ import {
   UserRoleSchema,
 } from '@/schemas';
 
+interface UseStaffManagementProps {
+  searchQuery?: string;
+  selectedRole?: UserRole | '';
+  page?: number;
+  limit?: number;
+}
+
+interface DeleteConfirmation {
+  visible: boolean;
+  staff: Profile | null;
+}
+
+// Staff editing interfaces
 interface UseStaffEditProps {
   staff: Profile | null;
   onSuccess?: () => void;
@@ -49,6 +67,212 @@ interface FormErrors {
   general?: string;
 }
 
+export function useStaffManagement({
+  searchQuery,
+  selectedRole,
+  page = 1,
+  limit = 10,
+}: UseStaffManagementProps = {}) {
+  // ============================================================================
+  // STATE
+  // ============================================================================
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [confirmDeleteModal, setConfirmDeleteModal] =
+    useState<DeleteConfirmation>({
+      visible: false,
+      staff: null,
+    });
+
+  // ============================================================================
+  // HOOKS
+  // ============================================================================
+  const { user: currentUser, userProfile } = useAuth();
+
+  // Data fetching
+  const {
+    data: staffData,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useStaffListings({
+    searchQuery: searchQuery?.trim() || undefined,
+    role: selectedRole || undefined,
+    page,
+    limit,
+  });
+
+  // Mutations
+  const updateRoleMutation = useUpdateStaffRole();
+  const updatePermissionsMutation = useUpdateStaffPermissions();
+  const { deleteByEmail, isDeleting } = useQuickDeleteUser();
+
+  // ============================================================================
+  // COMPUTED VALUES
+  // ============================================================================
+  const staffMembers = staffData?.data || [];
+  const totalCount = staffData?.count || 0;
+  const totalPages = Math.ceil(totalCount / limit);
+
+  // Statistics calculations
+  const statistics = {
+    total: totalCount,
+    admins: staffMembers.filter((s) => s.role === 'tourism_admin').length,
+    editors: staffMembers.filter(
+      (s) => s.role.includes('content') || s.role.includes('listing')
+    ).length,
+    active: staffMembers.filter((s) => s.is_verified).length,
+  };
+
+  // ============================================================================
+  // HANDLERS
+  // ============================================================================
+
+  /**
+   * Handle role update for a staff member
+   */
+  const handleRoleUpdate = (userId: string, newRole: UserRole) => {
+    const STAFF_ROLES: UserRole[] = [
+      'tourism_admin',
+      'business_listing_manager',
+      'tourism_content_manager',
+      'business_registration_manager',
+    ];
+
+    if (!STAFF_ROLES.includes(newRole)) {
+      Alert.alert('Error', 'Invalid staff role selected');
+      return;
+    }
+
+    updateRoleMutation.mutate(
+      { userId, newRole },
+      {
+        onSuccess: () => {
+          Alert.alert('Success', 'Staff role updated successfully');
+          setEditingUserId(null);
+        },
+        onError: (error) => {
+          Alert.alert('Error', `Failed to update role: ${error.message}`);
+        },
+      }
+    );
+  };
+
+  /**
+   * Start editing a staff member's role
+   */
+  const startEditing = (userId: string) => {
+    setEditingUserId(userId);
+  };
+
+  /**
+   * Cancel editing
+   */
+  const cancelEditing = () => {
+    setEditingUserId(null);
+  };
+
+  /**
+   * Show delete confirmation modal
+   */
+  const showDeleteConfirmation = (staff: Profile) => {
+    console.log('🔥 DELETE BUTTON CLICKED!');
+    console.log('Staff to delete:', staff);
+    console.log('Current user:', currentUser);
+
+    // Prevent self-deletion
+    if (currentUser?.email === staff.email) {
+      console.log('❌ Self-deletion prevented');
+      Alert.alert('Error', 'You cannot delete your own account');
+      return;
+    }
+
+    // Only Tourism Admins can delete users
+    if (userProfile?.role !== 'tourism_admin') {
+      console.log('❌ Permission denied - not tourism admin');
+      console.log('Current user role:', userProfile?.role);
+      Alert.alert('Error', 'Only Tourism Admins can delete staff members');
+      return;
+    }
+
+    console.log(
+      '✅ About to show confirmation dialog for:',
+      staff.first_name,
+      staff.last_name
+    );
+
+    setConfirmDeleteModal({
+      visible: true,
+      staff,
+    });
+  };
+
+  /**
+   * Confirm and execute deletion
+   */
+  const confirmDelete = () => {
+    if (confirmDeleteModal.staff) {
+      console.log('✅ Deletion confirmed, calling deleteByEmail');
+      deleteByEmail(confirmDeleteModal.staff.email);
+      setConfirmDeleteModal({ visible: false, staff: null });
+    }
+  };
+
+  /**
+   * Cancel deletion
+   */
+  const cancelDelete = () => {
+    console.log('❌ Deletion cancelled');
+    setConfirmDeleteModal({ visible: false, staff: null });
+  };
+
+  // ============================================================================
+  // RETURN
+  // ============================================================================
+  return {
+    // Data
+    staffMembers,
+    totalCount,
+    totalPages,
+    statistics,
+
+    // Loading states
+    isLoading,
+    isError,
+    error,
+    isDeleting,
+
+    // Edit state
+    editingUserId,
+
+    // Mutation states
+    isUpdating:
+      updateRoleMutation.isPending || updatePermissionsMutation.isPending,
+
+    // Current user
+    currentUser,
+    userProfile,
+
+    // Delete confirmation
+    confirmDeleteModal,
+
+    // Actions
+    handleRoleUpdate,
+    startEditing,
+    cancelEditing,
+    showDeleteConfirmation,
+    confirmDelete,
+    cancelDelete,
+    refetch,
+  };
+}
+
+/**
+ * Staff Edit Hook - Consolidated within Staff Management
+ *
+ * Handles individual staff member editing with form validation.
+ * Previously was in a separate useStaffEdit.ts file.
+ */
 export function useStaffEdit({ staff, onSuccess, onError }: UseStaffEditProps) {
   // ============================================================================
   // STATE
@@ -96,7 +320,9 @@ export function useStaffEdit({ staff, onSuccess, onError }: UseStaffEditProps) {
       validationError.errors?.forEach((err: any) => {
         newErrors[err.path[0] as keyof FormErrors] = err.message;
       });
-    } // Validate role
+    }
+
+    // Validate role
     try {
       UserRoleSchema.parse(formData.role);
     } catch {
@@ -232,7 +458,8 @@ export function useStaffEdit({ staff, onSuccess, onError }: UseStaffEditProps) {
         ].includes(formData.role)
       ) {
         try {
-          const validatedPermissions = StaffPermissionsUpdateSchema.parse(permissions);
+          const validatedPermissions =
+            StaffPermissionsUpdateSchema.parse(permissions);
           await updatePermissionsMutation.mutateAsync({
             userId: staff.id,
             permissions: validatedPermissions,
@@ -303,6 +530,7 @@ export function useStaffEdit({ staff, onSuccess, onError }: UseStaffEditProps) {
     resetForm,
 
     // Computed
-    canSubmit: !isLoading && hasUnsavedChanges && Object.keys(errors).length === 0,
+    canSubmit:
+      !isLoading && hasUnsavedChanges && Object.keys(errors).length === 0,
   };
 }

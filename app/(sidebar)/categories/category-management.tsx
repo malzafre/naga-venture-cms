@@ -12,7 +12,7 @@ import {
   useDeleteMainCategory,
   useDeleteSubCategory,
   useMainCategories,
-} from '@/hooks/useCategoryManagement';
+} from '@/hooks/features/categories/useCategoryManagement';
 import { MainCategoryWithSubCategories, SubCategory } from '@/schemas';
 
 interface ModalState {
@@ -31,7 +31,9 @@ type SelectedItem = {
 
 const CategoryManagementPage = () => {
   // UI State
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
+    new Set()
+  );
   const [selectedItem, setSelectedItem] = useState<SelectedItem | null>(null);
   const [modalState, setModalState] = useState<ModalState>({
     isVisible: false,
@@ -53,16 +55,22 @@ const CategoryManagementPage = () => {
     sortOrder: 'asc',
   });
 
-  const mainCategories = useMemo(() => mainCategoriesData?.data || [], [mainCategoriesData]);
+  const mainCategories = useMemo(
+    () => mainCategoriesData?.data || [],
+    [mainCategoriesData]
+  );
 
   // Effect to refresh selectedItem data when mainCategories changes
   useEffect(() => {
     if (!selectedItem || mainCategories.length === 0) return;
 
     if (selectedItem.type === 'main') {
-      const newMainCategoryData = mainCategories.find((mc) => mc.id === selectedItem.data.id);
+      const newMainCategoryData = mainCategories.find(
+        (mc) => mc.id === selectedItem.data.id
+      );
       if (newMainCategoryData) {
-        const currentMainCategoryData = selectedItem.data as MainCategoryWithSubCategories;
+        const currentMainCategoryData =
+          selectedItem.data as MainCategoryWithSubCategories;
 
         const oldSubCategories = currentMainCategoryData.sub_categories;
         const oldSubCount = oldSubCategories?.length ?? -1;
@@ -70,8 +78,10 @@ const CategoryManagementPage = () => {
         const newSubCategories = newMainCategoryData.sub_categories;
         const newSubCount = newSubCategories?.length ?? -1;
 
-        const nameChanged = currentMainCategoryData.name !== newMainCategoryData.name;
-        const statusChanged = currentMainCategoryData.is_active !== newMainCategoryData.is_active;
+        const nameChanged =
+          currentMainCategoryData.name !== newMainCategoryData.name;
+        const statusChanged =
+          currentMainCategoryData.is_active !== newMainCategoryData.is_active;
 
         // Update if the main category object reference is different,
         // or if the sub_categories array reference or length has changed,
@@ -89,7 +99,9 @@ const CategoryManagementPage = () => {
         setSelectedItem(null); // Main category was deleted or not found
       }
     } else if (selectedItem.type === 'sub' && selectedItem.parentId) {
-      const parentCategory = mainCategories.find((mc) => mc.id === selectedItem.parentId);
+      const parentCategory = mainCategories.find(
+        (mc) => mc.id === selectedItem.parentId
+      );
       if (parentCategory?.sub_categories) {
         const newSubCategoryData = parentCategory.sub_categories.find(
           (sc) => sc.id === selectedItem.data.id
@@ -201,7 +213,10 @@ const CategoryManagementPage = () => {
                 await deleteMainCategoryMutation.mutateAsync(category.id);
 
                 // Clear selection if the deleted category was selected
-                if (selectedItem?.type === 'main' && selectedItem.data.id === category.id) {
+                if (
+                  selectedItem?.type === 'main' &&
+                  selectedItem.data.id === category.id
+                ) {
                   setSelectedItem(null);
                 }
 
@@ -212,7 +227,9 @@ const CategoryManagementPage = () => {
 
                 Alert.alert(
                   'Delete Failed',
-                  error instanceof Error ? error.message : 'Failed to delete main category'
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to delete main category'
                 );
               }
             },
@@ -224,33 +241,42 @@ const CategoryManagementPage = () => {
   );
   const handleDeleteSubCategory = useCallback(
     (category: SubCategory) => {
-      Alert.alert('Delete Sub-Category', `Are you sure you want to delete "${category.name}"?`, [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteSubCategoryMutation.mutateAsync(category.id);
+      Alert.alert(
+        'Delete Sub-Category',
+        `Are you sure you want to delete "${category.name}"?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                await deleteSubCategoryMutation.mutateAsync(category.id);
 
-              // Clear selection if the deleted category was selected
-              if (selectedItem?.type === 'sub' && selectedItem.data.id === category.id) {
-                setSelectedItem(null);
+                // Clear selection if the deleted category was selected
+                if (
+                  selectedItem?.type === 'sub' &&
+                  selectedItem.data.id === category.id
+                ) {
+                  setSelectedItem(null);
+                }
+
+                // Show success message
+                Alert.alert('Success', 'Sub-category deleted successfully');
+              } catch (error) {
+                console.error('Delete sub-category error:', error);
+
+                Alert.alert(
+                  'Delete Failed',
+                  error instanceof Error
+                    ? error.message
+                    : 'Failed to delete sub-category'
+                );
               }
-
-              // Show success message
-              Alert.alert('Success', 'Sub-category deleted successfully');
-            } catch (error) {
-              console.error('Delete sub-category error:', error);
-
-              Alert.alert(
-                'Delete Failed',
-                error instanceof Error ? error.message : 'Failed to delete sub-category'
-              );
-            }
+            },
           },
-        },
-      ]);
+        ]
+      );
     },
     [deleteSubCategoryMutation, selectedItem]
   );

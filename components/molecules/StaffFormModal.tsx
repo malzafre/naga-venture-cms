@@ -1,11 +1,27 @@
 'use client';
 
-import { Buildings, Check, Compass, Crown, FileText, User, Users, X } from 'phosphor-react-native';
+import {
+  Buildings,
+  Check,
+  Compass,
+  Crown,
+  FileText,
+  User,
+  Users,
+  X,
+} from 'phosphor-react-native';
 import React, { useState } from 'react';
-import { Alert, Modal, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 import { CMSInput, CMSText } from '@/components/atoms';
-import { useCreateStaff } from '@/hooks/useUserManagement';
+import { useCreateStaff } from '@/hooks/features/user/useUserManagement';
 import { type StaffPermissions, type UserRole } from '@/schemas';
 
 interface StaffFormModalProps {
@@ -57,7 +73,11 @@ const PERMISSION_LABELS: Record<string, string> = {
  * - Professional card-like appearance
  * - Responsive design for different screen sizes
  */
-export default function StaffFormModal({ visible, onClose, onSuccess }: StaffFormModalProps) {
+export default function StaffFormModal({
+  visible,
+  onClose,
+  onSuccess,
+}: StaffFormModalProps) {
   const createStaffMutation = useCreateStaff();
 
   // Form state
@@ -242,8 +262,17 @@ export default function StaffFormModal({ visible, onClose, onSuccess }: StaffFor
   };
 
   return (
-    <Modal visible={visible} animationType="fade" transparent={true} onRequestClose={handleClose}>
-      <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={handleClose}>
+    <Modal
+      visible={visible}
+      animationType="fade"
+      transparent={true}
+      onRequestClose={handleClose}
+    >
+      <TouchableOpacity
+        style={styles.modalOverlay}
+        activeOpacity={1}
+        onPress={handleClose}
+      >
         <TouchableOpacity
           style={styles.modalContainer}
           activeOpacity={1}
@@ -252,7 +281,10 @@ export default function StaffFormModal({ visible, onClose, onSuccess }: StaffFor
           <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-              <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+              <TouchableOpacity
+                onPress={handleClose}
+                style={styles.closeButton}
+              >
                 <X size={20} color="#666" />
                 <CMSText type="body" style={styles.closeText}>
                   Cancel
@@ -268,7 +300,10 @@ export default function StaffFormModal({ visible, onClose, onSuccess }: StaffFor
                 style={styles.saveButton}
                 disabled={createStaffMutation.isPending}
               >
-                <Check size={20} color={createStaffMutation.isPending ? '#999' : '#007AFF'} />
+                <Check
+                  size={20}
+                  color={createStaffMutation.isPending ? '#999' : '#007AFF'}
+                />
                 <CMSText
                   type="body"
                   style={[
@@ -281,7 +316,10 @@ export default function StaffFormModal({ visible, onClose, onSuccess }: StaffFor
               </TouchableOpacity>
             </View>
 
-            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+            <ScrollView
+              style={styles.content}
+              showsVerticalScrollIndicator={false}
+            >
               {/* Basic Information */}
               <View style={styles.section}>
                 <CMSText type="subtitle" style={styles.sectionTitle}>
@@ -293,7 +331,9 @@ export default function StaffFormModal({ visible, onClose, onSuccess }: StaffFor
                     label="Email Address *"
                     placeholder="john.doe@example.com"
                     value={formData.email}
-                    onChangeText={(text) => setFormData((prev) => ({ ...prev, email: text }))}
+                    onChangeText={(text) =>
+                      setFormData((prev) => ({ ...prev, email: text }))
+                    }
                     error={errors.email}
                     keyboardType="email-address"
                     autoCapitalize="none"
@@ -305,7 +345,9 @@ export default function StaffFormModal({ visible, onClose, onSuccess }: StaffFor
                     label="First Name *"
                     placeholder="John"
                     value={formData.firstName}
-                    onChangeText={(text) => setFormData((prev) => ({ ...prev, firstName: text }))}
+                    onChangeText={(text) =>
+                      setFormData((prev) => ({ ...prev, firstName: text }))
+                    }
                     error={errors.firstName}
                   />
                 </View>
@@ -315,7 +357,9 @@ export default function StaffFormModal({ visible, onClose, onSuccess }: StaffFor
                     label="Last Name *"
                     placeholder="Doe"
                     value={formData.lastName}
-                    onChangeText={(text) => setFormData((prev) => ({ ...prev, lastName: text }))}
+                    onChangeText={(text) =>
+                      setFormData((prev) => ({ ...prev, lastName: text }))
+                    }
                     error={errors.lastName}
                   />
                 </View>
@@ -325,7 +369,9 @@ export default function StaffFormModal({ visible, onClose, onSuccess }: StaffFor
                     label="Phone Number"
                     placeholder="+63 912 345 6789"
                     value={formData.phoneNumber}
-                    onChangeText={(text) => setFormData((prev) => ({ ...prev, phoneNumber: text }))}
+                    onChangeText={(text) =>
+                      setFormData((prev) => ({ ...prev, phoneNumber: text }))
+                    }
                     keyboardType="phone-pad"
                   />
                 </View>
@@ -358,7 +404,9 @@ export default function StaffFormModal({ visible, onClose, onSuccess }: StaffFor
                             formData.role === role && styles.roleRadioSelected,
                           ]}
                         >
-                          {formData.role === role && <View style={styles.roleRadioInner} />}
+                          {formData.role === role && (
+                            <View style={styles.roleRadioInner} />
+                          )}
                         </View>
                         <View style={styles.roleIconContainer}>
                           <IconComponent
@@ -390,7 +438,9 @@ export default function StaffFormModal({ visible, onClose, onSuccess }: StaffFor
                   <TouchableOpacity
                     key={key}
                     style={styles.permissionOption}
-                    onPress={() => handlePermissionToggle(key as keyof StaffPermissions)}
+                    onPress={() =>
+                      handlePermissionToggle(key as keyof StaffPermissions)
+                    }
                   >
                     <View style={styles.permissionContent}>
                       <View

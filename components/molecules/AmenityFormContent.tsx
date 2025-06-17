@@ -2,7 +2,7 @@ import { useTheme } from '@/constants/useTheme';
 import {
   useCreateAmenity,
   useUpdateAmenity,
-} from '@/hooks/useAmenitiesManagement';
+} from '@/hooks/features/amenities/useAmenitiesManagement';
 import { AmenityComplete, AmenityInsert } from '@/schemas/amenitiesSchemas';
 import { MaterialIcons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useState } from 'react';

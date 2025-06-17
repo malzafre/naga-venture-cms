@@ -31,7 +31,7 @@ import { CMSButton } from '@/components/atoms';
 import { BusinessImageViewer, StatusBadge } from '@/components/molecules';
 import { CMSRouteGuard } from '@/components/organisms';
 import { NavigationService } from '@/constants/NavigationService';
-import { useBusiness } from '@/hooks/useBusinessManagement';
+import { useBusiness } from '@/hooks/features/business/useBusinessManagement';
 
 /**
  * View Business Page

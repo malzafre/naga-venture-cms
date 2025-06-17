@@ -13,12 +13,12 @@ import { ConfirmationModal } from '@/components/molecules/ConfirmationModal';
 import StaffFilterControls from '@/components/molecules/StaffFilterControls';
 import StaffStatistics from '@/components/molecules/StaffStatistics';
 import StaffGrid from '@/components/organisms/StaffGrid';
-import { useAuth } from '@/hooks/useAuthModern';
+import { useAuth } from '@/hooks/features/auth/useAuth';
 import {
   useQuickDeleteUser,
   useStaffListings,
   useUpdateStaffRole,
-} from '@/hooks/useUserManagement';
+} from '@/hooks/features/user/useUserManagement';
 import { type Profile, type UserRole } from '@/schemas';
 
 interface StaffManagementProps {
@@ -177,7 +177,8 @@ export default function StaffManagement({
         message={
           confirmDeleteModal.staff
             ? `Are you sure you want to delete ${
-                confirmDeleteModal.staff.first_name && confirmDeleteModal.staff.last_name
+                confirmDeleteModal.staff.first_name &&
+                confirmDeleteModal.staff.last_name
                   ? `${confirmDeleteModal.staff.first_name} ${confirmDeleteModal.staff.last_name}`
                   : 'this staff member'
               }? This action cannot be undone and will permanently remove their access to the system.`

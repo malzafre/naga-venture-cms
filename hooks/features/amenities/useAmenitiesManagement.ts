@@ -24,8 +24,8 @@ import { Alert, useWindowDimensions } from 'react-native';
 import { z } from 'zod';
 
 import { DOMAIN_CACHE_CONFIG } from '@/constants/CacheConstants';
-import { useAuth } from '@/hooks/useAuthModern';
-import { useDebounce } from '@/hooks/useDebounce';
+import { useAuth } from '@/hooks/features/auth/useAuth';
+import { useDebounce } from '@/hooks/shared/useDebounce';
 import queryKeys from '@/lib/queryKeys';
 import { supabase } from '@/lib/supabaseClient';
 import {

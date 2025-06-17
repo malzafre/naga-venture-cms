@@ -29,12 +29,12 @@ import {
 import { ConfirmationModal } from '@/components/molecules/ConfirmationModal';
 import { NavigationService } from '@/constants/NavigationService';
 import { useTheme } from '@/constants/useTheme';
-import { useBusinessFilterManagement } from '@/hooks/useBusinessFilterManagement';
+import { useBusinessFilters } from '@/hooks/features/business/useBusinessFilters';
 import {
   useBusinessListings,
   useDeleteBusiness,
-} from '@/hooks/useBusinessManagement';
-import { useBusinessSubscription } from '@/hooks/useSupabaseSubscription';
+} from '@/hooks/features/business/useBusinessManagement';
+import { useBusinessSubscription } from '@/hooks/shared/useSupabaseSubscription';
 import { Business } from '@/types/supabase';
 
 /**
@@ -51,7 +51,7 @@ export default function AllBusinessesScreen() {
 
   // === ZUSTAND INTEGRATION ===  // Replaced useState filter management with centralized Zustand store
   const { filters, searchQuery, setFilter, setSearchQuery } =
-    useBusinessFilterManagement();
+    useBusinessFilters();
 
   // Get screen dimensions for responsive pagination
   const { height: screenHeight } = useWindowDimensions();

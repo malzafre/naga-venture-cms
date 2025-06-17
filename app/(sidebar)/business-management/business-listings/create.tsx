@@ -12,8 +12,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ConfirmationModal } from '@/components/molecules/ConfirmationModal';
 import { BusinessForm, CMSRouteGuard } from '@/components/organisms';
 import { NavigationService } from '@/constants/NavigationService';
-import { useBusinessImageManagement } from '@/hooks/useBusinessImageManagement';
-import { useCreateBusiness } from '@/hooks/useBusinessManagement';
+import { useBusinessImageManagement } from '@/hooks/features/business/useBusinessImageManagement';
+import { useCreateBusiness } from '@/hooks/features/business/useBusinessManagement';
 import { BusinessInsert } from '@/schemas';
 
 /**

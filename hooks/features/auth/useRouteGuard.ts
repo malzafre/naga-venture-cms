@@ -2,7 +2,7 @@
 import { router } from 'expo-router';
 import { useEffect } from 'react';
 
-import { useAuth } from '@/hooks/useAuthModern';
+import { useAuth } from '@/hooks/features/auth/useAuth';
 import type { Database } from '@/types/database';
 
 type UserRole = Database['public']['Enums']['user_role'];

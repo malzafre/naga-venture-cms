@@ -1,5 +1,5 @@
-// filepath: c:\Users\Hans Candor\Documents\capstone-NV\naga-venture\app\TourismCMS\(admin)\business-management\business-listings\edit\[id].tsx
-// app/TourismCMS/(admin)/business-management/business-listings/edit/[id]/index.tsx
+// filepath: c:\Users\Hans Candor\Documents\capstone-NV\naga-venture-cms\app\(sidebar)\business-management\business-listings\edit\[id].tsx
+// app/(sidebar)/business-management/business-listings/edit/[id].tsx
 import { useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
@@ -14,8 +14,11 @@ import { CMSButton } from '@/components/atoms';
 import { ConfirmationModal } from '@/components/molecules/ConfirmationModal';
 import { BusinessForm, CMSRouteGuard } from '@/components/organisms';
 import { NavigationService } from '@/constants/NavigationService';
-import { useBusiness, useUpdateBusiness } from '@/hooks/useBusinessManagement';
-import { BusinessUpdate } from '@/types/supabase';
+import {
+  useBusiness,
+  useUpdateBusiness,
+} from '@/hooks/features/business/useBusinessManagement';
+import { BusinessUpdate } from '@/schemas/business/businessSchemas';
 
 /**
  * Edit Business Page
@@ -33,19 +36,25 @@ export default function EditBusinessScreen() {
   const [errorMessage, setErrorMessage] = useState('');
 
   // Fetch business data
-  const { data: business, isLoading: businessLoading, isError, error } = useBusiness(id);
+  const {
+    data: business,
+    isLoading: businessLoading,
+    isError,
+    error,
+  } = useBusiness(id);
 
   const updateBusinessMutation = useUpdateBusiness();
 
   // Early guard - check if id exists
   if (!id) {
     return (
-      <CMSRouteGuard routePath="/TourismCMS/(admin)/business-management/business-listings/edit">
+      <CMSRouteGuard routePath="/(sidebar)/business-management/business-listings/edit">
         <SafeAreaView style={styles.container}>
           <View style={styles.errorContainer}>
             <Text style={styles.errorTitle}>Invalid Business ID</Text>
             <Text style={styles.errorMessage}>
-              No business ID was provided. Please select a valid business to edit.
+              No business ID was provided. Please select a valid business to
+              edit.
             </Text>
             <CMSButton
               title="Go Back"
@@ -59,11 +68,44 @@ export default function EditBusinessScreen() {
     );
   }
 
-  const handleSubmit = (data: BusinessUpdate) => {
+  const handleSubmit = (data: any) => {
     if (!id) return;
 
+    // Create update data with only defined fields that match BusinessUpdate schema
+    const updateFields: Record<string, any> = {};
+
+    // Map form fields to update fields, filtering out undefined/null values
+    const fieldMapping = {
+      business_name: data.business_name,
+      business_type: data.business_type,
+      description: data.description,
+      address: data.address,
+      city: data.city,
+      province: data.province,
+      postal_code: data.postal_code,
+      phone: data.phone,
+      email: data.email,
+      website: data.website,
+      facebook_url: data.facebook_url,
+      instagram_url: data.instagram_url,
+      twitter_url: data.twitter_url,
+      location: data.location,
+    };
+
+    // Only include fields that have values
+    Object.entries(fieldMapping).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        updateFields[key] = value;
+      }
+    });
+
+    // Handle owner_id separately to ensure proper type
+    if (data.owner_id && data.owner_id !== null) {
+      updateFields.owner_id = data.owner_id;
+    }
+
     updateBusinessMutation.mutate(
-      { businessId: id, updateData: data },
+      { businessId: id, updateData: updateFields as BusinessUpdate },
       {
         onSuccess: (updatedBusiness) => {
           setSuccessMessage('Business listing has been updated successfully!');
@@ -87,7 +129,9 @@ export default function EditBusinessScreen() {
   };
 
   const confirmCancel = () => {
-    console.log('✅ [EditBusinessScreen] User confirmed cancel - navigating back');
+    console.log(
+      '✅ [EditBusinessScreen] User confirmed cancel - navigating back'
+    );
     setCancelModalVisible(false);
     try {
       NavigationService.toAllBusinesses();
@@ -113,7 +157,7 @@ export default function EditBusinessScreen() {
   // Loading state
   if (businessLoading) {
     return (
-      <CMSRouteGuard routePath="/TourismCMS/(admin)/business-management/business-listings/edit">
+      <CMSRouteGuard routePath="/(sidebar)/business-management/business-listings/edit">
         <SafeAreaView style={styles.container}>
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#3B82F6" />
@@ -127,7 +171,7 @@ export default function EditBusinessScreen() {
   // Error state
   if (isError || !business) {
     return (
-      <CMSRouteGuard routePath="/TourismCMS/(admin)/business-management/business-listings/edit">
+      <CMSRouteGuard routePath="/(sidebar)/business-management/business-listings/edit">
         <SafeAreaView style={styles.container}>
           <View style={styles.errorContainer}>
             <Text style={styles.errorTitle}>Business Not Found</Text>
@@ -146,8 +190,30 @@ export default function EditBusinessScreen() {
     );
   }
 
+  // Transform business data to match form expectations
+  const transformedBusinessData = business
+    ? ({
+        ...business,
+        // Convert Date objects to strings for form compatibility
+        approved_at:
+          business.approved_at instanceof Date
+            ? business.approved_at.toISOString()
+            : business.approved_at,
+        created_at:
+          business.created_at instanceof Date
+            ? business.created_at.toISOString()
+            : business.created_at,
+        updated_at:
+          business.updated_at instanceof Date
+            ? business.updated_at.toISOString()
+            : business.updated_at,
+        // Ensure email is string | null (not undefined)
+        email: business.email ?? null,
+      } as any)
+    : undefined;
+
   return (
-    <CMSRouteGuard routePath="/TourismCMS/(admin)/business-management/business-listings/edit">
+    <CMSRouteGuard routePath="/(sidebar)/business-management/business-listings/edit">
       <SafeAreaView style={styles.container}>
         {/*
           FIX: Add a dynamic key based on the business ID.
@@ -157,7 +223,7 @@ export default function EditBusinessScreen() {
         */}
         <BusinessForm
           key={`edit-business-form-${id}`} // <-- THE FIX
-          initialData={business}
+          initialData={transformedBusinessData}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           isLoading={updateBusinessMutation.isPending}

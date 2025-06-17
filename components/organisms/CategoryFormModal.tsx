@@ -24,7 +24,7 @@ import {
   useCreateSubCategory,
   useUpdateMainCategory,
   useUpdateSubCategory,
-} from '@/hooks/useCategoryManagement';
+} from '@/hooks/features/categories/useCategoryManagement';
 import { type MainCategory, type SubCategory } from '@/schemas';
 import {
   MainCategoryCreateFormSchema,
