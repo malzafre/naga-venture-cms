@@ -6,6 +6,7 @@ export { CMSNavigationDropdownIndicator } from './CMSNavigationDropdownIndicator
 export { CMSNavigationItem } from './CMSNavigationItem';
 export { default as CMSText } from './CMSText';
 export { IconPicker } from './IconPicker';
+export { SkeletonLoader } from './SkeletonLoader';
 
 // Export types
 export type { CMSButtonProps } from './CMSButton';

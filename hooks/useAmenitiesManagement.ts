@@ -25,6 +25,7 @@ import { z } from 'zod';
 
 import { DOMAIN_CACHE_CONFIG } from '@/constants/CacheConstants';
 import { useAuth } from '@/hooks/useAuthModern';
+import { useDebounce } from '@/hooks/useDebounce';
 import queryKeys from '@/lib/queryKeys';
 import { supabase } from '@/lib/supabaseClient';
 import {
@@ -808,14 +809,13 @@ export const useValidateAmenityName = () => {
  */
 export const useAmenitiesManagementPage = () => {
   // === STATE MANAGEMENT ===
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearch = useDebounce(searchInput, 300);
+
   const [filterState, setFilterState] = useState<{
-    searchQuery: string;
-    hasUsage?: boolean;
     sortBy: 'name' | 'created_at' | 'total_usage';
     sortOrder: 'asc' | 'desc';
   }>({
-    searchQuery: '',
-    hasUsage: undefined,
     sortBy: 'name',
     sortOrder: 'asc',
   });
@@ -828,15 +828,12 @@ export const useAmenitiesManagementPage = () => {
     isVisible: false,
     mode: 'create',
   });
-
   const [deleteModalState, setDeleteModalState] = useState<{
     isVisible: boolean;
     amenity?: any;
   }>({
     isVisible: false,
   });
-
-  const [showAnalytics, setShowAnalytics] = useState(false);
 
   // === RESPONSIVE DESIGN ===
   const { height: screenHeight } = useWindowDimensions();
@@ -862,23 +859,19 @@ export const useAmenitiesManagementPage = () => {
     }
 
     return Math.max(5, calculatedSize);
-  }, [screenHeight]);
-
-  // === DATA FETCHING ===
+  }, [screenHeight]); // === DATA FETCHING ===
   const amenityFilters: AmenityFilters = useMemo(
     () => ({
-      search: filterState.searchQuery || undefined,
-      has_usage: filterState.hasUsage,
+      search: debouncedSearch || undefined,
       sortBy: filterState.sortBy,
       sortOrder: filterState.sortOrder,
       page: 1,
       limit: responsivePageSize,
       include_usage: true,
-      include_audit: true,
+      include_audit: false,
     }),
-    [filterState, responsivePageSize]
+    [debouncedSearch, filterState, responsivePageSize]
   );
-
   const {
     data: amenitiesData,
     isLoading,
@@ -886,30 +879,21 @@ export const useAmenitiesManagementPage = () => {
     error,
   } = useAmenities(amenityFilters);
 
-  const { data: analyticsData, isLoading: isAnalyticsLoading } =
-    useAmenityUsageAnalytics();
-
   const amenities = useMemo(() => amenitiesData || [], [amenitiesData]);
-
   // === MUTATIONS ===
   const deleteAmenityMutation = useDeleteAmenity();
 
-  // === STATISTICS ===
-  const stats = useMemo(() => {
-    if (!amenities.length) return { total: 0, used: 0, unused: 0 };
-
-    const total = amenities.length;
-    const used = amenities.filter(
-      (a: any) => a.total_usage && a.total_usage > 0
-    ).length;
-    const unused = total - used;
-
-    return { total, used, unused };
-  }, [amenities]);
-
   // === EVENT HANDLERS ===
   const handleSearch = useCallback((query: string) => {
-    setFilterState((prev) => ({ ...prev, searchQuery: query }));
+    setSearchInput(query);
+  }, []);
+
+  const handleSortChange = useCallback((sortKey: string) => {
+    const [sortBy, sortOrder] = sortKey.split('_') as [
+      'name' | 'created_at' | 'total_usage',
+      'asc' | 'desc',
+    ];
+    setFilterState((prev) => ({ ...prev, sortBy, sortOrder }));
   }, []);
 
   const handleFilterChange = useCallback((field: string, value: any) => {
@@ -971,42 +955,26 @@ export const useAmenitiesManagementPage = () => {
     [handleOpenEditModal]
   );
 
-  const handleToggleAnalytics = useCallback(() => {
-    setShowAnalytics((prev) => !prev);
-  }, []);
-
-  const handleUnusedPress = useCallback(() => {
-    setFilterState((prev) => ({
-      ...prev,
-      hasUsage: false,
-      sortBy: 'name',
-      sortOrder: 'asc',
-    }));
-    setShowAnalytics(false);
-  }, []);
-
   // === RETURN INTERFACE ===
   return {
     // Data
     amenities,
-    stats,
-    analyticsData,
 
     // Loading states
     isLoading,
     isError,
     error,
-    isAnalyticsLoading,
 
     // UI State
+    searchInput,
     filterState,
     modalState,
     deleteModalState,
-    showAnalytics,
     responsivePageSize,
 
     // Event handlers
     handleSearch,
+    handleSortChange,
     handleFilterChange,
     handleOpenCreateModal,
     handleOpenEditModal,
@@ -1014,8 +982,6 @@ export const useAmenitiesManagementPage = () => {
     handleDeleteAmenity,
     handleConfirmDelete,
     handleRowPress,
-    handleToggleAnalytics,
-    handleUnusedPress,
   };
 };
 
