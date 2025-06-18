@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { useTheme } from '@/constants/useTheme';
-import { AmenityComplete } from '@/schemas/amenitiesSchemas';
+import { AmenityComplete } from '@/schemas';
 
 /**
  * CompactAmenityCard - Molecule Component

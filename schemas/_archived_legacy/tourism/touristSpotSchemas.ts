@@ -195,8 +195,17 @@ export const TouristSpotFiltersSchema = z.object({
  */
 export const BulkTouristSpotOperationSchema = z.object({
   ids: z.array(UUIDSchema).min(1, 'At least one tourist spot must be selected'),
-  operation: z.enum(['activate', 'deactivate', 'feature', 'unfeature', 'delete']),
-  reason: z.string().min(3, 'Reason is required for bulk operations').optional(),
+  operation: z.enum([
+    'activate',
+    'deactivate',
+    'feature',
+    'unfeature',
+    'delete',
+  ]),
+  reason: z
+    .string()
+    .min(3, 'Reason is required for bulk operations')
+    .optional(),
 });
 
 /**
@@ -293,12 +302,22 @@ export const TouristSpotDashboardDataSchema = z.object({
 export type TouristSpotStatus = z.infer<typeof TouristSpotStatusSchema>;
 export type TouristSpotType = z.infer<typeof TouristSpotTypeSchema>;
 export type TouristSpot = z.infer<typeof TouristSpotSchema>;
-export type TouristSpotWithRelations = z.infer<typeof TouristSpotWithRelationsSchema>;
+export type TouristSpotWithRelations = z.infer<
+  typeof TouristSpotWithRelationsSchema
+>;
 export type TouristSpotInsert = z.infer<typeof TouristSpotInsertSchema>;
 export type TouristSpotUpdate = z.infer<typeof TouristSpotUpdateSchema>;
 export type TouristSpotFilters = z.infer<typeof TouristSpotFiltersSchema>;
-export type BulkTouristSpotOperation = z.infer<typeof BulkTouristSpotOperationSchema>;
-export type TouristSpotStatusUpdate = z.infer<typeof TouristSpotStatusUpdateSchema>;
-export type TouristSpotFeatureUpdate = z.infer<typeof TouristSpotFeatureUpdateSchema>;
+export type BulkTouristSpotOperation = z.infer<
+  typeof BulkTouristSpotOperationSchema
+>;
+export type TouristSpotStatusUpdate = z.infer<
+  typeof TouristSpotStatusUpdateSchema
+>;
+export type TouristSpotFeatureUpdate = z.infer<
+  typeof TouristSpotFeatureUpdateSchema
+>;
 export type TouristSpotAnalytics = z.infer<typeof TouristSpotAnalyticsSchema>;
-export type TouristSpotDashboardData = z.infer<typeof TouristSpotDashboardDataSchema>;
+export type TouristSpotDashboardData = z.infer<
+  typeof TouristSpotDashboardDataSchema
+>;

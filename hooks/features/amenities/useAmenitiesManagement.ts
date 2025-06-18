@@ -33,7 +33,7 @@ import {
   AmenityCompleteSchema,
   AmenityFiltersSchema,
   AmenityFormSchema,
-  AmenityInsertSchema,
+  AmenityCreateSchema as AmenityInsertSchema, // Legacy alias
   AmenitySchema,
   AmenityUpdateSchema,
   AmenityUsageStatsSchema,
@@ -42,10 +42,10 @@ import {
   type AmenityComplete,
   type AmenityFilters,
   type AmenityFormData,
-  type AmenityInsert,
+  type AmenityCreate as AmenityInsert, // Legacy alias
   type AmenityUpdate,
   type AmenityUsageStats,
-} from '@/schemas/amenitiesSchemas';
+} from '@/schemas';
 
 // ============================================================================
 // ERROR HANDLING
@@ -181,17 +181,17 @@ export const useAmenities = (filters: Partial<AmenityFilters> = {}) => {
         // Apply updater filter
         if (validatedFilters.updated_by) {
           query = query.eq('updated_by', validatedFilters.updated_by);
-        }
-
-        // Apply sorting
+        } // Apply sorting
         const sortColumn = validatedFilters.sortBy;
         const sortOrder = validatedFilters.sortOrder;
 
         if (sortColumn === 'total_usage' && validatedFilters.include_usage) {
           // For usage-based sorting, we'll sort client-side after processing
           query = query.order('name', { ascending: sortOrder === 'asc' });
-        } else {
+        } else if (sortColumn) {
           query = query.order(sortColumn, { ascending: sortOrder === 'asc' });
+        } else {
+          query = query.order('name', { ascending: sortOrder === 'asc' });
         }
 
         // Apply pagination

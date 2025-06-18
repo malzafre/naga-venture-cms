@@ -84,6 +84,9 @@ const PERMISSION_LABELS: Record<keyof StaffPermissions, string> = {
   can_manage_events: 'Manage Events',
   can_approve_content: 'Approve Content',
   can_manage_categories: 'Manage Categories',
+  can_moderate_business_content: 'Moderate Business Content',
+  can_moderate_tourism_content: 'Moderate Tourism Content',
+  can_approve_business_applications: 'Approve Business Applications',
   created_at: 'Created At',
   updated_at: 'Updated At',
 };

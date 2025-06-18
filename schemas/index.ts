@@ -1,6 +1,6 @@
 // filepath: schemas/index.ts
 /**
- * Schema Index - Phase 5 Implementation
+ * Schema Index - Centralized Schema Library
  *
  * Barrel export for all validation schemas.
  * Provides centralized access to validation patterns across the application.
@@ -9,31 +9,162 @@
 import { z } from 'zod';
 
 // ============================================================================
-// COMMON SCHEMAS
+// BASE SCHEMAS (Common, reusable schemas)
 // ============================================================================
 
-// ============================================================================
-// AMENITIES SCHEMAS
-// ============================================================================
-
-export * from './amenitiesSchemas';
+export * from './base.schemas';
 
 // ============================================================================
-// SCHEMA UTILITIES
+// AUTHENTICATION SCHEMAS (Login, Registration, etc.)
 // ============================================================================
 
-export * from './common/baseSchemas';
+export {
+  // Core authentication
+  AuthSessionSchema,
+  LoginApiResponseSchema,
+  LoginFormSchema,
+  PasswordResetFormSchema,
+  PasswordResetRequestSchema,
+  RegisterFormSchema,
+  // Types
+  type AuthSession,
+  type LoginApiResponse,
+  type LoginForm,
+  type PasswordResetForm,
+  type PasswordResetRequest,
+  type RegisterForm,
+} from './auth/auth.schemas';
 
 // ============================================================================
-// FEATURE SCHEMAS
+// USER MANAGEMENT SCHEMAS (Profiles, Staff, Permissions)
 // ============================================================================
 
-export * from './api/responseSchemas';
-export * from './auth/authSchemas';
-export * from './business/businessSchemas';
-export * from './categoriesSchemas'; // Corrected import
-export * from './tourism/eventSchemas';
-export * from './tourism/touristSpotSchemas';
+// Export specific schemas from profile.schemas to avoid conflicts with auth
+export {
+  // User management schemas
+  BulkUserOperationSchema,
+  ProfileCreateSchema,
+  ProfileSchema,
+  ProfileUpdateSchema,
+  ProfileWithPermissionsSchema,
+  // Staff-specific schemas
+  StaffCreateResponseSchema,
+  StaffCreateSchema,
+  StaffFiltersSchema,
+  StaffPermissionsSchema,
+  StaffPermissionsUpdateSchema,
+  UserDashboardDataSchema,
+  UserFiltersSchema,
+  UserIdParamSchema,
+  UserRoleStatsSchema,
+  UserRoleUpdateSchema,
+  UserVerificationSchema,
+  // User management types
+  type BulkUserOperation,
+  type Profile,
+  type ProfileCreate,
+  type ProfileUpdate,
+  type ProfileWithPermissions,
+  // Types
+  type StaffCreate,
+  type StaffCreateResponse,
+  type StaffFilters,
+  type StaffPermissions,
+  type StaffPermissionsUpdate,
+  type UserDashboardData,
+  type UserFilters,
+  type UserIdParam,
+  type UserRoleStats,
+  type UserRoleUpdate,
+  type UserVerification,
+} from './user/profile.schemas';
+
+// ============================================================================
+// BUSINESS AND ACCOMMODATION SCHEMAS
+// ============================================================================
+
+export * from './business/booking.schemas';
+export * from './business/business.schemas';
+
+// Legacy business schema exports (temporarily disabled to prevent conflicts)
+// TODO: Phase out legacy imports and remove these lines
+// export * from './business/businessSchemas';
+
+// ============================================================================
+// CATEGORY AND AMENITY SCHEMAS
+// ============================================================================
+
+export * from './content/amenity.schemas';
+export * from './content/category.schemas';
+
+// Legacy schema exports (temporarily disabled to prevent conflicts)
+// TODO: Phase out legacy imports and remove these lines
+// export * from './categories/categorySchemas';
+// export * from './amenitiesSchemas';
+
+// ============================================================================
+// TOURISM CONTENT SCHEMAS
+// ============================================================================
+
+// Temporarily using selective exports to avoid conflicts
+export {
+  BulkEventOperationSchema,
+  EventAnalyticsSchema,
+  EventBaseSchema,
+  EventCalendarQuerySchema,
+  EventCalendarResponseSchema,
+  EventCompleteSchema,
+  EventCreateSchema,
+  EventFiltersSchema,
+  EventListQuerySchema,
+  EventListResponseSchema,
+  EventSortSchema,
+  EventUpdateSchema,
+  type BulkEventOperation,
+  type EventAnalytics,
+  type EventBase,
+  type EventCalendarQuery,
+  type EventCalendarResponse,
+  type EventComplete,
+  type EventCreate,
+  type EventFilters,
+  type EventListQuery,
+  type EventListResponse,
+  type EventSort,
+  type EventUpdate,
+} from './tourism/event.schemas';
+
+export * from './tourism/tourist-spot.schemas';
+// Legacy tourism schema exports (temporarily disabled to prevent conflicts)
+// TODO: Phase out legacy imports and remove these lines
+// export * from './tourism/eventSchemas';
+// export * from './tourism/touristSpotSchemas';
+
+// ============================================================================
+// REVIEW AND INTERACTION SCHEMAS
+// ============================================================================
+
+export * from './content/review.schemas';
+
+// ============================================================================
+// STORAGE AND FILE MANAGEMENT SCHEMAS
+// ============================================================================
+
+export * from './system/storage.schemas';
+
+// ============================================================================
+// API AND RESPONSE SCHEMAS (selective exports to avoid conflicts)
+// ============================================================================
+
+export {
+  ApiErrorSchema,
+  ApiSuccessResponseSchema,
+  SupabaseListResponseSchema,
+  SupabaseSingleResponseSchema,
+  validateSupabaseListResponse,
+  validateSupabaseResponse,
+  type ApiError,
+} from './_archived_legacy/api/responseSchemas';
 
 /**
  * Creates a validation function for any schema
@@ -134,7 +265,9 @@ export const validateFormData = <T extends z.ZodTypeAny>(
   const { stripUnknown = true, throwOnError = true } = options || {};
 
   try {
-    const processedSchema = stripUnknown ? schema.strip() : schema;
+    // Only apply strip if the schema is an object schema that supports it
+    const processedSchema =
+      stripUnknown && 'strip' in schema ? (schema as any).strip() : schema;
     return processedSchema.parse(data);
   } catch (error) {
     if (throwOnError) {

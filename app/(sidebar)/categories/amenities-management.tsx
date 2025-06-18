@@ -29,7 +29,7 @@ import {
 } from '@/components/molecules/SortDropdown';
 import { useTheme } from '@/constants/useTheme';
 import { useAmenitiesManagementPage } from '@/hooks/features/amenities/useAmenitiesManagement';
-import { AmenityComplete } from '@/schemas/amenitiesSchemas';
+import { AmenityComplete } from '@/schemas';
 
 // ============================================================================
 // INTERFACES

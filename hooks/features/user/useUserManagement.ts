@@ -24,8 +24,12 @@ import queryKeys from '@/lib/queryKeys';
 import { supabase } from '@/lib/supabaseClient';
 import {
   ProfileSchema,
+  ProfileUpdateSchema,
+  STAFF_ROLES,
+  StaffCreateSchema,
   StaffPermissionsSchema,
   UserRoleSchema,
+  UuidSchema,
   validateSupabaseListResponse,
   validateSupabaseResponse,
   type Profile,
@@ -37,15 +41,7 @@ import {
 // CONSTANTS
 // ============================================================================
 
-/**
- * Staff roles constant - used across multiple hooks to avoid re-creation
- */
-const STAFF_ROLES: UserRole[] = [
-  'tourism_admin',
-  'business_listing_manager',
-  'tourism_content_manager',
-  'business_registration_manager',
-] as const;
+// Note: STAFF_ROLES constant is now imported from centralized schemas
 
 // ============================================================================
 // ERROR HANDLING
@@ -209,7 +205,7 @@ export function useUser(userId: string | undefined) {
       if (!userId) return null;
 
       // Phase 5: Validate userId input
-      const validatedId = z.string().uuid().parse(userId);
+      const validatedId = UuidSchema.parse(userId);
 
       const response = await supabase
         .from('profiles')
@@ -322,8 +318,8 @@ export function useUpdateUserProfile() {
       updateData: Partial<UserProfile>;
     }) => {
       // Phase 5: Validate input data
-      const validatedId = z.string().uuid().parse(userId);
-      const validatedUpdateData = ProfileSchema.partial().parse(updateData);
+      const validatedId = UuidSchema.parse(userId);
+      const validatedUpdateData = ProfileUpdateSchema.parse(updateData);
 
       const response = await supabase
         .from('profiles')
@@ -451,7 +447,7 @@ export function useUpdateStaffPermissions() {
       permissions: Partial<StaffPermissions>;
     }) => {
       // Phase 5: Validate input data
-      const validatedId = z.string().uuid().parse(userId);
+      const validatedId = UuidSchema.parse(userId);
       const validatedPermissions =
         StaffPermissionsSchema.partial().parse(permissions);
 
@@ -521,7 +517,7 @@ export function useVerifyUser() {
       isVerified: boolean;
     }) => {
       // Phase 5: Validate input data
-      const validatedId = z.string().uuid().parse(userId);
+      const validatedId = UuidSchema.parse(userId);
       const validatedVerification = z.boolean().parse(isVerified);
 
       const response = await supabase
@@ -676,21 +672,14 @@ export function useCreateStaff() {
       permissions?: Partial<StaffPermissions>;
     }) => {
       // Validate input data
-      const validatedData = z
-        .object({
-          email: z.string().email('Invalid email address'),
-          role: UserRoleSchema,
-          firstName: z.string().optional(),
-          lastName: z.string().optional(),
-          phoneNumber: z.string().optional(),
-        })
-        .parse({
-          email,
-          role,
-          firstName,
-          lastName,
-          phoneNumber,
-        });
+      const validatedData = StaffCreateSchema.parse({
+        email,
+        role,
+        firstName,
+        lastName,
+        phoneNumber,
+        permissions,
+      });
 
       // Validate that the role is a staff role
       if (!STAFF_ROLES.includes(validatedData.role)) {
@@ -772,7 +761,7 @@ export function useUpdateStaffRole() {
       newRole: UserRole;
     }) => {
       // Validate input data
-      const validatedId = z.string().uuid().parse(userId);
+      const validatedId = UuidSchema.parse(userId);
       const validatedRole = UserRoleSchema.parse(newRole);
 
       // Validate that the new role is a staff role

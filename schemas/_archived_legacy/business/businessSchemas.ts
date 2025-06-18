@@ -28,7 +28,7 @@ import {
 } from '../common/baseSchemas';
 
 // Import ProfileSchema for business owner information
-import { ProfileSchema } from '../auth/authSchemas';
+import { ProfileSchema } from '../../auth/authSchemas';
 
 // ============================================================================
 // ENUMS

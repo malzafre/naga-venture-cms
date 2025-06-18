@@ -3,10 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import {
-  BusinessCreateFormSchema,
-  type BusinessCreateForm,
-} from '@/schemas/business/businessSchemas';
+import { BusinessCreateFormSchema, type BusinessCreateForm } from '@/schemas';
 import { Business } from '@/types/supabase';
 
 // Use the new type alias for better consistency
@@ -15,8 +12,22 @@ export type BusinessFormData = BusinessCreateForm;
 // Step field mappings for validation
 const STEP_FIELDS = {
   1: ['business_name', 'business_type', 'description'] as const,
-  2: ['address', 'city', 'province', 'postal_code', 'latitude', 'longitude'] as const,
-  3: ['phone', 'email', 'website', 'facebook_url', 'instagram_url', 'twitter_url'] as const,
+  2: [
+    'address',
+    'city',
+    'province',
+    'postal_code',
+    'latitude',
+    'longitude',
+  ] as const,
+  3: [
+    'phone',
+    'email',
+    'website',
+    'facebook_url',
+    'instagram_url',
+    'twitter_url',
+  ] as const,
   4: ['images'] as const,
 } as const;
 
@@ -52,7 +63,9 @@ export function useBusinessForm({
         return nagaCityCenter;
       }
 
-      const match = location.match(/POINT\(([-+]?\d*\.?\d+)\s+([-+]?\d*\.?\d+)\)/);
+      const match = location.match(
+        /POINT\(([-+]?\d*\.?\d+)\s+([-+]?\d*\.?\d+)\)/
+      );
       if (match && match[1] && match[2]) {
         return {
           lng: parseFloat(match[1]),
@@ -66,7 +79,9 @@ export function useBusinessForm({
   );
 
   // Get initial coordinates
-  const initialCoords = extractCoordinates((initialData?.location as string) || null);
+  const initialCoords = extractCoordinates(
+    (initialData?.location as string) || null
+  );
   // Form setup with React Hook Form
   const form = useForm<BusinessFormData>({
     resolver: zodResolver(BusinessCreateFormSchema),
@@ -100,9 +115,14 @@ export function useBusinessForm({
     watch,
   } = form; // Reset form when initialData changes (for edit mode)
   useEffect(() => {
-    console.log('🔄 [useBusinessForm] Effect triggered - initialData/isEdit changed');
+    console.log(
+      '🔄 [useBusinessForm] Effect triggered - initialData/isEdit changed'
+    );
     console.log('🔄 [useBusinessForm] isEdit:', isEdit);
-    console.log('🔄 [useBusinessForm] initialData:', initialData?.business_name || 'none');
+    console.log(
+      '🔄 [useBusinessForm] initialData:',
+      initialData?.business_name || 'none'
+    );
 
     if (initialData && isEdit) {
       console.log('📝 [useBusinessForm] Setting form to EDIT mode');
@@ -156,7 +176,8 @@ export function useBusinessForm({
   // Validate current step fields only
   const validateCurrentStep = useCallback(async (): Promise<boolean> => {
     try {
-      const fieldsToValidate = STEP_FIELDS[currentStep as keyof typeof STEP_FIELDS];
+      const fieldsToValidate =
+        STEP_FIELDS[currentStep as keyof typeof STEP_FIELDS];
       const result = await trigger(fieldsToValidate);
       return result;
     } catch (error) {
@@ -170,7 +191,9 @@ export function useBusinessForm({
     console.log('➡️ [useBusinessForm] Is navigating:', isNavigating);
 
     if (isNavigating) {
-      console.log('⏸️ [useBusinessForm] Navigation blocked - already navigating');
+      console.log(
+        '⏸️ [useBusinessForm] Navigation blocked - already navigating'
+      );
       return;
     }
 
@@ -184,7 +207,9 @@ export function useBusinessForm({
       console.log('✅ [useBusinessForm] Moving to next step');
       setCurrentStep((prev) => prev + 1);
     } else {
-      console.log('❌ [useBusinessForm] Cannot move to next step - validation failed or last step');
+      console.log(
+        '❌ [useBusinessForm] Cannot move to next step - validation failed or last step'
+      );
     }
 
     setIsNavigating(false);
@@ -196,7 +221,9 @@ export function useBusinessForm({
     console.log('⬅️ [useBusinessForm] Is navigating:', isNavigating);
 
     if (isNavigating) {
-      console.log('⏸️ [useBusinessForm] Navigation blocked - already navigating');
+      console.log(
+        '⏸️ [useBusinessForm] Navigation blocked - already navigating'
+      );
       return;
     }
 
@@ -204,7 +231,9 @@ export function useBusinessForm({
       console.log('✅ [useBusinessForm] Moving to previous step');
       setCurrentStep((prev) => prev - 1);
     } else {
-      console.log('❌ [useBusinessForm] Cannot move to previous step - already at first step');
+      console.log(
+        '❌ [useBusinessForm] Cannot move to previous step - already at first step'
+      );
     }
   }, [currentStep, isNavigating]);
   // Clear form data with debugging
@@ -273,7 +302,10 @@ export function useBusinessForm({
     console.log('🚨 [useBusinessForm] Cancel button clicked');
     console.log('🚨 [useBusinessForm] onCancel function:', typeof onCancel);
     console.log('🚨 [useBusinessForm] Current step:', currentStep);
-    console.log('🚨 [useBusinessForm] Form data before cancel:', form.getValues());
+    console.log(
+      '🚨 [useBusinessForm] Form data before cancel:',
+      form.getValues()
+    );
 
     try {
       onCancel();

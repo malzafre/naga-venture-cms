@@ -6,20 +6,12 @@ import { Controller, useForm } from 'react-hook-form';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { z } from 'zod';
 
 import { CMSButton, CMSText } from '@/components';
 import { useAuth } from '@/hooks/features/auth/useAuth';
+import { LoginFormSchema, type LoginForm } from '@/schemas';
 
-// Zod schema for login form validation
-const LoginSchema = z.object({
-  email: z.string().email({ message: 'Invalid email address' }),
-  password: z
-    .string()
-    .min(6, { message: 'Password must be at least 6 characters' }),
-});
-
-type LoginFormInputs = z.infer<typeof LoginSchema>;
+type LoginFormInputs = LoginForm;
 
 const LoginWeb = () => {
   const {
@@ -36,7 +28,7 @@ const LoginWeb = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormInputs>({
-    resolver: zodResolver(LoginSchema),
+    resolver: zodResolver(LoginFormSchema),
     defaultValues: {
       email: '',
       password: '',

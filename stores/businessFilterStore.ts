@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
 
-import { BusinessFilters } from '@/schemas/business/businessSchemas';
+import { BusinessFilters } from '@/schemas';
 
 export interface BusinessFilterState {
   // Filter values
@@ -18,7 +18,10 @@ export interface BusinessFilterState {
 
 export interface BusinessFilterStore extends BusinessFilterState {
   // Filter actions
-  setFilter: <K extends keyof BusinessFilters>(key: K, value: BusinessFilters[K]) => void;
+  setFilter: <K extends keyof BusinessFilters>(
+    key: K,
+    value: BusinessFilters[K]
+  ) => void;
   updateFilters: (updates: Partial<BusinessFilters>) => void;
   resetFilters: () => void;
 
@@ -40,6 +43,7 @@ const initialState: BusinessFilterState = {
   filters: {
     page: 1,
     limit: 20,
+    sortOrder: 'desc' as const,
   },
   searchQuery: '',
   showFilters: false,
@@ -104,6 +108,7 @@ export const useBusinessFilterStore = create<BusinessFilterStore>()(
         filters: {
           page: 1,
           limit: 20,
+          sortOrder: 'desc' as const,
         },
         searchQuery: '',
         showFilters: false,

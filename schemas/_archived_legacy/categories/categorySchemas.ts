@@ -53,7 +53,8 @@ export const MainCategoryCreateFormSchema = z.object({
 /**
  * Main category update form schema
  */
-export const MainCategoryUpdateFormSchema = MainCategoryCreateFormSchema.partial();
+export const MainCategoryUpdateFormSchema =
+  MainCategoryCreateFormSchema.partial();
 
 /**
  * Main category insert schema
@@ -69,9 +70,10 @@ export const MainCategoryInsertSchema = z.object({
 /**
  * Main category update schema
  */
-export const MainCategoryUpdateSchema = MainCategoryInsertSchema.partial().extend({
-  updated_by: UuidSchema.optional(),
-});
+export const MainCategoryUpdateSchema =
+  MainCategoryInsertSchema.partial().extend({
+    updated_by: UuidSchema.optional(),
+  });
 
 // ============================================================================
 // SUB CATEGORY SCHEMAS
@@ -123,7 +125,8 @@ export const SubCategoryCreateFormSchema = z.object({
 /**
  * Sub category update form schema
  */
-export const SubCategoryUpdateFormSchema = SubCategoryCreateFormSchema.partial();
+export const SubCategoryUpdateFormSchema =
+  SubCategoryCreateFormSchema.partial();
 
 /**
  * Sub category insert schema
@@ -140,9 +143,11 @@ export const SubCategoryInsertSchema = z.object({
 /**
  * Sub category update schema
  */
-export const SubCategoryUpdateSchema = SubCategoryInsertSchema.partial().extend({
-  updated_by: UuidSchema.optional(),
-});
+export const SubCategoryUpdateSchema = SubCategoryInsertSchema.partial().extend(
+  {
+    updated_by: UuidSchema.optional(),
+  }
+);
 
 // ============================================================================
 // CATEGORY HIERARCHY SCHEMAS
@@ -227,8 +232,12 @@ export const CategoryAssignmentSchema = z.object({
  */
 export const BulkCategoryAssignmentSchema = z.object({
   entity_type: z.enum(['business', 'tourist_spot', 'event']),
-  entity_ids: z.array(UuidSchema).min(1, 'At least one entity must be selected'),
-  sub_category_ids: z.array(UuidSchema).min(1, 'At least one category must be selected'),
+  entity_ids: z
+    .array(UuidSchema)
+    .min(1, 'At least one entity must be selected'),
+  sub_category_ids: z
+    .array(UuidSchema)
+    .min(1, 'At least one category must be selected'),
 });
 
 // ============================================================================
@@ -347,7 +356,9 @@ export const CategoryReorderSchema = z.object({
 export const CategoryBulkOperationSchema = z.object({
   operation: z.enum(['activate', 'deactivate', 'delete']),
   category_type: z.enum(['main', 'sub']),
-  category_ids: z.array(UuidSchema).min(1, 'At least one category must be selected'),
+  category_ids: z
+    .array(UuidSchema)
+    .min(1, 'At least one category must be selected'),
 });
 
 // ============================================================================
@@ -355,8 +366,12 @@ export const CategoryBulkOperationSchema = z.object({
 // ============================================================================
 
 export type MainCategory = z.infer<typeof MainCategorySchema>;
-export type MainCategoryCreateForm = z.infer<typeof MainCategoryCreateFormSchema>;
-export type MainCategoryUpdateForm = z.infer<typeof MainCategoryUpdateFormSchema>;
+export type MainCategoryCreateForm = z.infer<
+  typeof MainCategoryCreateFormSchema
+>;
+export type MainCategoryUpdateForm = z.infer<
+  typeof MainCategoryUpdateFormSchema
+>;
 export type MainCategoryInsert = z.infer<typeof MainCategoryInsertSchema>;
 export type MainCategoryUpdate = z.infer<typeof MainCategoryUpdateSchema>;
 export type SubCategory = z.infer<typeof SubCategorySchema>;
@@ -371,14 +386,30 @@ export type MainCategoryFilters = z.infer<typeof MainCategoryFiltersSchema>;
 export type SubCategoryFilters = z.infer<typeof SubCategoryFiltersSchema>;
 export type CategorySearch = z.infer<typeof CategorySearchSchema>;
 export type CategoryAssignment = z.infer<typeof CategoryAssignmentSchema>;
-export type BulkCategoryAssignment = z.infer<typeof BulkCategoryAssignmentSchema>;
-export type MainCategoryApiResponse = z.infer<typeof MainCategoryApiResponseSchema>;
-export type MainCategoryListApiResponse = z.infer<typeof MainCategoryListApiResponseSchema>;
-export type SubCategoryApiResponse = z.infer<typeof SubCategoryApiResponseSchema>;
-export type SubCategoryListApiResponse = z.infer<typeof SubCategoryListApiResponseSchema>;
-export type CategoryHierarchyApiResponse = z.infer<typeof CategoryHierarchyApiResponseSchema>;
-export type CategoryMutationResponse = z.infer<typeof CategoryMutationResponseSchema>;
+export type BulkCategoryAssignment = z.infer<
+  typeof BulkCategoryAssignmentSchema
+>;
+export type MainCategoryApiResponse = z.infer<
+  typeof MainCategoryApiResponseSchema
+>;
+export type MainCategoryListApiResponse = z.infer<
+  typeof MainCategoryListApiResponseSchema
+>;
+export type SubCategoryApiResponse = z.infer<
+  typeof SubCategoryApiResponseSchema
+>;
+export type SubCategoryListApiResponse = z.infer<
+  typeof SubCategoryListApiResponseSchema
+>;
+export type CategoryHierarchyApiResponse = z.infer<
+  typeof CategoryHierarchyApiResponseSchema
+>;
+export type CategoryMutationResponse = z.infer<
+  typeof CategoryMutationResponseSchema
+>;
 export type CategoryUsageStats = z.infer<typeof CategoryUsageStatsSchema>;
-export type CategoryAnalyticsResponse = z.infer<typeof CategoryAnalyticsResponseSchema>;
+export type CategoryAnalyticsResponse = z.infer<
+  typeof CategoryAnalyticsResponseSchema
+>;
 export type CategoryReorder = z.infer<typeof CategoryReorderSchema>;
 export type CategoryBulkOperation = z.infer<typeof CategoryBulkOperationSchema>;

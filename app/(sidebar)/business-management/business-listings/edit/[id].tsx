@@ -6,19 +6,19 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Hooks and types
+import type { BusinessUpdate } from '@/schemas';
 
 // Services
-
-// Components
-import { CMSButton } from '@/components/atoms';
-import { ConfirmationModal } from '@/components/molecules/ConfirmationModal';
-import { BusinessForm, CMSRouteGuard } from '@/components/organisms';
 import { NavigationService } from '@/constants/NavigationService';
 import {
   useBusiness,
   useUpdateBusiness,
 } from '@/hooks/features/business/useBusinessManagement';
-import { BusinessUpdate } from '@/schemas/business/businessSchemas';
+
+// Components
+import { CMSButton } from '@/components/atoms';
+import { ConfirmationModal } from '@/components/molecules/ConfirmationModal';
+import { BusinessForm, CMSRouteGuard } from '@/components/organisms';
 
 /**
  * Edit Business Page
@@ -196,16 +196,16 @@ export default function EditBusinessScreen() {
         ...business,
         // Convert Date objects to strings for form compatibility
         approved_at:
-          business.approved_at instanceof Date
-            ? business.approved_at.toISOString()
+          business.approved_at && typeof business.approved_at === 'object'
+            ? (business.approved_at as Date).toISOString()
             : business.approved_at,
         created_at:
-          business.created_at instanceof Date
-            ? business.created_at.toISOString()
+          business.created_at && typeof business.created_at === 'object'
+            ? (business.created_at as Date).toISOString()
             : business.created_at,
         updated_at:
-          business.updated_at instanceof Date
-            ? business.updated_at.toISOString()
+          business.updated_at && typeof business.updated_at === 'object'
+            ? (business.updated_at as Date).toISOString()
             : business.updated_at,
         // Ensure email is string | null (not undefined)
         email: business.email ?? null,

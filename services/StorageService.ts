@@ -7,7 +7,7 @@
  */
 
 import { supabase } from '@/lib/supabaseClient';
-import { z } from 'zod';
+import { UuidSchema } from '@/schemas';
 
 // ============================================================================
 // TYPES & SCHEMAS
@@ -82,7 +82,10 @@ export class StorageService {
   /**
    * Generate unique file path for business images
    */
-  private static generateBusinessImagePath(businessId: string, fileName: string): string {
+  private static generateBusinessImagePath(
+    businessId: string,
+    fileName: string
+  ): string {
     const timestamp = Date.now();
     const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, '_');
 
@@ -113,11 +116,14 @@ export class StorageService {
   ): Promise<UploadResult> {
     try {
       // Validate inputs
-      z.string().uuid().parse(businessId);
+      UuidSchema.parse(businessId);
       this.validateImageFile(imageFile);
 
       // Generate unique file path
-      const filePath = this.generateBusinessImagePath(businessId, imageFile.name);
+      const filePath = this.generateBusinessImagePath(
+        businessId,
+        imageFile.name
+      );
 
       // Convert image to blob
       const blob = await this.imageToBlob(imageFile);
@@ -182,7 +188,7 @@ export class StorageService {
   ): Promise<UploadResult[]> {
     try {
       // Validate inputs
-      z.string().uuid().parse(businessId);
+      UuidSchema.parse(businessId);
 
       if (!Array.isArray(imageFiles) || imageFiles.length === 0) {
         throw new StorageError('No images provided for upload');
@@ -205,12 +211,14 @@ export class StorageService {
 
       // Check for errors
       const errors = results.filter(
-        (result): result is { error: any; index: number; fileName: string } => 'error' in result
+        (result): result is { error: any; index: number; fileName: string } =>
+          'error' in result
       );
 
       if (errors.length > 0) {
         const errorMessages = errors.map(
-          ({ error, index, fileName }) => `${fileName} (${index + 1}): ${error.message}`
+          ({ error, index, fileName }) =>
+            `${fileName} (${index + 1}): ${error.message}`
         );
         throw new StorageError(
           `Failed to upload ${errors.length} images:\n${errorMessages.join('\n')}`
@@ -237,14 +245,19 @@ export class StorageService {
         throw new StorageError('Image path is required for deletion');
       }
 
-      const { error } = await supabase.storage.from(STORAGE_CONFIG.BUCKET_NAME).remove([imagePath]);
+      const { error } = await supabase.storage
+        .from(STORAGE_CONFIG.BUCKET_NAME)
+        .remove([imagePath]);
 
       if (error) {
         console.error('[StorageService] Delete error:', error);
 
         if (error.message.includes('not found')) {
           // File already deleted, this is not an error
-          console.warn('[StorageService] File not found, may already be deleted:', imagePath);
+          console.warn(
+            '[StorageService] File not found, may already be deleted:',
+            imagePath
+          );
           return;
         }
 
@@ -271,27 +284,36 @@ export class StorageService {
         throw new StorageError('No image paths provided for deletion');
       }
 
-      const validPaths = imagePaths.filter((path) => path && path.trim() !== '');
+      const validPaths = imagePaths.filter(
+        (path) => path && path.trim() !== ''
+      );
 
       if (validPaths.length === 0) {
         throw new StorageError('No valid image paths provided for deletion');
       }
 
-      const { error } = await supabase.storage.from(STORAGE_CONFIG.BUCKET_NAME).remove(validPaths);
+      const { error } = await supabase.storage
+        .from(STORAGE_CONFIG.BUCKET_NAME)
+        .remove(validPaths);
 
       if (error) {
         console.error('[StorageService] Batch delete error:', error);
         throw new StorageError(`Failed to delete images: ${error.message}`);
       }
 
-      console.log('[StorageService] Images deleted successfully:', validPaths.length);
+      console.log(
+        '[StorageService] Images deleted successfully:',
+        validPaths.length
+      );
     } catch (error) {
       if (error instanceof StorageError) {
         throw error;
       }
 
       console.error('[StorageService] Unexpected batch delete error:', error);
-      throw new StorageError(`Unexpected error during batch deletion: ${error}`);
+      throw new StorageError(
+        `Unexpected error during batch deletion: ${error}`
+      );
     }
   }
 

@@ -3,7 +3,7 @@ import {
   useCreateAmenity,
   useUpdateAmenity,
 } from '@/hooks/features/amenities/useAmenitiesManagement';
-import { AmenityComplete, AmenityInsert } from '@/schemas/amenitiesSchemas';
+import { AmenityComplete, AmenityCreate } from '@/schemas';
 import { MaterialIcons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
@@ -177,7 +177,7 @@ export const AmenityFormContent: React.FC<AmenityFormContentProps> = ({
     setIsLoading(true);
     try {
       if (mode === 'create') {
-        const createData: AmenityInsert = {
+        const createData: AmenityCreate = {
           name: formData.name.trim(),
           icon_url: formData.icon_url.trim() || null,
         };

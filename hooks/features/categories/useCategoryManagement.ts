@@ -11,16 +11,16 @@
  * - Category assignment and bulk operations
  */
 
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { z } from 'zod';
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 import { DOMAIN_CACHE_CONFIG, cacheUtils } from '@/constants/CacheConstants';
 import queryKeys from '@/lib/queryKeys';
 import { supabase } from '@/lib/supabaseClient';
-import {
-  validateSupabaseListResponse,
-  validateSupabaseResponse,
-} from '@/schemas/api/responseSchemas';
 import {
   MainCategoryFiltersSchema,
   MainCategoryInsertSchema,
@@ -31,7 +31,10 @@ import {
   SubCategoryInsertSchema,
   SubCategorySchema,
   SubCategoryUpdateSchema,
-  SubCategoryWithMainSchema, // New schema for main cats with subs
+  SubCategoryWithMainSchema,
+  UuidSchema,
+  validateSupabaseListResponse,
+  validateSupabaseResponse, // New schema for main cats with subs
   type MainCategory,
   type MainCategoryFilters,
   type MainCategoryInsert,
@@ -42,7 +45,7 @@ import {
   type SubCategoryInsert,
   type SubCategoryUpdate,
   type SubCategoryWithMain,
-} from '@/schemas/categoriesSchemas'; // Updated import path
+} from '@/schemas';
 
 // ============================================================================
 // ERROR HANDLING
@@ -51,7 +54,11 @@ import {
 /**
  * Enhanced error handling for category operations with contextual logging
  */
-const handleCategoryError = (error: any, operation: string, context?: Record<string, any>) => {
+const handleCategoryError = (
+  error: any,
+  operation: string,
+  context?: Record<string, any>
+) => {
   // Log error with context for debugging (development only)
   if (__DEV__) {
     console.error(`[CategoryManagement] ${operation}:`, error, context);
@@ -67,7 +74,9 @@ const handleCategoryError = (error: any, operation: string, context?: Record<str
   }
 
   // Default enhanced error message
-  throw new Error(`Failed to ${operation}: ${error.message || 'Unknown error'}`);
+  throw new Error(
+    `Failed to ${operation}: ${error.message || 'Unknown error'}`
+  );
 };
 
 // ============================================================================
@@ -121,14 +130,19 @@ export function useMainCategories(filters: Partial<MainCategoryFilters> = {}) {
   return useQuery({
     queryKey: queryKeys.categories.mainList(validatedFilters),
     queryFn: async (): Promise<MainCategoryListResponse> => {
-      let mainQuery = supabase.from('main_categories').select('*', { count: 'exact' });
+      let mainQuery = supabase
+        .from('main_categories')
+        .select('*', { count: 'exact' });
 
-      if (is_active !== undefined) mainQuery = mainQuery.eq('is_active', is_active);
+      if (is_active !== undefined)
+        mainQuery = mainQuery.eq('is_active', is_active);
       if (created_by) mainQuery = mainQuery.eq('created_by', created_by);
 
       if (search && search.trim()) {
         const searchTerm = search.trim();
-        mainQuery = mainQuery.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+        mainQuery = mainQuery.or(
+          `name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`
+        );
       }
 
       mainQuery = mainQuery.order(sortBy, { ascending: sortOrder === 'asc' });
@@ -173,35 +187,48 @@ export function useMainCategories(filters: Partial<MainCategoryFilters> = {}) {
         .order('name', { ascending: true });
 
       if (subResponse.error) {
-        handleCategoryError(subResponse.error, 'fetch sub-categories for main categories', {
-          mainCategoryIds,
-        });
+        handleCategoryError(
+          subResponse.error,
+          'fetch sub-categories for main categories',
+          {
+            mainCategoryIds,
+          }
+        );
         // Continue with main categories even if subs fail, or handle differently
       }
 
-      const validatedSubCats = validateSupabaseListResponse(SubCategorySchema, subResponse);
+      const validatedSubCats = validateSupabaseListResponse(
+        SubCategorySchema,
+        subResponse
+      );
 
-      const mainCategoriesWithSubsData = validatedMainCats.data.map((mainCat) => {
-        const subs = validatedSubCats.data.filter((sc) => sc.main_category_id === mainCat.id);
-        // Validate the final structure for each item
-        const parseResult = MainCategoryWithSubCategoriesSchema.safeParse({
-          ...mainCat,
-          sub_categories: subs,
-        });
-        if (!parseResult.success) {
-          console.error(
-            'Validation error for MainCategoryWithSubCategories:',
-            parseResult.error,
-            mainCat,
-            subs
+      const mainCategoriesWithSubsData = validatedMainCats.data.map(
+        (mainCat) => {
+          const subs = validatedSubCats.data.filter(
+            (sc) => sc.main_category_id === mainCat.id
           );
-          // Handle error, e.g., return mainCat without subs or throw
-          return { ...mainCat, sub_categories: [] }; // Fallback
+          // Validate the final structure for each item
+          const parseResult = MainCategoryWithSubCategoriesSchema.safeParse({
+            ...mainCat,
+            sub_categories: subs,
+          });
+          if (!parseResult.success) {
+            console.error(
+              'Validation error for MainCategoryWithSubCategories:',
+              parseResult.error,
+              mainCat,
+              subs
+            );
+            // Handle error, e.g., return mainCat without subs or throw
+            return { ...mainCat, sub_categories: [] }; // Fallback
+          }
+          return parseResult.data;
         }
-        return parseResult.data;
-      });
+      );
 
-      const hasMore = validatedMainCats.count ? from + limit < validatedMainCats.count : false;
+      const hasMore = validatedMainCats.count
+        ? from + limit < validatedMainCats.count
+        : false;
 
       return {
         data: mainCategoriesWithSubsData,
@@ -230,7 +257,7 @@ export function useMainCategory(categoryId: string | undefined) {
     queryFn: async () => {
       if (!categoryId) return null;
 
-      const validatedId = z.string().uuid().parse(categoryId);
+      const validatedId = UuidSchema.parse(categoryId);
 
       const response = await supabase
         .from('main_categories')
@@ -292,13 +319,16 @@ export function useSubCategories(filters: Partial<SubCategoryFilters> = {}) {
         { count: 'exact' }
       );
 
-      if (main_category_id) query = query.eq('main_category_id', main_category_id);
+      if (main_category_id)
+        query = query.eq('main_category_id', main_category_id);
       if (is_active !== undefined) query = query.eq('is_active', is_active);
       if (created_by) query = query.eq('created_by', created_by);
 
       if (search && search.trim()) {
         const searchTerm = search.trim();
-        query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+        query = query.or(
+          `name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`
+        );
       }
 
       query = query.order(sortBy, { ascending: sortOrder === 'asc' });
@@ -319,9 +349,14 @@ export function useSubCategories(filters: Partial<SubCategoryFilters> = {}) {
         return { data: [], count: 0, hasMore: false };
       }
 
-      const validatedResponse = validateSupabaseListResponse(SubCategoryWithMainSchema, response);
+      const validatedResponse = validateSupabaseListResponse(
+        SubCategoryWithMainSchema,
+        response
+      );
 
-      const hasMore = validatedResponse.count ? from + limit < validatedResponse.count : false;
+      const hasMore = validatedResponse.count
+        ? from + limit < validatedResponse.count
+        : false;
 
       return {
         data: validatedResponse.data,
@@ -345,7 +380,7 @@ export function useSubCategory(categoryId: string | undefined) {
     queryFn: async () => {
       if (!categoryId) return null;
 
-      const validatedId = z.string().uuid().parse(categoryId);
+      const validatedId = UuidSchema.parse(categoryId);
 
       const response = await supabase
         .from('sub_categories')
@@ -381,7 +416,9 @@ export function useCreateMainCategory() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (categoryData: MainCategoryInsert): Promise<MainCategory> => {
+    mutationFn: async (
+      categoryData: MainCategoryInsert
+    ): Promise<MainCategory> => {
       const validatedData = MainCategoryInsertSchema.parse(categoryData); // Use new schema
 
       const response = await supabase
@@ -397,7 +434,10 @@ export function useCreateMainCategory() {
         throw response.error; // Re-throw to be caught by mutation's onError
       }
 
-      const newCategory = validateSupabaseResponse(MainCategorySchema, response);
+      const newCategory = validateSupabaseResponse(
+        MainCategorySchema,
+        response
+      );
       if (!newCategory) {
         throw new Error('Failed to create main category - invalid response');
       }
@@ -407,7 +447,10 @@ export function useCreateMainCategory() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.categories.mainLists(),
       });
-      queryClient.setQueryData(queryKeys.categories.mainDetail(newCategory.id), newCategory);
+      queryClient.setQueryData(
+        queryKeys.categories.mainDetail(newCategory.id),
+        newCategory
+      );
     },
     retry: cacheUtils.getRetryConfig('critical'),
   });
@@ -423,7 +466,7 @@ export function useUpdateMainCategory() {
       id: string;
       updates: MainCategoryUpdate;
     }): Promise<MainCategory> => {
-      const validatedId = z.string().uuid().parse(id);
+      const validatedId = UuidSchema.parse(id);
       const validatedUpdateData = MainCategoryUpdateSchema.parse(updates); // Use new schema
 
       const response = await supabase
@@ -444,7 +487,10 @@ export function useUpdateMainCategory() {
         throw response.error;
       }
 
-      const updatedCategory = validateSupabaseResponse(MainCategorySchema, response);
+      const updatedCategory = validateSupabaseResponse(
+        MainCategorySchema,
+        response
+      );
       if (!updatedCategory) {
         throw new Error('Failed to update main category - invalid response');
       }
@@ -454,7 +500,10 @@ export function useUpdateMainCategory() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.categories.mainLists(),
       });
-      queryClient.setQueryData(queryKeys.categories.mainDetail(categoryId), updatedCategory);
+      queryClient.setQueryData(
+        queryKeys.categories.mainDetail(categoryId),
+        updatedCategory
+      );
       // Also invalidate sub-category lists if main category name/status changes, as it might be displayed with subs
       queryClient.invalidateQueries({
         queryKey: queryKeys.categories.subLists(),
@@ -469,12 +518,15 @@ export function useDeleteMainCategory() {
 
   return useMutation({
     mutationFn: async (categoryId: string): Promise<string> => {
-      const validatedId = z.string().uuid().parse(categoryId);
+      const validatedId = UuidSchema.parse(categoryId);
 
       // It's good practice to ensure sub-categories are handled (e.g., deleted by cascade in DB or manually here)
       // Assuming DB handles cascade delete for sub_categories based on foreign key constraint
 
-      const response = await supabase.from('main_categories').delete().eq('id', validatedId);
+      const response = await supabase
+        .from('main_categories')
+        .delete()
+        .eq('id', validatedId);
 
       if (response.error) {
         handleCategoryError(response.error, 'delete main category', {
@@ -508,7 +560,9 @@ export function useCreateSubCategory() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (categoryData: SubCategoryInsert): Promise<SubCategory> => {
+    mutationFn: async (
+      categoryData: SubCategoryInsert
+    ): Promise<SubCategory> => {
       const validatedData = SubCategoryInsertSchema.parse(categoryData); // Use new schema
 
       const response = await supabase
@@ -547,7 +601,10 @@ export function useCreateSubCategory() {
         queryKey: queryKeys.categories.mainLists(),
       });
 
-      queryClient.setQueryData(queryKeys.categories.subDetail(newCategory.id), newCategory);
+      queryClient.setQueryData(
+        queryKeys.categories.subDetail(newCategory.id),
+        newCategory
+      );
     },
     retry: cacheUtils.getRetryConfig('critical'),
   });
@@ -563,7 +620,7 @@ export function useUpdateSubCategory() {
       id: string;
       updates: SubCategoryUpdate;
     }): Promise<SubCategory> => {
-      const validatedId = z.string().uuid().parse(id);
+      const validatedId = UuidSchema.parse(id);
       const validatedUpdateData = SubCategoryUpdateSchema.parse(updates); // Use new schema
 
       const response = await supabase
@@ -583,7 +640,10 @@ export function useUpdateSubCategory() {
         });
         throw response.error;
       }
-      const updatedCategory = validateSupabaseResponse(SubCategorySchema, response);
+      const updatedCategory = validateSupabaseResponse(
+        SubCategorySchema,
+        response
+      );
       if (!updatedCategory) {
         throw new Error('Failed to update sub category - invalid response');
       }
@@ -616,7 +676,10 @@ export function useUpdateSubCategory() {
         queryKey: queryKeys.categories.mainLists(),
       });
 
-      queryClient.setQueryData(queryKeys.categories.subDetail(updatedCategory.id), updatedCategory);
+      queryClient.setQueryData(
+        queryKeys.categories.subDetail(updatedCategory.id),
+        updatedCategory
+      );
     },
     retry: cacheUtils.getRetryConfig('critical'),
   });
@@ -627,7 +690,7 @@ export function useDeleteSubCategory() {
 
   return useMutation({
     mutationFn: async (categoryId: string): Promise<string> => {
-      const validatedId = z.string().uuid().parse(categoryId);
+      const validatedId = UuidSchema.parse(categoryId);
 
       // Fetch the sub-category first to know its main_category_id for targeted cache invalidation
       const subCatQuery = await supabase
@@ -637,7 +700,10 @@ export function useDeleteSubCategory() {
         .single();
       const mainCategoryId = subCatQuery.data?.main_category_id;
 
-      const response = await supabase.from('sub_categories').delete().eq('id', validatedId);
+      const response = await supabase
+        .from('sub_categories')
+        .delete()
+        .eq('id', validatedId);
 
       if (response.error) {
         handleCategoryError(response.error, 'delete sub category', {
@@ -688,17 +754,29 @@ export function useCategoryAnalytics() {
   return useQuery({
     queryKey: queryKeys.categories.analytics(),
     queryFn: async () => {
-      const [mainCategoriesResponse, subCategoriesResponse] = await Promise.all([
-        supabase.from('main_categories').select('id, is_active', { count: 'exact' }),
-        supabase.from('sub_categories').select('id, is_active', { count: 'exact' }),
-      ]);
+      const [mainCategoriesResponse, subCategoriesResponse] = await Promise.all(
+        [
+          supabase
+            .from('main_categories')
+            .select('id, is_active', { count: 'exact' }),
+          supabase
+            .from('sub_categories')
+            .select('id, is_active', { count: 'exact' }),
+        ]
+      );
 
       if (mainCategoriesResponse.error) {
-        handleCategoryError(mainCategoriesResponse.error, 'fetch main categories analytics');
+        handleCategoryError(
+          mainCategoriesResponse.error,
+          'fetch main categories analytics'
+        );
         // Or return a default/error state
       }
       if (subCategoriesResponse.error) {
-        handleCategoryError(subCategoriesResponse.error, 'fetch sub categories analytics');
+        handleCategoryError(
+          subCategoriesResponse.error,
+          'fetch sub categories analytics'
+        );
       }
 
       const mainCategories = mainCategoriesResponse.data || [];
@@ -740,6 +818,8 @@ export function useCategoryDashboardData() {
       recentMainCategoriesQuery.isError ||
       recentSubCategoriesQuery.isError,
     error:
-      analyticsQuery.error || recentMainCategoriesQuery.error || recentSubCategoriesQuery.error,
+      analyticsQuery.error ||
+      recentMainCategoriesQuery.error ||
+      recentSubCategoriesQuery.error,
   };
 }

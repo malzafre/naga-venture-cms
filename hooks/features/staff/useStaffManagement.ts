@@ -25,8 +25,8 @@ import {
 } from '@/hooks/features/user/useUserManagement';
 import {
   type Profile,
-  type ProfileUpdateForm,
-  ProfileUpdateFormSchema,
+  type ProfileUpdate,
+  ProfileUpdateSchema,
   type StaffPermissions,
   StaffPermissionsUpdateSchema,
   type UserRole,
@@ -307,11 +307,9 @@ export function useStaffEdit({ staff, onSuccess, onError }: UseStaffEditProps) {
   // VALIDATION
   // ============================================================================
   const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-
-    // Validate profile fields
+    const newErrors: FormErrors = {}; // Validate profile fields
     try {
-      ProfileUpdateFormSchema.parse({
+      ProfileUpdateSchema.parse({
         first_name: formData.first_name,
         last_name: formData.last_name,
         phone_number: formData.phone_number,
@@ -429,7 +427,7 @@ export function useStaffEdit({ staff, onSuccess, onError }: UseStaffEditProps) {
         formData.last_name !== staff.last_name ||
         formData.phone_number !== staff.phone_number
       ) {
-        const profileUpdate: ProfileUpdateForm = {
+        const profileUpdate: ProfileUpdate = {
           first_name: formData.first_name,
           last_name: formData.last_name,
           phone_number: formData.phone_number,

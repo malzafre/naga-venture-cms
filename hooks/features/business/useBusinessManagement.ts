@@ -18,7 +18,6 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import { z } from 'zod';
 
 import { DOMAIN_CACHE_CONFIG } from '@/constants/CacheConstants';
 import queryKeys from '@/lib/queryKeys';
@@ -29,6 +28,7 @@ import {
   BusinessSchema,
   BusinessUpdateSchema,
   BusinessWithRelationsSchema,
+  UuidSchema,
   validateSupabaseListResponse,
   validateSupabaseResponse,
   type Business,
@@ -110,6 +110,7 @@ export function useBusinessListings(filters: Partial<BusinessFilters> = {}) {
   const defaultFilters: BusinessFilters = {
     page: 1,
     limit: 20,
+    sortOrder: 'desc' as const,
     ...filters,
   };
 
@@ -233,7 +234,7 @@ export function useBusiness(businessId: string | undefined) {
       );
 
       // Phase 5: Validate businessId input
-      const validatedId = z.string().uuid().parse(businessId);
+      const validatedId = UuidSchema.parse(businessId);
 
       const response = await supabase
         .from('businesses')
@@ -432,7 +433,7 @@ export function useUpdateBusiness() {
       updateData: BusinessUpdate;
     }): Promise<Business> => {
       // Phase 5: Validate input data
-      const validatedId = z.string().uuid().parse(businessId);
+      const validatedId = UuidSchema.parse(businessId);
       const validatedUpdateData = BusinessUpdateSchema.parse(updateData);
 
       const response = await supabase
@@ -484,7 +485,7 @@ export function useDeleteBusiness() {
   return useMutation({
     mutationFn: async (businessId: string): Promise<void> => {
       // Phase 5: Validate businessId input
-      const validatedId = z.string().uuid().parse(businessId);
+      const validatedId = UuidSchema.parse(businessId);
 
       const response = await supabase
         .from('businesses')
@@ -527,6 +528,7 @@ export function useInfiniteBusinessListings(
   const defaultFilters: BusinessFilters = {
     page: 1,
     limit: 20,
+    sortOrder: 'desc' as const,
     ...filters,
   };
 
