@@ -1,9 +1,9 @@
 // filepath: hooks/useNavigationManagement.ts
-import { usePathname } from 'expo-router';
-import { useMemo } from 'react';
-
 import { tourismAdminNavigation } from '@/constants/NavigationConfig';
-import { useNavigationActions, useNavigationFilter } from '@/stores';
+import {
+  findActiveSection,
+  useNavigationFilter,
+} from '@/hooks/features/navigation';
 import { UserRole } from '@/types/supabase';
 
 /**
@@ -23,43 +23,55 @@ import { UserRole } from '@/types/supabase';
  * purely presentational.
  */
 export function useNavigationManagement(userRole: UserRole | undefined) {
-  const pathname = usePathname();
-  const actions = useNavigationActions();
-
   // Get filtered navigation based on user role
-  const filteredNavigation = useNavigationFilter(tourismAdminNavigation, userRole);
+  const filteredNavigation = useNavigationFilter(
+    tourismAdminNavigation,
+    userRole
+  );
 
   // Utility functions
-  const findActiveSection = useMemo(() => actions.findActiveSection, [actions]);
+  // findActiveSection is now a pure utility function
   // Check if section is expanded - delegated to sidebar store
   const isSectionExpanded = (sectionId: string) => {
     // This should be handled by the sidebar store
-    console.warn('[useNavigationManagement] isSectionExpanded should use useSidebarStore directly');
+    console.warn(
+      '[useNavigationManagement] isSectionExpanded should use useSidebarStore directly'
+    );
     return false;
   };
 
   // Check if section is active - delegated to sidebar store
   const isSectionActive = (sectionId: string) => {
     // This should be handled by the sidebar store
-    console.warn('[useNavigationManagement] isSectionActive should use useSidebarStore directly');
+    console.warn(
+      '[useNavigationManagement] isSectionActive should use useSidebarStore directly'
+    );
     return false;
   };
 
   // Navigation management functions - delegated to sidebar store
   const toggleExpand = (sectionId: string) => {
-    console.warn('[useNavigationManagement] toggleExpand should use useSidebarStore directly');
+    console.warn(
+      '[useNavigationManagement] toggleExpand should use useSidebarStore directly'
+    );
   };
 
   const expandSection = (sectionId: string) => {
-    console.warn('[useNavigationManagement] expandSection should use useSidebarStore directly');
+    console.warn(
+      '[useNavigationManagement] expandSection should use useSidebarStore directly'
+    );
   };
 
   const collapseSection = (sectionId: string) => {
-    console.warn('[useNavigationManagement] collapseSection should use useSidebarStore directly');
+    console.warn(
+      '[useNavigationManagement] collapseSection should use useSidebarStore directly'
+    );
   };
 
   const collapseAll = () => {
-    console.warn('[useNavigationManagement] collapseAll should use useSidebarStore directly');
+    console.warn(
+      '[useNavigationManagement] collapseAll should use useSidebarStore directly'
+    );
   };
   return {
     // State
@@ -77,7 +89,8 @@ export function useNavigationManagement(userRole: UserRole | undefined) {
     isSectionActive,
 
     // Utils
-    findActiveSection,
+    findActiveSection: (items: any[], path: string) =>
+      findActiveSection(items, path),
   };
 }
 

@@ -2,8 +2,9 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
+import { useSignInMutation, useSignOutMutation } from '@/hooks/features/auth';
 import { supabase } from '@/lib/supabaseClient';
-import { useAuthActions, useAuthError, useAuthLoading, useAuthSession } from '@/stores/authStore';
+import { useAuthError, useAuthLoading, useAuthSession } from '@/stores';
 import { Profile as UserProfile, UserRole } from '@/types/supabase';
 
 /**
@@ -11,15 +12,27 @@ import { Profile as UserProfile, UserRole } from '@/types/supabase';
  *
  * Follows project guidelines:
  * - Zustand for client state (session, auth UI state)
- * - TanStack Query for server state (user profile)
+ * - TanStack Query for server state (user profile) + business logic
  * - Smart Hook pattern with optimized subscriptions
  */
 export function useAuth() {
   const { session, user } = useAuthSession();
   const { isLoadingInitial, isSigningIn, isSigningOut } = useAuthLoading();
   const authError = useAuthError();
-  const { signInWithEmail, signOut } = useAuthActions();
   const queryClient = useQueryClient();
+
+  // Get auth mutations (business logic now in TanStack Query)
+  const signInMutation = useSignInMutation();
+  const signOutMutation = useSignOutMutation();
+
+  // Wrapper functions for backward compatibility
+  const signInWithEmail = (email: string, password: string) => {
+    return signInMutation.mutate({ email, password });
+  };
+
+  const signOut = () => {
+    return signOutMutation.mutate();
+  };
 
   // Note: Initialization is handled by AuthInitializer component.
   // The global listener runs automatically in authStore.ts.
@@ -96,11 +109,16 @@ export function useAuth() {
 
   // Legacy compatibility methods
   const login = (userData: any) => {
-    console.warn("[useAuth] Legacy 'login' method called. Please use 'signInWithEmail'.", userData);
+    console.warn(
+      "[useAuth] Legacy 'login' method called. Please use 'signInWithEmail'.",
+      userData
+    );
   };
 
   const logout = () => {
-    console.warn("[useAuth] Legacy 'logout' method called. Please use 'signOut'.");
+    console.warn(
+      "[useAuth] Legacy 'logout' method called. Please use 'signOut'."
+    );
     signOut();
   };
 

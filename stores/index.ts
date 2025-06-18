@@ -2,19 +2,23 @@
 /**
  * Zustand Stores - Centralized State Management
  *
- * Feature-based store organization following the "Smart Hook, Dumb Component" pattern.
+ * Domain-organized store architecture following the "Smart Hook, Dumb Component" pattern.
  * Each store manages a specific domain of application state with type-safe actions and selectors.
- * * Architecture:
- * - Sidebar Store: Navigation state and user-specific persistence
- * - Business Filter Store: Business listing filters with debounced search
- * - Theme Store: UI preferences and accessibility settings
- * - Navigation Store: Navigation filtering and utility functions
+ *
+ * Architecture:
+ * - auth/: Authentication session state (UI state only, business logic in TanStack Query)
+ * - ui/: User interface state management
+ *   - sidebarStore: Navigation UI state and user-specific persistence
+ *   - themeStore: UI preferences and accessibility settings
+ *   - businessFilterStore: Business listing filters with debounced search
+ * - navigation/: Navigation state management (pure state only, logic in hooks)
  *
  * Best Practices:
  * - Use selector hooks for optimized subscriptions
  * - Leverage subscribeWithSelector for fine-grained updates
  * - Implement persistence where appropriate
  * - Follow immutable update patterns
+ * - Separate business logic from UI state management
  */
 
 // Store exports
@@ -27,7 +31,7 @@ export {
   useAuthStore,
   type AuthState,
   type AuthStore,
-} from './authStore';
+} from './auth/authStore';
 
 export {
   useActiveSection,
@@ -35,18 +39,18 @@ export {
   useSidebarActions,
   useSidebarStore,
   type SidebarStore,
-} from './sidebarStore';
+} from './ui/sidebarStore';
 
 export {
   useBusinessFilterActions,
-  useBusinessFilters,
   useBusinessFilterState,
   useBusinessFilterStore,
   useBusinessFilterUI,
+  useBusinessFilters,
   useBusinessSearch,
   type BusinessFilterState,
   type BusinessFilterStore,
-} from './businessFilterStore';
+} from './ui/businessFilterStore';
 
 export {
   useAccessibilityPreferences,
@@ -59,16 +63,17 @@ export {
   type ThemeMode,
   type ThemeState,
   type ThemeStore,
-} from './themeStore';
+} from './ui/themeStore';
 
 export {
   useFilteredNavigation,
   useNavigationActions,
-  useNavigationFilter,
   useNavigationLoading,
+  useNavigationState,
   useNavigationStore,
+  type NavigationState,
   type NavigationStore,
-} from './navigationStore';
+} from './navigation/navigationStore';
 
 /**
  * Store initialization utilities
@@ -81,8 +86,8 @@ export {
 export const initializeStores = async (userId?: string | null) => {
   try {
     // Dynamic imports to avoid circular dependencies
-    const { useSidebarStore } = await import('./sidebarStore');
-    const { useThemeStore } = await import('./themeStore');
+    const { useSidebarStore } = await import('./ui/sidebarStore');
+    const { useThemeStore } = await import('./ui/themeStore');
 
     // Initialize sidebar store with user-specific data
     await useSidebarStore.getState()._loadPersistedState(userId);
@@ -103,7 +108,7 @@ export const initializeStores = async (userId?: string | null) => {
 export const cleanupStores = async () => {
   try {
     // Dynamic imports to avoid circular dependencies
-    const { useBusinessFilterStore } = await import('./businessFilterStore');
+    const { useBusinessFilterStore } = await import('./ui/businessFilterStore');
 
     // Clear any pending debounce timers in business filter store
     useBusinessFilterStore.getState()._clearDebounceTimer();
@@ -121,9 +126,9 @@ export const cleanupStores = async () => {
 export const resetUserStores = async () => {
   try {
     // Dynamic imports to avoid circular dependencies
-    const { useSidebarStore } = await import('./sidebarStore');
-    const { useBusinessFilterStore } = await import('./businessFilterStore');
-    const { useNavigationStore } = await import('./navigationStore');
+    const { useSidebarStore } = await import('./ui/sidebarStore');
+    const { useBusinessFilterStore } = await import('./ui/businessFilterStore');
+    const { useNavigationStore } = await import('./navigation/navigationStore');
 
     // Reset sidebar state
     useSidebarStore.setState({

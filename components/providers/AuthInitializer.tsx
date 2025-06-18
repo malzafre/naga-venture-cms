@@ -1,26 +1,22 @@
 // filepath: components/providers/AuthInitializer.tsx
-import React, { useEffect } from 'react';
+import React from 'react';
 
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthQuery } from '@/hooks/features/auth';
 
 /**
  * AuthInitializer Component
  *
- * Initializes the Zustand auth store when the app starts.
- * The auth listener is now set up globally in authStore.ts to avoid race conditions.
+ * Initializes authentication state when the app starts using TanStack Query.
+ * The Supabase auth listener is set up globally in authStore.ts.
  *
- * Usage: Wrap your app root with this component or include it in your main layout.
+ * Refactored to follow "Smart Hook, Dumb Component" pattern:
+ * - Uses useAuthQuery for initial auth state
+ * - No direct store access
+ * - Clean component interface
  */
 export function AuthInitializer({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    // Initialize auth state
-    // The auth listener is already running globally
-    const initAuth = async () => {
-      await useAuthStore.getState()._initializeAuth();
-    };
-
-    initAuth();
-  }, []);
+  // Initialize auth state using TanStack Query
+  useAuthQuery();
 
   return <>{children}</>;
 }
@@ -29,14 +25,9 @@ export function AuthInitializer({ children }: { children: React.ReactNode }) {
  * Alternative: Auth Hook for App-level Initialization
  *
  * If you prefer a hook-based approach instead of a component wrapper.
- * The auth listener is now set up globally in authStore.ts.
+ * Now uses TanStack Query for auth initialization.
  */
 export function useAuthInitialization() {
-  useEffect(() => {
-    const initAuth = async () => {
-      await useAuthStore.getState()._initializeAuth();
-    };
-
-    initAuth();
-  }, []);
+  // Initialize auth state using TanStack Query
+  useAuthQuery();
 }

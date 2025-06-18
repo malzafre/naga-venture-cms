@@ -1,4 +1,4 @@
-// filepath: stores/businessFilterStore.ts
+// filepath: stores/ui/businessFilterStore.ts
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
