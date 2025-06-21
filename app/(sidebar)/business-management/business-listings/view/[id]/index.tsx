@@ -25,12 +25,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 // Hooks and types
 
 // Services
+import { NavigationService } from '@/services/NavigationService';
 
 // Components
 import { CMSButton } from '@/components/atoms';
 import { BusinessImageViewer, StatusBadge } from '@/components/molecules';
 import { CMSRouteGuard } from '@/components/organisms';
-import { NavigationService } from '@/constants/NavigationService';
 import { useBusiness } from '@/hooks/features/business/useBusinessManagement';
 
 /**
@@ -352,7 +352,7 @@ export default function ViewBusinessScreen() {
           )}
 
           {/* Owner Information */}
-          {business.profiles && (
+          {business.owner && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Business Owner</Text>
 
@@ -360,26 +360,24 @@ export default function ViewBusinessScreen() {
                 <View style={styles.infoItem}>
                   <Text style={styles.infoLabel}>Name</Text>
                   <Text style={styles.infoValue}>
-                    {`${business.profiles.first_name || ''} ${
-                      business.profiles.last_name || ''
+                    {`${business.owner.first_name || ''} ${
+                      business.owner.last_name || ''
                     }`.trim() || 'N/A'}
                   </Text>
                 </View>
 
-                {business.profiles.email && (
+                {business.owner.email && (
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>Email</Text>
-                    <Text style={styles.infoValue}>
-                      {business.profiles.email}
-                    </Text>
+                    <Text style={styles.infoValue}>{business.owner.email}</Text>
                   </View>
                 )}
 
-                {business.profiles.phone_number && (
+                {business.owner.phone_number && (
                   <View style={styles.infoItem}>
                     <Text style={styles.infoLabel}>Phone</Text>
                     <Text style={styles.infoValue}>
-                      {business.profiles.phone_number}
+                      {business.owner.phone_number}
                     </Text>
                   </View>
                 )}

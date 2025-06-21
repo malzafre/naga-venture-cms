@@ -1,4 +1,4 @@
-// filepath: constants/NavigationConfig.ts
+// filepath: config/NavigationConfig.ts
 import { NavigationItem } from '@/types/navigation';
 /**
  * Tourism CMS Navigation Configuration

@@ -6,23 +6,17 @@
  */
 
 import {
-  Buildings,
   Calendar,
   Check,
-  Compass,
-  Crown,
-  FileText,
   PencilSimple,
   TrashSimple,
-  User,
-  Users,
 } from 'phosphor-react-native';
 import React, { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { CMSButton, CMSText } from '@/components/atoms';
 import StaffEditModal from '@/components/molecules/StaffEditModal';
-import { useTheme } from '@/constants/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 import { type Profile, type UserRole } from '@/schemas';
 
 const STAFF_ROLES: UserRole[] = [
@@ -41,19 +35,9 @@ const ROLE_LABELS: Record<UserRole, string> = {
   tourist: 'Tourist',
 };
 
-const ROLE_ICONS: Record<UserRole, React.ComponentType<any>> = {
-  tourism_admin: Crown,
-  business_listing_manager: Buildings,
-  tourism_content_manager: Compass,
-  business_registration_manager: FileText,
-  business_owner: User,
-  tourist: Users,
-};
-
 interface ModernStaffCardProps {
   staff: Profile;
   isEditing: boolean;
-  onEdit: () => void;
   onCancelEdit: () => void;
   onRoleUpdate: (newRole: UserRole) => void;
   onDelete: () => void;
@@ -65,7 +49,6 @@ interface ModernStaffCardProps {
 export default function ModernStaffCard({
   staff,
   isEditing,
-  onEdit,
   onCancelEdit,
   onRoleUpdate,
   onDelete,
@@ -80,12 +63,14 @@ export default function ModernStaffCard({
   const styles = useMemo(() => getStyles(colors), [colors]);
 
   const displayName =
-    staff.first_name && staff.last_name ? `${staff.first_name} ${staff.last_name}` : staff.email;
+    staff.first_name && staff.last_name
+      ? `${staff.first_name} ${staff.last_name}`
+      : (staff.email ?? 'User');
 
   const initials =
     staff.first_name && staff.last_name
       ? `${staff.first_name[0]}${staff.last_name[0]}`
-      : staff.email[0].toUpperCase();
+      : (staff.email?.[0]?.toUpperCase() ?? 'U');
 
   const handleSaveRole = () => {
     if (selectedRole !== staff.role) {
@@ -111,7 +96,8 @@ export default function ModernStaffCard({
   };
 
   const formatDate = (dateString: string | Date) => {
-    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+    const date =
+      typeof dateString === 'string' ? new Date(dateString) : dateString;
     return date.toLocaleDateString();
   };
 
@@ -128,7 +114,10 @@ export default function ModernStaffCard({
           <CMSText type="subtitle" style={styles.staffName}>
             {displayName}
           </CMSText>
-          <CMSText type="body" style={[styles.staffEmail, { color: colors.textSecondary }]}>
+          <CMSText
+            type="body"
+            style={[styles.staffEmail, { color: colors.textSecondary }]}
+          >
             {staff.email}
           </CMSText>
 
@@ -167,7 +156,10 @@ export default function ModernStaffCard({
       <View style={[styles.cardFooter, { borderTopColor: colors.border }]}>
         <View style={styles.footerContent}>
           <Calendar size={14} color={colors.textSecondary} />
-          <CMSText type="caption" style={[styles.footerText, { color: colors.textSecondary }]}>
+          <CMSText
+            type="caption"
+            style={[styles.footerText, { color: colors.textSecondary }]}
+          >
             Joined {formatDate(staff.created_at)}
           </CMSText>
         </View>
@@ -204,7 +196,9 @@ function StaffAvatar({ initials, roleColor, isVerified }: StaffAvatarProps) {
         <CMSText style={styles.avatarText}>{initials}</CMSText>
       </View>
       {isVerified && (
-        <View style={[styles.verifiedBadge, { backgroundColor: colors.success }]}>
+        <View
+          style={[styles.verifiedBadge, { backgroundColor: colors.success }]}
+        >
           <Check size={12} color="white" />
         </View>
       )}
@@ -224,7 +218,9 @@ function RoleBadge({ role, roleColor }: RoleBadgeProps) {
 
   return (
     <View style={[styles.roleBadge, { backgroundColor: roleColor + '20' }]}>
-      <CMSText style={[styles.roleBadgeText, { color: roleColor }]}>{ROLE_LABELS[role]}</CMSText>
+      <CMSText style={[styles.roleBadgeText, { color: roleColor }]}>
+        {ROLE_LABELS[role]}
+      </CMSText>
     </View>
   );
 }
@@ -254,7 +250,10 @@ function ActionButton({
       onPress={onPress}
       disabled={disabled}
     >
-      <IconComponent size={16} color={disabled ? colors.textSecondary : color} />
+      <IconComponent
+        size={16}
+        color={disabled ? colors.textSecondary : color}
+      />
     </TouchableOpacity>
   );
 }
@@ -286,7 +285,11 @@ function RoleEditingSection({
       <CMSText type="caption" style={styles.editLabel}>
         Change Role:
       </CMSText>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.roleOptions}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.roleOptions}
+      >
         {STAFF_ROLES.map((role) => (
           <TouchableOpacity
             key={role}
@@ -313,7 +316,12 @@ function RoleEditingSection({
       </ScrollView>
 
       <View style={styles.editActions}>
-        <CMSButton title="Save" onPress={onSave} disabled={isUpdating} style={styles.saveButton} />
+        <CMSButton
+          title="Save"
+          onPress={onSave}
+          disabled={isUpdating}
+          style={styles.saveButton}
+        />
         <CMSButton
           title="Cancel"
           onPress={onCancel}

@@ -27,14 +27,14 @@ import {
   type DataTableColumn,
 } from '@/components/molecules';
 import { ConfirmationModal } from '@/components/molecules/ConfirmationModal';
-import { NavigationService } from '@/constants/NavigationService';
-import { useTheme } from '@/constants/useTheme';
 import { useBusinessFilters } from '@/hooks/features/business/useBusinessFilters';
 import {
   useBusinessListings,
   useDeleteBusiness,
 } from '@/hooks/features/business/useBusinessManagement';
 import { useBusinessSubscription } from '@/hooks/shared/useSupabaseSubscription';
+import { useTheme } from '@/hooks/useTheme';
+import { NavigationService } from '@/services/NavigationService';
 import { Business } from '@/types/supabase';
 
 /**
@@ -216,7 +216,7 @@ export default function AllBusinessesScreen() {
         width: 140,
         minWidth: 120,
         render: (value, business: any) => {
-          const owner = business.profiles;
+          const owner = business.owner;
           const ownerName = owner
             ? `${owner.first_name || ''} ${owner.last_name || ''}`.trim()
             : 'N/A';
@@ -250,7 +250,7 @@ export default function AllBusinessesScreen() {
         width: 180,
         minWidth: 160,
         render: (value, business: any) => {
-          const owner = business.profiles;
+          const owner = business.owner;
           const email = owner?.email || business.email || '';
           const phone = business.phone || '';
 

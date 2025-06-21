@@ -30,8 +30,8 @@ import {
 } from 'react-native';
 
 import { CMSInput, CMSText } from '@/components/atoms';
-import { useTheme } from '@/constants/useTheme';
 import { useStaffEdit } from '@/hooks/features/staff/useStaffManagement';
+import { useTheme } from '@/hooks/useTheme';
 import { type Profile, type StaffPermissions, type UserRole } from '@/schemas';
 
 interface StaffEditModalProps {

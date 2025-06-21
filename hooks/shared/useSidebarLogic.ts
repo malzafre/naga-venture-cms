@@ -1,12 +1,15 @@
 import { usePathname } from 'expo-router';
 import React from 'react';
 
-import { tourismAdminNavigation } from '@/constants/NavigationConfig';
-import { NavigationService } from '@/constants/NavigationService';
+import { tourismAdminNavigation } from '@/config/NavigationConfig';
 import { useAuth } from '@/hooks/features/auth/useAuth';
+import { NavigationService } from '@/services/NavigationService';
 import { useSidebarActions, useSidebarStore } from '@/stores';
-import { NavigationItem } from '@/types/navigation';
 import { UserRole } from '@/types/supabase';
+import {
+  filterNavigationByRole,
+  findActiveSection,
+} from '@/utils/navigationUtils';
 
 /**
  * Smart Hook: useSidebarLogic
@@ -15,10 +18,10 @@ import { UserRole } from '@/types/supabase';
  * Contains ALL business logic for the sidebar component.
  *
  * Features:
- * - Role-based navigation filtering
- * - Navigation state management
- * - Route-based active section detection
- * - Centralized navigation handling
+ * - Role-based navigation filtering using pure utility functions
+ * - Navigation state management via Zustand
+ * - Route-based active section detection using pure utility functions
+ * - Centralized navigation handling via NavigationService
  * - User session management
  */
 export function useSidebarLogic(userRole?: UserRole) {
@@ -29,27 +32,14 @@ export function useSidebarLogic(userRole?: UserRole) {
   const expandedSections = useSidebarStore((state) => state.expandedSections);
   const activeSection = useSidebarStore((state) => state.activeSection);
 
-  // Get stable actions
+  // Get stable actions from Zustand
   const actions = useSidebarActions();
 
-  // Filter navigation items based on user role
-  const filteredNavigation = React.useMemo(() => {
-    if (!userRole) return [];
-
-    const filterByPermissions = (items: NavigationItem[]): NavigationItem[] => {
-      return items
-        .filter((item) => item.permissions.includes(userRole))
-        .map((item) => ({
-          ...item,
-          subsections: item.subsections
-            ? filterByPermissions(item.subsections)
-            : undefined,
-        }))
-        .filter((item) => !item.subsections || item.subsections.length > 0);
-    };
-
-    return filterByPermissions(tourismAdminNavigation);
-  }, [userRole]);
+  // Filter navigation items based on user role using the pure utility function
+  const filteredNavigation = React.useMemo(
+    () => filterNavigationByRole(tourismAdminNavigation, userRole),
+    [userRole]
+  );
 
   // Create stable state object
   const sidebarState = React.useMemo(
@@ -63,33 +53,13 @@ export function useSidebarLogic(userRole?: UserRole) {
 
   // Auto-expand and set active section based on current route
   React.useEffect(() => {
-    const findActiveSection = (
-      items: NavigationItem[],
-      path: string
-    ): string => {
-      for (const item of items) {
-        if (item.path === path) {
-          actions.setActiveSection(item.id);
-          if (!actions.isSectionExpanded(item.id)) {
-            actions.autoExpandSection(item.id);
-          }
-          return item.id;
-        }
-        if (item.subsections) {
-          const found = findActiveSection(item.subsections, path);
-          if (found) {
-            actions.setActiveSection(found);
-            if (!actions.isSectionExpanded(item.id)) {
-              actions.autoExpandSection(item.id);
-            }
-            return found;
-          }
-        }
+    const active = findActiveSection(filteredNavigation, pathname);
+    if (active.section) {
+      actions.setActiveSection(active.subsection || active.section);
+      if (!actions.isSectionExpanded(active.section)) {
+        actions.autoExpandSection(active.section);
       }
-      return '';
-    };
-
-    findActiveSection(filteredNavigation, pathname);
+    }
   }, [pathname, filteredNavigation, actions]);
 
   // Track user ID in the sidebar store

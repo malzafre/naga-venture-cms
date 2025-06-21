@@ -1,8 +1,8 @@
-// filepath: constants/NavigationService.ts
+// filepath: services/NavigationService.ts
 // Enhanced Navigation Service with validation, analytics, and error handling
 import { router } from 'expo-router';
 
-import { ROUTE_CONSTANTS } from './RouteConstants';
+import { ROUTE_CONSTANTS } from '@/constants/RouteConstants';
 
 /**
  * Enhanced Navigation Service
@@ -100,8 +100,10 @@ RouteValidator.initialize();
 export const ROUTES = {
   TOURISM_CMS: {
     BUSINESS_MANAGEMENT: {
-      ALL_BUSINESSES: ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS.ALL_BUSINESSES,
-      CREATE_BUSINESS: ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS.CREATE,
+      ALL_BUSINESSES:
+        ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS.ALL_BUSINESSES,
+      CREATE_BUSINESS:
+        ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS.CREATE,
       EDIT_BUSINESS: ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS.EDIT,
       VIEW_BUSINESS: ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS.VIEW,
     },
@@ -118,7 +120,10 @@ export class NavigationService {
   /**
    * Track navigation event for analytics
    */
-  private static trackNavigation(route: string, metadata?: Record<string, any>) {
+  private static trackNavigation(
+    route: string,
+    metadata?: Record<string, any>
+  ) {
     const event: NavigationEvent = {
       route,
       timestamp: Date.now(),
@@ -194,9 +199,15 @@ export class NavigationService {
    */
   private static navigateToFallback() {
     try {
-      router.replace(ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS.ALL_BUSINESSES as any);
+      router.replace(
+        ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS
+          .ALL_BUSINESSES as any
+      );
     } catch (error) {
-      console.error('❌ [NavigationService] Fallback navigation failed:', error);
+      console.error(
+        '❌ [NavigationService] Fallback navigation failed:',
+        error
+      );
     }
   }
 
@@ -206,16 +217,21 @@ export class NavigationService {
    * Navigate to All Businesses page
    */
   static toAllBusinesses() {
-    return this.safeNavigate(ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS.ALL_BUSINESSES, {
-      replace: true,
-    });
+    return this.safeNavigate(
+      ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS.ALL_BUSINESSES,
+      {
+        replace: true,
+      }
+    );
   }
 
   /**
    * Navigate to Create Business page
    */
   static toCreateBusiness() {
-    return this.safeNavigate(ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS.CREATE);
+    return this.safeNavigate(
+      ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS.CREATE
+    );
   }
 
   /**
@@ -223,11 +239,15 @@ export class NavigationService {
    */
   static toEditBusiness(businessId: string) {
     if (!businessId || businessId.trim() === '') {
-      console.error('❌ [NavigationService] Invalid business ID for edit:', businessId);
+      console.error(
+        '❌ [NavigationService] Invalid business ID for edit:',
+        businessId
+      );
       return false;
     }
 
-    const route = ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS.EDIT(businessId);
+    const route =
+      ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS.EDIT(businessId);
     return this.safeNavigate(route, { validate: false }); // Dynamic routes skip validation
   }
 
@@ -236,11 +256,15 @@ export class NavigationService {
    */
   static toViewBusiness(businessId: string) {
     if (!businessId || businessId.trim() === '') {
-      console.error('❌ [NavigationService] Invalid business ID for view:', businessId);
+      console.error(
+        '❌ [NavigationService] Invalid business ID for view:',
+        businessId
+      );
       return false;
     }
 
-    const route = ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS.VIEW(businessId);
+    const route =
+      ROUTE_CONSTANTS.BUSINESS_MANAGEMENT.BUSINESS_LISTINGS.VIEW(businessId);
     return this.safeNavigate(route, { validate: false }); // Dynamic routes skip validation
   }
 
@@ -295,7 +319,9 @@ export class NavigationService {
       }
     } else {
       if (__DEV__) {
-        console.log('🔄 [NavigationService] Cannot go back - navigating to fallback');
+        console.log(
+          '🔄 [NavigationService] Cannot go back - navigating to fallback'
+        );
       }
       this.toAllBusinesses();
       return false;

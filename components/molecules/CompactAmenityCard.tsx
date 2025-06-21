@@ -2,7 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { useTheme } from '@/constants/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 import { AmenityComplete } from '@/schemas';
 
 /**

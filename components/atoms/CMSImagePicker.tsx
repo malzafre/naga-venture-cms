@@ -10,7 +10,7 @@ import * as ImagePicker from 'expo-image-picker';
 import React, { useCallback } from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { useTheme } from '@/constants/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 
 // ============================================================================
 // TYPES
@@ -113,53 +113,64 @@ export default function CMSImagePicker({
   /**
    * Validate selected image file
    */
-  const validateImage = useCallback((asset: ImagePicker.ImagePickerAsset): ImageFile | null => {
-    try {
-      // Check file size
-      if (asset.fileSize && asset.fileSize > STORAGE_CONFIG.MAX_FILE_SIZE) {
-        Alert.alert(
-          'File Too Large',
-          `Image size ${(asset.fileSize / 1024 / 1024).toFixed(1)}MB exceeds maximum ${
-            STORAGE_CONFIG.MAX_FILE_SIZE / 1024 / 1024
-          }MB`
-        );
+  const validateImage = useCallback(
+    (asset: ImagePicker.ImagePickerAsset): ImageFile | null => {
+      try {
+        // Check file size
+        if (asset.fileSize && asset.fileSize > STORAGE_CONFIG.MAX_FILE_SIZE) {
+          Alert.alert(
+            'File Too Large',
+            `Image size ${(asset.fileSize / 1024 / 1024).toFixed(1)}MB exceeds maximum ${
+              STORAGE_CONFIG.MAX_FILE_SIZE / 1024 / 1024
+            }MB`
+          );
+          return null;
+        }
+
+        // Generate file name if not provided
+        const fileName =
+          asset.fileName ||
+          `image_${Date.now()}.${asset.type?.split('/')[1] || 'jpg'}`;
+
+        // Determine MIME type
+        let mimeType = asset.type || 'image/jpeg';
+        if (!STORAGE_CONFIG.ALLOWED_TYPES.includes(mimeType)) {
+          // Default to JPEG for unknown types
+          mimeType = 'image/jpeg';
+        }
+
+        return {
+          uri: asset.uri,
+          type: mimeType,
+          name: fileName,
+          size: asset.fileSize || 0,
+        };
+      } catch (error) {
+        console.error('[CMSImagePicker] Error validating image:', error);
+        Alert.alert('Error', 'Failed to process selected image');
         return null;
       }
-
-      // Generate file name if not provided
-      const fileName =
-        asset.fileName || `image_${Date.now()}.${asset.type?.split('/')[1] || 'jpg'}`;
-
-      // Determine MIME type
-      let mimeType = asset.type || 'image/jpeg';
-      if (!STORAGE_CONFIG.ALLOWED_TYPES.includes(mimeType)) {
-        // Default to JPEG for unknown types
-        mimeType = 'image/jpeg';
-      }
-
-      return {
-        uri: asset.uri,
-        type: mimeType,
-        name: fileName,
-        size: asset.fileSize || 0,
-      };
-    } catch (error) {
-      console.error('[CMSImagePicker] Error validating image:', error);
-      Alert.alert('Error', 'Failed to process selected image');
-      return null;
-    }
-  }, []);
+    },
+    []
+  );
   /**
    * Handle image selection from gallery
    */
   const selectFromGallery = useCallback(async () => {
     console.log('📱 [CMSImagePicker] selectFromGallery called');
-    console.log('📱 [CMSImagePicker] Current state:', { disabled, currentImageCount, maxImages });
+    console.log('📱 [CMSImagePicker] Current state:', {
+      disabled,
+      currentImageCount,
+      maxImages,
+    });
 
     try {
-      console.log('📷 [CMSImagePicker] Requesting media library permissions...');
+      console.log(
+        '📷 [CMSImagePicker] Requesting media library permissions...'
+      );
       // Request permission
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
       console.log('📷 [CMSImagePicker] Permission result:', permissionResult);
 
       if (!permissionResult.granted) {
@@ -198,7 +209,10 @@ export default function CMSImagePicker({
       console.log('🎯 [CMSImagePicker] Image picker result:', result);
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
-        console.log('✅ [CMSImagePicker] Images selected:', result.assets.length);
+        console.log(
+          '✅ [CMSImagePicker] Images selected:',
+          result.assets.length
+        );
 
         // Validate and process selected images
         const validImages: ImageFile[] = [];
@@ -234,50 +248,15 @@ export default function CMSImagePicker({
   }, [maxImages, currentImageCount, onImagesSelected, validateImage, disabled]);
 
   /**
-   * Handle taking photo with camera
-   */
-  const takePhoto = useCallback(async () => {
-    try {
-      // Request permission
-      const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-
-      if (!permissionResult.granted) {
-        Alert.alert('Permission Required', 'Please allow camera access to take photos');
-        return;
-      }
-
-      // Check remaining slots
-      const remainingSlots = maxImages - currentImageCount;
-      if (remainingSlots <= 0) {
-        Alert.alert('Maximum Images', `Maximum ${maxImages} images allowed`);
-        return;
-      }
-
-      // Launch camera
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 0.8,
-        exif: false,
-      });
-
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const asset = result.assets[0];
-        const validImage = validateImage(asset);
-
-        if (validImage) {
-          onImagesSelected([validImage]);
-        }
-      }
-    } catch (error) {
-      console.error('[CMSImagePicker] Error taking photo:', error);
-      Alert.alert('Error', 'Failed to take photo');
-    }
-  }, [maxImages, currentImageCount, onImagesSelected, validateImage]); /**
    * Show action sheet for image selection options
    */
   const showImageOptions = useCallback(() => {
     console.log('🎛️ [CMSImagePicker] showImageOptions called');
-    console.log('🎛️ [CMSImagePicker] Component state:', { disabled, currentImageCount, maxImages });
+    console.log('🎛️ [CMSImagePicker] Component state:', {
+      disabled,
+      currentImageCount,
+      maxImages,
+    });
 
     if (disabled) {
       console.log('❌ [CMSImagePicker] Component is disabled');
@@ -365,7 +344,9 @@ export default function CMSImagePicker({
             ? `${currentImageCount}/${maxImages} images selected`
             : `Tap to select up to ${remainingSlots} more image${remainingSlots === 1 ? '' : 's'}`}
         </Text>
-        <Text style={styles.helperText}>Supports JPEG, PNG, WebP • Max 5MB each</Text>
+        <Text style={styles.helperText}>
+          Supports JPEG, PNG, WebP • Max 5MB each
+        </Text>
       </View>
     </TouchableOpacity>
   );

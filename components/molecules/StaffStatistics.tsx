@@ -9,7 +9,7 @@ import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { CMSButton, CMSText } from '@/components/atoms';
-import { useTheme } from '@/constants/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 import { type Profile } from '@/schemas';
 
 interface StaffStatisticsProps {
@@ -84,7 +84,11 @@ export default function StaffStatistics({
 
       {/* Add Button - positioned on the right */}
       {onAddStaff && (
-        <CMSButton title="+ Add Staff Member" onPress={onAddStaff} style={styles.addButton} />
+        <CMSButton
+          title="+ Add Staff Member"
+          onPress={onAddStaff}
+          style={styles.addButton}
+        />
       )}
     </View>
   );

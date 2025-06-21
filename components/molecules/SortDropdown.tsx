@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 
-import { useTheme } from '@/constants/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 
 /**
  * SortDropdown - Molecule Component

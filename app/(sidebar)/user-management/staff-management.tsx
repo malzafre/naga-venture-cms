@@ -5,7 +5,7 @@ import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 
 import { StaffFormModal } from '@/components/molecules';
 import { StaffManagement } from '@/components/organisms';
-import { useTheme } from '@/constants/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 import { type UserRole } from '@/schemas';
 
 /**

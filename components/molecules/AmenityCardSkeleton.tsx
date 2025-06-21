@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { SkeletonLoader } from '@/components/atoms/SkeletonLoader';
-import { useTheme } from '@/constants/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 
 /**
  * AmenityCardSkeleton - Molecule Component

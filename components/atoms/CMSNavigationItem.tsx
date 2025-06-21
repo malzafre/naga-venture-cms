@@ -45,7 +45,7 @@ import {
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { useTheme } from '@/constants/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 import { NavigationBadge, NavigationItem } from '@/types/navigation';
 
 interface CMSNavigationItemProps {
@@ -142,8 +142,12 @@ export const CMSNavigationItem: React.FC<CMSNavigationItemProps> = ({
     };
 
     return (
-      <View style={[styles.badge, { backgroundColor: badgeColors[badge.type] }]}>
-        <Text style={styles.badgeText}>{badge.count > 99 ? '99+' : badge.count.toString()}</Text>
+      <View
+        style={[styles.badge, { backgroundColor: badgeColors[badge.type] }]}
+      >
+        <Text style={styles.badgeText}>
+          {badge.count > 99 ? '99+' : badge.count.toString()}
+        </Text>
       </View>
     );
   };

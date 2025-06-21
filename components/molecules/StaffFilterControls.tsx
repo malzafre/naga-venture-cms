@@ -9,7 +9,7 @@ import React, { useMemo } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { CMSInput, CMSText } from '@/components/atoms';
-import { useTheme } from '@/constants/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 import { type UserRole } from '@/schemas';
 
 const STAFF_ROLES: UserRole[] = [

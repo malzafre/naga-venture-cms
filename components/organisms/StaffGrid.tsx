@@ -10,7 +10,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { CMSButton, CMSText } from '@/components/atoms';
 import ModernStaffCard from '@/components/organisms/ModernStaffCard';
-import { useTheme } from '@/constants/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 import { type Profile, type UserRole } from '@/schemas';
 
 interface StaffGridProps {
@@ -63,21 +63,29 @@ export default function StaffGrid({
 
   if (staffMembers.length === 0) {
     return (
-      <EmptyState searchQuery={searchQuery} selectedRole={selectedRole} roleLabels={ROLE_LABELS} />
+      <EmptyState
+        searchQuery={searchQuery}
+        selectedRole={selectedRole}
+        roleLabels={ROLE_LABELS}
+      />
     );
   }
 
   return (
     <View style={styles.container}>
-      <StaffHeader totalCount={totalCount} selectedRole={selectedRole} roleLabels={ROLE_LABELS} />
+      <StaffHeader
+        totalCount={totalCount}
+        selectedRole={selectedRole}
+        roleLabels={ROLE_LABELS}
+      />
       <ScrollView style={styles.staffGrid}>
         <View style={styles.gridContainer}>
+          {' '}
           {staffMembers.map((staff) => (
             <View key={staff.id} style={styles.gridItem}>
               <ModernStaffCard
                 staff={staff}
                 isEditing={editingUserId === staff.id}
-                onEdit={() => onEdit(staff.id)}
                 onCancelEdit={onCancelEdit}
                 onRoleUpdate={(newRole) => onRoleUpdate(staff.id, newRole)}
                 onDelete={() => onDelete(staff)}
@@ -130,7 +138,11 @@ interface StaffHeaderProps {
   roleLabels: Record<UserRole, string>;
 }
 
-function StaffHeader({ totalCount, selectedRole, roleLabels }: StaffHeaderProps) {
+function StaffHeader({
+  totalCount,
+  selectedRole,
+  roleLabels,
+}: StaffHeaderProps) {
   const { theme } = useTheme();
   const { colors } = theme;
   const styles = useMemo(() => getStyles(colors), [colors]);
@@ -155,7 +167,11 @@ interface PaginationControlsProps {
   onPageChange: (page: number) => void;
 }
 
-function PaginationControls({ currentPage, totalPages, onPageChange }: PaginationControlsProps) {
+function PaginationControls({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: PaginationControlsProps) {
   const { theme } = useTheme();
   const { colors } = theme;
   const styles = useMemo(() => getStyles(colors), [colors]);

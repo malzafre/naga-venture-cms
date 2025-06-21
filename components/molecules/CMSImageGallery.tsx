@@ -11,7 +11,7 @@ import React, { useCallback } from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { CMSImagePicker } from '@/components/atoms';
-import { useTheme } from '@/constants/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 import { type BusinessFormImage } from '@/schemas';
 
 // ============================================================================
@@ -53,7 +53,9 @@ const VALIDATION_CONFIG = {
 /**
  * Validate an image file against our requirements
  */
-const validateImageFile = (file: ImageFile): { isValid: boolean; error?: string } => {
+const validateImageFile = (
+  file: ImageFile
+): { isValid: boolean; error?: string } => {
   // Check file size
   if (file.size > VALIDATION_CONFIG.MAX_FILE_SIZE) {
     return {
@@ -249,18 +251,29 @@ export default function CMSImageGallery({
       // Validate each image
       const validationErrors = newImages
         .map((img, index) => {
-          console.log(`🔍 [CMSImageGallery] Validating image ${index + 1}:`, img);
+          console.log(
+            `🔍 [CMSImageGallery] Validating image ${index + 1}:`,
+            img
+          );
           const { isValid, error } = validateImageFile(img);
           if (!isValid) {
-            console.log(`❌ [CMSImageGallery] Validation failed for image ${index + 1}:`, error);
+            console.log(
+              `❌ [CMSImageGallery] Validation failed for image ${index + 1}:`,
+              error
+            );
           }
           return isValid ? null : error;
         })
         .filter(Boolean) as string[];
 
       if (validationErrors.length > 0) {
-        console.log('❌ [CMSImageGallery] Validation errors found:', validationErrors);
-        Alert.alert('Image Validation Error', validationErrors.join('\n\n'), [{ text: 'OK' }]);
+        console.log(
+          '❌ [CMSImageGallery] Validation errors found:',
+          validationErrors
+        );
+        Alert.alert('Image Validation Error', validationErrors.join('\n\n'), [
+          { text: 'OK' },
+        ]);
         return;
       }
 
@@ -272,13 +285,22 @@ export default function CMSImageGallery({
           id: `temp_${Date.now()}_${Math.random()}`,
           isPrimary: images.length === 0 && index === 0, // First image becomes primary
         };
-        console.log(`📝 [CMSImageGallery] Created image item ${index + 1}:`, imageItem);
+        console.log(
+          `📝 [CMSImageGallery] Created image item ${index + 1}:`,
+          imageItem
+        );
         return imageItem;
       });
 
-      console.log('📤 [CMSImageGallery] Calling onImagesChange with updated images');
+      console.log(
+        '📤 [CMSImageGallery] Calling onImagesChange with updated images'
+      );
       const updatedImages = [...images, ...imageItems];
-      console.log('📤 [CMSImageGallery] Updated images:', updatedImages.length, 'total');
+      console.log(
+        '📤 [CMSImageGallery] Updated images:',
+        updatedImages.length,
+        'total'
+      );
       onImagesChange(updatedImages);
     },
     [images, onImagesChange]
@@ -289,29 +311,33 @@ export default function CMSImageGallery({
    */
   const handleDeleteImage = useCallback(
     (imageId: string) => {
-      Alert.alert('Delete Image', 'Are you sure you want to delete this image?', [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            const updatedImages = images.filter((img) => img.id !== imageId);
-
-            // If deleted image was primary, make first remaining image primary
-            if (updatedImages.length > 0) {
-              const deletedImage = images.find((img) => img.id === imageId);
-              if (deletedImage?.isPrimary) {
-                updatedImages[0].isPrimary = true;
-              }
-            }
-
-            onImagesChange(updatedImages);
+      Alert.alert(
+        'Delete Image',
+        'Are you sure you want to delete this image?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
           },
-        },
-      ]);
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: () => {
+              const updatedImages = images.filter((img) => img.id !== imageId);
+
+              // If deleted image was primary, make first remaining image primary
+              if (updatedImages.length > 0) {
+                const deletedImage = images.find((img) => img.id === imageId);
+                if (deletedImage?.isPrimary) {
+                  updatedImages[0].isPrimary = true;
+                }
+              }
+
+              onImagesChange(updatedImages);
+            },
+          },
+        ]
+      );
     },
     [images, onImagesChange]
   );
@@ -408,7 +434,9 @@ export default function CMSImageGallery({
         <View style={styles.emptyState}>
           <Text style={styles.emptyIcon}>🖼️</Text>
           <Text style={styles.emptyText}>No images added yet</Text>
-          <Text style={styles.emptySubtext}>Add photos to showcase your business</Text>
+          <Text style={styles.emptySubtext}>
+            Add photos to showcase your business
+          </Text>
         </View>
       )}
 

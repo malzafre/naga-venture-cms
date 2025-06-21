@@ -2,16 +2,12 @@ import { useFonts } from 'expo-font';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React from 'react';
-import { ImageBackground, Platform, Text, View } from 'react-native';
+import { ImageBackground, Text, View } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 
 import { CMSButton, CMSText } from '@/components/atoms';
-import { NavigationService } from '@/constants/NavigationService';
-
-if (Platform.OS !== 'web') {
-  // Only load the polyfill on native platforms
-  require('react-native-url-polyfill/auto');
-}
+import { NavigationService } from '@/services/NavigationService';
+import 'react-native-url-polyfill/auto';
 
 const Index = () => {
   const [fontsLoaded] = useFonts({

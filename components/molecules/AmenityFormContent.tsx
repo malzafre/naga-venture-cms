@@ -1,8 +1,8 @@
-import { useTheme } from '@/constants/useTheme';
 import {
   useCreateAmenity,
   useUpdateAmenity,
 } from '@/hooks/features/amenities/useAmenitiesManagement';
+import { useTheme } from '@/hooks/useTheme';
 import { AmenityComplete, AmenityCreate } from '@/schemas';
 import { MaterialIcons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useState } from 'react';

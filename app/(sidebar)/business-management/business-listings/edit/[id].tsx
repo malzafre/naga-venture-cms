@@ -6,14 +6,14 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Hooks and types
-import type { BusinessUpdate } from '@/schemas';
+import type { BusinessUpdate } from '@/schemas/business/business.schemas';
 
 // Services
-import { NavigationService } from '@/constants/NavigationService';
 import {
   useBusiness,
   useUpdateBusiness,
 } from '@/hooks/features/business/useBusinessManagement';
+import { NavigationService } from '@/services/NavigationService';
 
 // Components
 import { CMSButton } from '@/components/atoms';
@@ -68,44 +68,69 @@ export default function EditBusinessScreen() {
     );
   }
 
-  const handleSubmit = (data: any) => {
-    if (!id) return;
+  const handleSubmit = (data: BusinessUpdate) => {
+    if (!id || !business) return;
 
-    // Create update data with only defined fields that match BusinessUpdate schema
-    const updateFields: Record<string, any> = {};
+    const updateData: BusinessUpdate = {};
 
-    // Map form fields to update fields, filtering out undefined/null values
-    const fieldMapping = {
-      business_name: data.business_name,
-      business_type: data.business_type,
-      description: data.description,
-      address: data.address,
-      city: data.city,
-      province: data.province,
-      postal_code: data.postal_code,
-      phone: data.phone,
-      email: data.email,
-      website: data.website,
-      facebook_url: data.facebook_url,
-      instagram_url: data.instagram_url,
-      twitter_url: data.twitter_url,
-      location: data.location,
-    };
-
-    // Only include fields that have values
-    Object.entries(fieldMapping).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        updateFields[key] = value;
+    // Compare each field and add it to updateData if it has changed
+    if (data.business_name && data.business_name !== business.business_name) {
+      updateData.business_name = data.business_name;
+    }
+    if (data.business_type && data.business_type !== business.business_type) {
+      updateData.business_type = data.business_type;
+    }
+    if (data.description && data.description !== business.description) {
+      updateData.description = data.description;
+    }
+    if (data.address && data.address !== business.address) {
+      updateData.address = data.address;
+    }
+    if (data.city && data.city !== business.city) {
+      updateData.city = data.city;
+    }
+    if (data.province && data.province !== business.province) {
+      updateData.province = data.province;
+    }
+    if (data.postal_code && data.postal_code !== business.postal_code) {
+      updateData.postal_code = data.postal_code;
+    }
+    if (data.phone && data.phone !== business.phone) {
+      updateData.phone = data.phone;
+    }
+    if (data.email && data.email !== business.email) {
+      updateData.email = data.email;
+    }
+    if (data.website && data.website !== business.website) {
+      updateData.website = data.website;
+    }
+    if (data.facebook_url && data.facebook_url !== business.facebook_url) {
+      updateData.facebook_url = data.facebook_url;
+    }
+    if (data.instagram_url && data.instagram_url !== business.instagram_url) {
+      updateData.instagram_url = data.instagram_url;
+    }
+    if (data.twitter_url && data.twitter_url !== business.twitter_url) {
+      updateData.twitter_url = data.twitter_url;
+    }
+    if (data.latitude !== undefined && data.longitude !== undefined) {
+      const newLocation = `POINT(${data.longitude} ${data.latitude})`;
+      if (newLocation !== business.location) {
+        updateData.location = newLocation;
+        updateData.latitude = data.latitude;
+        updateData.longitude = data.longitude;
       }
-    });
+    }
 
-    // Handle owner_id separately to ensure proper type
-    if (data.owner_id && data.owner_id !== null) {
-      updateFields.owner_id = data.owner_id;
+    // Only proceed if there are actual changes
+    if (Object.keys(updateData).length === 0) {
+      setSuccessMessage('No changes were made to the business listing.');
+      setSuccessModalVisible(true);
+      return;
     }
 
     updateBusinessMutation.mutate(
-      { businessId: id, updateData: updateFields as BusinessUpdate },
+      { businessId: id, updateData },
       {
         onSuccess: (updatedBusiness) => {
           setSuccessMessage('Business listing has been updated successfully!');

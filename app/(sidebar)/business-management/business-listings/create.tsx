@@ -7,14 +7,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 // Hooks and types
 
 // Services
+import { NavigationService } from '@/services/NavigationService';
 
 // Components
 import { ConfirmationModal } from '@/components/molecules/ConfirmationModal';
 import { BusinessForm, CMSRouteGuard } from '@/components/organisms';
-import { NavigationService } from '@/constants/NavigationService';
 import { useBusinessImageManagement } from '@/hooks/features/business/useBusinessImageManagement';
 import { useCreateBusiness } from '@/hooks/features/business/useBusinessManagement';
-import { BusinessInsert } from '@/schemas';
+import { type BusinessInsert } from '@/schemas/business/business.schemas';
 
 /**
  * Create Business Page
@@ -49,16 +49,17 @@ export default function CreateBusinessScreen() {
     if (
       !rawBusinessData.business_name ||
       !rawBusinessData.description ||
-      !rawBusinessData.address
+      !rawBusinessData.address ||
+      !rawBusinessData.phone ||
+      rawBusinessData.latitude == null ||
+      rawBusinessData.longitude == null
     ) {
       setErrorMessage(
         'Missing required fields. Please check the form and try again.'
       );
       setErrorModalVisible(true);
       return;
-    }
-
-    // Create clean BusinessInsert object with only required fields
+    } // Create clean BusinessInsert object with all required fields
     const businessInsertData: BusinessInsert = {
       business_name: String(rawBusinessData.business_name),
       business_type: rawBusinessData.business_type || 'shop',
@@ -66,11 +67,10 @@ export default function CreateBusinessScreen() {
       address: String(rawBusinessData.address),
       city: String(rawBusinessData.city || 'Naga City'),
       province: String(rawBusinessData.province || 'Camarines Sur'),
-      location: String(rawBusinessData.location),
       postal_code: rawBusinessData.postal_code
         ? String(rawBusinessData.postal_code)
         : null,
-      phone: rawBusinessData.phone ? String(rawBusinessData.phone) : null,
+      phone: String(rawBusinessData.phone),
       email: rawBusinessData.email ? String(rawBusinessData.email) : null,
       website: rawBusinessData.website ? String(rawBusinessData.website) : null,
       facebook_url: rawBusinessData.facebook_url
@@ -82,6 +82,12 @@ export default function CreateBusinessScreen() {
       twitter_url: rawBusinessData.twitter_url
         ? String(rawBusinessData.twitter_url)
         : null,
+      latitude: Number(rawBusinessData.latitude),
+      longitude: Number(rawBusinessData.longitude),
+      location: `POINT(${rawBusinessData.longitude} ${rawBusinessData.latitude})`,
+      status: 'pending',
+      is_claimed: false,
+      is_featured: false,
     };
 
     console.log('🏢 Business insert data:', businessInsertData);
