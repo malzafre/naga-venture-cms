@@ -1,10 +1,10 @@
 import { FontAwesome } from '@expo/vector-icons';
-import { router } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { useAuth } from '@/hooks/features/auth/useAuth';
 import { useRouteGuard } from '@/hooks/features/auth/useRouteGuard';
+import { NavigationService } from '@/services/NavigationService';
 
 import { CMSButton, CMSText } from '../atoms';
 
@@ -57,11 +57,11 @@ const CMSRouteGuard: React.FC<CMSRouteGuardProps> = ({
         </CMSText>
         <CMSText type="body" darkColor="#666" style={styles.errorMessage}>
           Please sign in to access the Tourism CMS
-        </CMSText>
+        </CMSText>{' '}
         <CMSButton
           title="Go to Login"
           variant="primary"
-          onPress={() => router.push('/login')}
+          onPress={() => NavigationService.toLogin()}
           style={styles.actionButton}
         />
       </View>
@@ -85,11 +85,11 @@ const CMSRouteGuard: React.FC<CMSRouteGuardProps> = ({
         </CMSText>
         <CMSText type="caption" darkColor="#999" style={styles.roleInfo}>
           Current role: {userProfile?.role || 'No role assigned'}
-        </CMSText>
+        </CMSText>{' '}
         <CMSButton
           title="Go to Dashboard"
           variant="secondary"
-          onPress={() => router.push('/dashboard')}
+          onPress={() => NavigationService.toDashboard()}
           style={styles.actionButton}
         />
       </View>

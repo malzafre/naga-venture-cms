@@ -1,5 +1,4 @@
 // filepath: components/TourismCMS/atoms/CMSNavigationItem.tsx
-import { router } from 'expo-router';
 import {
   Bed,
   Bell,
@@ -46,6 +45,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { useTheme } from '@/hooks/useTheme';
+import { NavigationService } from '@/services/NavigationService';
 import { NavigationBadge, NavigationItem } from '@/types/navigation';
 
 interface CMSNavigationItemProps {
@@ -81,8 +81,8 @@ export const CMSNavigationItem: React.FC<CMSNavigationItemProps> = ({
       // ✅ CORRECT: Call the onPress prop directly
       onPress();
     } else if (item.path) {
-      // Fallback to router.push only if no onPress is provided
-      router.push(item.path as any);
+      // Use NavigationService instead of direct router call
+      NavigationService.navigate(item.path);
     }
   };
   const getPhosphorIcon = (iconName: string): React.ComponentType<any> => {
