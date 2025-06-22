@@ -1,13 +1,15 @@
 // filepath: components/TourismCMS/organisms/BusinessForm.tsx
 import { Picker } from '@react-native-picker/picker';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Controller } from 'react-hook-form';
 import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 // Smart hook
 import { CMSButton, CMSInput } from '@/components/atoms';
 import { CMSImageGallery } from '@/components/molecules';
+import MapLocationPicker from '@/components/organisms/MapLocationPicker';
 import { useBusinessForm } from '@/hooks/features/business/useBusinessForm';
+import { useMapLocationPicker } from '@/hooks/features/business/useMapLocationPicker';
 // Types
 import { Business } from '@/types/supabase';
 
@@ -42,8 +44,8 @@ export default function BusinessForm({
     isLoading,
     isEdit,
   });
-
   const {
+    form,
     control,
     errors,
     currentStep,
@@ -63,6 +65,42 @@ export default function BusinessForm({
     onCancel,
     isEdit,
   });
+
+  // Map location picker hook for interactive location selection
+  const {
+    isMapVisible,
+    selectedLocation,
+    showMap,
+    hideMap,
+    handleLocationSelect,
+  } = useMapLocationPicker();
+  // Handle location selection from map and update form
+  const handleMapLocationSelect = useCallback(
+    (location: any) => {
+      handleLocationSelect(location);
+
+      // Update form fields with selected location using setValue
+      if (location.coordinates && form.setValue) {
+        // Set latitude and longitude
+        form.setValue('latitude', location.coordinates.latitude);
+        form.setValue('longitude', location.coordinates.longitude);
+
+        // Update address if provided
+        if (location.address) {
+          form.setValue('address', location.address);
+        }
+
+        // Update city and province if provided
+        if (location.city) {
+          form.setValue('city', location.city);
+        }
+        if (location.province) {
+          form.setValue('province', location.province);
+        }
+      }
+    },
+    [handleLocationSelect, form]
+  );
   console.log('🏗️ [BusinessForm] Hook state:', {
     currentStep,
     totalSteps,
@@ -241,11 +279,27 @@ export default function BusinessForm({
             editable={!isLoading}
           />
         )}
-      />
+      />{' '}
       <Text style={styles.sectionTitle}>Location Coordinates</Text>
       <Text style={styles.helpText}>
-        Provide exact coordinates for map display. Default is Naga City center.
+        Provide exact coordinates for map display. Use the map picker for easy
+        selection.
       </Text>
+      {/* Map Picker Button */}{' '}
+      <View style={styles.mapPickerContainer}>
+        <CMSButton
+          title="📍 Pick Location on Map"
+          onPress={showMap}
+          variant="secondary"
+          disabled={isLoading}
+          style={styles.mapPickerButton}
+        />
+        {selectedLocation && (
+          <Text style={styles.selectedLocationText}>
+            📍 Selected: {selectedLocation.address}
+          </Text>
+        )}
+      </View>
       <View style={styles.row}>
         <View style={styles.halfWidth}>
           <Controller
@@ -543,6 +597,22 @@ export default function BusinessForm({
           )}
         </View>
       </View>
+
+      {/* Map Location Picker Modal */}
+      {isMapVisible && (
+        <MapLocationPicker
+          isVisible={isMapVisible}
+          onClose={hideMap}
+          onLocationSelect={handleMapLocationSelect}
+          initialLocation={
+            selectedLocation?.coordinates || {
+              latitude: 13.6218,
+              longitude: 123.1815,
+            }
+          }
+          initialAddress={selectedLocation?.address || ''}
+        />
+      )}
     </View>
   );
 }
@@ -673,6 +743,18 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     marginBottom: 16,
     lineHeight: 16,
+  },
+  mapPickerContainer: {
+    marginBottom: 16,
+  },
+  mapPickerButton: {
+    marginBottom: 8,
+  },
+  selectedLocationText: {
+    fontSize: 12,
+    color: '#10B981',
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
   navigationButtons: {
     padding: 20,

@@ -36,8 +36,8 @@ export const StaffPermissionsSchema = z.object({
   can_moderate_business_content: z.boolean().default(false),
   can_moderate_tourism_content: z.boolean().default(false),
   can_approve_business_applications: z.boolean().default(false),
-  created_at: z.string().datetime(),
-  updated_at: z.string().datetime(),
+  created_at: z.string(),
+  updated_at: z.string(),
 });
 
 export type StaffPermissions = z.infer<typeof StaffPermissionsSchema>;
@@ -72,8 +72,8 @@ export const ProfileSchema = z.object({
   profile_image_url: OptionalUrlSchema,
   role: UserRoleSchema,
   is_verified: z.boolean().default(false),
-  created_at: z.string().datetime(),
-  updated_at: z.string().datetime(),
+  created_at: z.string(),
+  updated_at: z.string(),
 });
 
 export type Profile = z.infer<typeof ProfileSchema>;

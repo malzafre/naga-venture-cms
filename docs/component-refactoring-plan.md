@@ -39,49 +39,41 @@
 
 ---
 
-## Phase 2: Smart Hook Creation for Molecules ✅ COMPLETED
+## Phase 2: Smart Hook Creation for Molecules
 
 **Goal:** Extract business logic from "smart" molecules into dedicated hooks. This is the core of the refactoring effort for medium-complexity components.
 
 ### Checklist:
 
--   [x] **`useImagePicker` Hook:** ✅ **COMPLETED**
-    -   [x] Create `hooks/shared/useImagePicker.ts`.
-    -   [x] Move all validation logic (file size, type, count) from `CMSImagePicker.tsx` into the hook.
-    -   [x] Refactor `CMSImagePicker.tsx` (atom) to be a dumb component consuming this hook.
+-   [ ] **`useImagePicker` Hook:**
+    -   [ ] Create `hooks/shared/useImagePicker.ts`.
+    -   [ ] Move all validation logic (file size, type, count) from `CMSImagePicker.tsx` into the hook.
+    -   [ ] Refactor `CMSImagePicker.tsx` (atom) to be a dumb component consuming this hook.
 
--   [x] **`useIconPicker` Hook:** ✅ **COMPLETED**
-    -   [x] Create `hooks/shared/useIconPicker.ts`.
-    -   [x] Move all icon data, search logic, and selection handling from `IconPicker.tsx` into the hook.
-    -   [x] Refactor `IconPicker.tsx` (molecule) to be a dumb component consuming this hook.
-    
 -   [ ] **`useImageUpload` Hook:**
     -   [ ] Create `hooks/shared/useImageUpload.ts`.
     -   [ ] Move image selection and Supabase upload mutation logic from `ImageUpload.tsx` and `ImagePicker.tsx` into the hook.
     -   [ ] Refactor both `ImageUpload.tsx` and `ImagePicker.tsx` (molecules) to be dumb components consuming this hook.
 
 -   [ ] **`useAmenitySelector` Hook:**
-    -   [ ] Create `hooks/features/tourism/useAmenitySelector.ts`. 
+    -   [ ] Create `hooks/features/tourism/useAmenitySelector.ts`.
     -   [ ] Move the TanStack Query logic for fetching amenities from `AmenitySelector.tsx` into the hook.
     -   [ ] Refactor `AmenitySelector.tsx` to be a dumb component consuming the hook.
-    -   [ ] **Note:** Component not found in current codebase, may be implemented in future.
 
 -   [ ] **`useBusinessCategorySelector` Hook:**
     -   [ ] Create `hooks/features/business/useBusinessCategorySelector.ts`.
     -   [ ] Move the TanStack Query logic from `BusinessCategorySelector.tsx` into the hook.
     -   [ ] Refactor `BusinessCategorySelector.tsx` to be a dumb component consuming the hook.
-    -   [ ] **Note:** Component not found in current codebase, may be implemented in future.
 
 -   [ ] **`useCategoryAssignment` Hook:**
     -   [ ] Create `hooks/features/categories/useCategoryAssignment.ts`.
     -   [ ] Move all TanStack Query logic from `CategoryAssignment.tsx` into the hook.
     -   [ ] Refactor `CategoryAssignment.tsx` to be a dumb component consuming the hook.
-    -   [ ] **Note:** Component not found in current codebase, may be implemented in future.
 
--   [x] **Data Table Component Suite Refactoring:** ✅ **COMPLETED**
-    -   [x] **`DataTable.tsx`:** Analyzed and confirmed it already follows the "dumb component" pattern with no internal business logic or state management. It only contains UI calculations for responsive sizing.
-    -   [x] **`CustomDataTable.tsx`:** Not found in current codebase, can be addressed when implemented in future.
-    -   [x] Documentation updated to note that the existing DataTable implementation is compliant with project guidelines.
+-   [ ] **Data Table Component Suite Refactoring:**
+    -   [ ] Refactor `CustomDataTable.tsx` to remove its internal `useState` for search queries. It should receive the query and a handler from props.
+    -   [ ] Refactor `DataTable.tsx` to remove its internal sorting logic. It should receive sorted data and an `onSort` handler from props.
+    -   [ ] Ensure all hooks using these components handle state externally.
 
 ---
 

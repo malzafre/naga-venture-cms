@@ -9,13 +9,13 @@
 import { z } from 'zod';
 import {
   BaseEntitySchema,
+  BusinessNameSchema,
   BusinessStatusSchema,
   BusinessTypeSchema,
   DateSchema,
   EmailSchema,
   LatitudeSchema,
   LongitudeSchema,
-  NameSchema,
   OptionalNameSchema,
   PaginationSchema,
   PhoneSchema,
@@ -73,7 +73,7 @@ export type BusinessAddress = z.infer<typeof BusinessAddressSchema>;
  * Base business schema with core fields
  */
 export const BusinessBaseSchema = z.object({
-  business_name: NameSchema,
+  business_name: BusinessNameSchema,
   business_type: BusinessTypeSchema,
   description: z
     .string()
@@ -215,7 +215,7 @@ export type BusinessFilters = z.infer<typeof BusinessFiltersSchema>;
  */
 export const BusinessAnalyticsSchema = z.object({
   business_id: UuidSchema,
-  business_name: NameSchema,
+  business_name: BusinessNameSchema,
   business_type: BusinessTypeSchema,
   total_views: z.number().int().min(0),
   total_bookings: z.number().int().min(0),
@@ -264,7 +264,7 @@ export type BusinessDashboardData = z.infer<typeof BusinessDashboardDataSchema>;
  */
 export const BusinessCreateFormSchema = z.object({
   // Step 1: Basic Information
-  business_name: NameSchema,
+  business_name: BusinessNameSchema,
   business_type: BusinessTypeSchema,
   description: z
     .string()

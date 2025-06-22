@@ -1,8 +1,6 @@
-# Component Refactoring Analysis
+# Organism Component Refactoring Analysis
 
-This document outlines the analysis and refactoring plan for the components in `components/atoms`, `components/molecules`, and `components/organisms` based on the NAGA VENTURE project's coding guidelines.
-
-**Last Updated:** June 22, 2025 - Updated with Phase 2 analysis
+This document outlines the analysis and refactoring plan for the organism components in `components/organisms` based on the NAGA VENTURE project's coding guidelines.
 
 ## 1. Deep Analysis of Organism Components
 
@@ -371,12 +369,10 @@ This section analyzes components in `components/atoms` to ensure they are simple
 
 ### IconPicker.tsx
 
-* **Analysis**: Originally a "smart" component with internal state management and business logic. Successfully refactored to use the `useIconPicker` hook for all its logic.
-* **Current State**: Now a true "dumb component" that simply renders UI based on props and hook data.
-* **Hook Integration**:
-  * Uses `useIconPicker` hook for icon data, search functionality, and selection handling.
-  * The hook provides filtered icon data, search state, and icon selection logic.
-* **Verdict**: Properly refactored to follow the "Smart Hook, Dumb Component" pattern.
+-   **Analysis**: This component is far too complex to be an atom. It includes a modal, search input, state management for the search query, and a categorized list of icons. It is a self-contained feature.
+-   **Verdict**: 🔴 Misplaced component.
+-   **Refactoring Checklist**:
+    -   [ ] Move `IconPicker.tsx` from `components/atoms` to `components/molecules`.
 
 ---
 

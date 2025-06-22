@@ -74,7 +74,6 @@ export const AmenityStatsDashboard: React.FC<AmenityStatsDashboardProps> = ({
         <CMSText style={styles.sectionTitle}>Amenity Overview</CMSText>
 
         <View style={styles.statsGrid}>
-          {' '}
           <CMSStatCard
             title="Total Amenities"
             value={analytics.total_amenities.toString()}
@@ -206,7 +205,6 @@ export const AmenityStatsDashboard: React.FC<AmenityStatsDashboardProps> = ({
           </CMSText>
 
           <View style={styles.insightsList}>
-            {' '}
             {analytics.unused_amenities > 0 && (
               <View style={styles.insightItem}>
                 <Warning size={16} color="#FF9500" />

@@ -68,7 +68,6 @@ export const CompactAmenityCard: React.FC<CompactAmenityCardProps> = ({
             { backgroundColor: colors.primary + '15' },
           ]}
         >
-          {' '}
           <MaterialIcons
             name={getIconFromUrl(amenity.icon_url || undefined)}
             size={24}

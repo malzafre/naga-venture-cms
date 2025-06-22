@@ -57,7 +57,7 @@ const CMSRouteGuard: React.FC<CMSRouteGuardProps> = ({
         </CMSText>
         <CMSText type="body" darkColor="#666" style={styles.errorMessage}>
           Please sign in to access the Tourism CMS
-        </CMSText>{' '}
+        </CMSText>
         <CMSButton
           title="Go to Login"
           variant="primary"
@@ -85,7 +85,7 @@ const CMSRouteGuard: React.FC<CMSRouteGuardProps> = ({
         </CMSText>
         <CMSText type="caption" darkColor="#999" style={styles.roleInfo}>
           Current role: {userProfile?.role || 'No role assigned'}
-        </CMSText>{' '}
+        </CMSText>
         <CMSButton
           title="Go to Dashboard"
           variant="secondary"

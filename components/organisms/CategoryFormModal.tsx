@@ -27,11 +27,11 @@ import {
 } from '@/hooks/features/categories/useCategoryManagement';
 import { type MainCategory, type SubCategory } from '@/schemas';
 import {
-  MainCategoryCreateFormSchema,
-  MainCategoryUpdateFormSchema,
-  SubCategoryCreateFormSchema,
-  SubCategoryUpdateFormSchema,
-} from '@/schemas/categories/categorySchemas';
+  MainCategoryCreateSchema as MainCategoryCreateFormSchema,
+  MainCategoryUpdateSchema as MainCategoryUpdateFormSchema,
+  SubCategoryCreateSchema as SubCategoryCreateFormSchema,
+  SubCategoryUpdateSchema as SubCategoryUpdateFormSchema,
+} from '@/schemas/content/category.schemas';
 
 // ============================================================================
 // TYPES

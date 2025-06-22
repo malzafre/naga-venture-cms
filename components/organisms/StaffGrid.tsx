@@ -80,7 +80,6 @@ export default function StaffGrid({
       />
       <ScrollView style={styles.staffGrid}>
         <View style={styles.gridContainer}>
-          {' '}
           {staffMembers.map((staff) => (
             <View key={staff.id} style={styles.gridItem}>
               <ModernStaffCard

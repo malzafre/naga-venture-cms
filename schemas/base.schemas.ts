@@ -123,6 +123,19 @@ export const OptionalNameSchema = z
   .or(z.literal(''));
 
 /**
+ * Business name validation - more permissive than personal names
+ * Allows numbers, special characters, and international characters commonly found in business names
+ */
+export const BusinessNameSchema = z
+  .string()
+  .min(1, 'Business name is required')
+  .max(200, 'Business name must be less than 200 characters')
+  .regex(
+    /^[\p{L}\p{N}\p{P}\p{S}\p{Z}]+$/u,
+    'Business name contains invalid characters'
+  );
+
+/**
  * URL validation
  */
 export const UrlSchema = z
@@ -172,10 +185,18 @@ export const DateSchema = z.coerce.date({
 
 /**
  * Date string validation (for database storage)
+ * Flexible format that accepts Supabase's timestamp format
  */
-export const DateStringSchema = z
-  .string()
-  .datetime({ message: 'Please enter a valid date and time' });
+export const DateStringSchema = z.string().refine(
+  (value) => {
+    // Try to parse the date - if it's valid, accept it
+    const date = new Date(value);
+    return !isNaN(date.getTime());
+  },
+  {
+    message: 'Please enter a valid date and time',
+  }
+);
 
 /**
  * Time validation (HH:MM format)

@@ -43,22 +43,32 @@ export default function CreateBusinessScreen() {
     console.log('📝 Form data received:', formData);
 
     // Extract images and create clean business data object
-    const { images, ...rawBusinessData } = formData;
-
-    // Ensure required fields are not undefined
+    const { images, ...rawBusinessData } = formData; // Ensure required fields are not undefined
     if (
       !rawBusinessData.business_name ||
       !rawBusinessData.description ||
-      !rawBusinessData.address ||
-      !rawBusinessData.phone ||
-      rawBusinessData.latitude == null ||
-      rawBusinessData.longitude == null
+      !rawBusinessData.address
     ) {
       setErrorMessage(
-        'Missing required fields. Please check the form and try again.'
+        'Missing required fields: Business Name, Description, and Address are required.'
       );
       setErrorModalVisible(true);
       return;
+    }
+
+    // Validate coordinates if provided
+    if (rawBusinessData.latitude != null && rawBusinessData.longitude != null) {
+      // Ensure coordinates are valid numbers
+      const lat = Number(rawBusinessData.latitude);
+      const lng = Number(rawBusinessData.longitude);
+
+      if (isNaN(lat) || isNaN(lng)) {
+        setErrorMessage(
+          'Invalid coordinates. Please select a valid location on the map.'
+        );
+        setErrorModalVisible(true);
+        return;
+      }
     } // Create clean BusinessInsert object with all required fields
     const businessInsertData: BusinessInsert = {
       business_name: String(rawBusinessData.business_name),
@@ -70,7 +80,7 @@ export default function CreateBusinessScreen() {
       postal_code: rawBusinessData.postal_code
         ? String(rawBusinessData.postal_code)
         : null,
-      phone: String(rawBusinessData.phone),
+      phone: rawBusinessData.phone ? String(rawBusinessData.phone) : null,
       email: rawBusinessData.email ? String(rawBusinessData.email) : null,
       website: rawBusinessData.website ? String(rawBusinessData.website) : null,
       facebook_url: rawBusinessData.facebook_url
@@ -82,9 +92,18 @@ export default function CreateBusinessScreen() {
       twitter_url: rawBusinessData.twitter_url
         ? String(rawBusinessData.twitter_url)
         : null,
-      latitude: Number(rawBusinessData.latitude),
-      longitude: Number(rawBusinessData.longitude),
-      location: `POINT(${rawBusinessData.longitude} ${rawBusinessData.latitude})`,
+      latitude:
+        rawBusinessData.latitude != null
+          ? Number(rawBusinessData.latitude)
+          : 13.6218,
+      longitude:
+        rawBusinessData.longitude != null
+          ? Number(rawBusinessData.longitude)
+          : 123.1815,
+      location:
+        rawBusinessData.latitude != null && rawBusinessData.longitude != null
+          ? `POINT(${rawBusinessData.longitude} ${rawBusinessData.latitude})`
+          : 'POINT(123.1815 13.6218)',
       status: 'pending',
       is_claimed: false,
       is_featured: false,

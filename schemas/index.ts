@@ -210,6 +210,7 @@ export const EnvironmentSchema = z.object({
   // API Configuration
   EXPO_PUBLIC_API_BASE_URL: z.string().url().optional(),
   EXPO_PUBLIC_STORAGE_BUCKET: z.string().optional(),
+  EXPO_PUBLIC_GOOGLE_MAPS_API_KEY: z.string().optional(),
 
   // Feature Flags
   EXPO_PUBLIC_ENABLE_ANALYTICS: z

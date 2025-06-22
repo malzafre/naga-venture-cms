@@ -317,7 +317,7 @@ const AmenitiesManagementPage: React.FC = () => {
               </TouchableOpacity>
             </View>
           )
-        )}{' '}
+        )}
       </View>
 
       {/* Amenity Form Modal */}

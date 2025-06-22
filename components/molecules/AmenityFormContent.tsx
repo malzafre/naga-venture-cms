@@ -283,7 +283,7 @@ export const AmenityFormContent: React.FC<AmenityFormContentProps> = ({
                       {errors.name}
                     </Text>
                   )}
-                </View>{' '}
+                </View>
                 {/* Icon Selection */}
                 <View style={styles.inputGroup}>
                   <Text style={[styles.label, { color: colors.text }]}>
@@ -385,7 +385,7 @@ export const AmenityFormContent: React.FC<AmenityFormContentProps> = ({
                               color={colors.textSecondary}
                             />
                           </TouchableOpacity>
-                        </View>{' '}
+                        </View>
                         {/* Icon Categories */}
                         <ScrollView
                           style={styles.iconModalContent}
@@ -487,9 +487,9 @@ export const AmenityFormContent: React.FC<AmenityFormContentProps> = ({
                       </View>
                     </View>
                   </Modal>
-                )}{' '}
+                )}
               </View>
-            </View>{' '}
+            </View>
             {/* Action Buttons */}
             <View style={[styles.actions, { borderTopColor: colors.border }]}>
               <TouchableOpacity
