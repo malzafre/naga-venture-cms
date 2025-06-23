@@ -87,7 +87,6 @@ export const useMapLocationPicker = (
   // Refs
   const mapRef = useRef<HTMLDivElement>(null);
   const searchInputContainerRef = useRef<HTMLDivElement>(null);
-
   // Single context object for better management
   const mapContext = useRef({
     map: null as google.maps.Map | null,
@@ -95,6 +94,9 @@ export const useMapLocationPicker = (
     autocomplete: null as PlaceAutocompleteElement | null,
     dragHandler: null as ((event: any) => void) | null,
     placeChangeHandler: null as (() => void) | null,
+    // Store listener references for proper cleanup
+    mapClickListener: null as google.maps.MapsEventListener | null,
+    markerDragListener: null as google.maps.MapsEventListener | null,
   });
 
   // State
@@ -296,20 +298,25 @@ export const useMapLocationPicker = (
           ],
         });
         mapContext.current.map = map;
-        map.addListener('click', async (e: google.maps.MapMouseEvent) => {
-          if (e.latLng) {
-            const lat = e.latLng.lat();
-            const lng = e.latLng.lng();
 
-            // Update marker position without reloading map
-            if (mapContext.current.marker) {
-              mapContext.current.marker.position = { lat, lng };
+        // Store the click listener reference for cleanup
+        mapContext.current.mapClickListener = map.addListener(
+          'click',
+          async (e: google.maps.MapMouseEvent) => {
+            if (e.latLng) {
+              const lat = e.latLng.lat();
+              const lng = e.latLng.lng();
+
+              // Update marker position without reloading map
+              if (mapContext.current.marker) {
+                mapContext.current.marker.position = { lat, lng };
+              }
+
+              setSelectedLocation({ latitude: lat, longitude: lng });
+              debouncedReverseGeocode(lat, lng);
             }
-
-            setSelectedLocation({ latitude: lat, longitude: lng });
-            debouncedReverseGeocode(lat, lng);
           }
-        });
+        );
 
         setIsMapInitialized(true);
       }
@@ -338,9 +345,9 @@ export const useMapLocationPicker = (
             debouncedReverseGeocode(lat, lng);
           }
         };
-
         mapContext.current.dragHandler = handleDragEnd;
-        mapContext.current.marker.addListener('dragend', handleDragEnd);
+        mapContext.current.markerDragListener =
+          mapContext.current.marker.addListener('dragend', handleDragEnd);
       }
 
       // Initialize autocomplete only once
@@ -461,19 +468,65 @@ export const useMapLocationPicker = (
       mapContext.current.map.panTo(newPosition);
     }
   }, [selectedLocation, isMapVisible]);
-
-  // Cleanup function for autocomplete event listeners
+  // Comprehensive cleanup function for all Google Maps resources
   useEffect(() => {
     const currentContext = mapContext.current;
+
     return () => {
+      console.log(
+        '🧹 [useMapLocationPicker] Cleaning up Google Maps resources'
+      );
+
+      // Clean up autocomplete listener
       if (currentContext.autocomplete && currentContext.placeChangeHandler) {
         currentContext.autocomplete.removeEventListener(
           'gmp-placechange',
           currentContext.placeChangeHandler
         );
+        console.log('🧹 [useMapLocationPicker] Removed autocomplete listener');
       }
+
+      // Clean up map click listener
+      if (currentContext.mapClickListener) {
+        google.maps.event.removeListener(currentContext.mapClickListener);
+        currentContext.mapClickListener = null;
+        console.log('🧹 [useMapLocationPicker] Removed map click listener');
+      }
+
+      // Clean up marker drag listener
+      if (currentContext.markerDragListener) {
+        google.maps.event.removeListener(currentContext.markerDragListener);
+        currentContext.markerDragListener = null;
+        console.log('🧹 [useMapLocationPicker] Removed marker drag listener');
+      }
+
+      // Clean up map instance listeners (comprehensive fallback)
+      if (currentContext.map) {
+        google.maps.event.clearInstanceListeners(currentContext.map);
+        console.log(
+          '🧹 [useMapLocationPicker] Cleared all map instance listeners'
+        );
+      }
+
+      // Clean up marker instance listeners (comprehensive fallback)
+      if (currentContext.marker) {
+        // Note: AdvancedMarkerElement doesn't fully support the old clearInstanceListeners API
+        // but we can try the standard approach for compatibility
+        try {
+          google.maps.event.clearInstanceListeners(currentContext.marker);
+          console.log(
+            '🧹 [useMapLocationPicker] Cleared all marker instance listeners'
+          );
+        } catch {
+          console.log(
+            '🧹 [useMapLocationPicker] Marker cleanup not needed (AdvancedMarkerElement)'
+          );
+        }
+      }
+
+      console.log('✅ [useMapLocationPicker] Google Maps cleanup completed');
     };
-  }, []);
+  }, []); // Empty dependency array - cleanup only on unmount
 
   // Create a non-debounced version for immediate confirmation
   const immediateReverseGeocode = useCallback(
@@ -522,13 +575,40 @@ export const useMapLocationPicker = (
   const showMap = useCallback(() => {
     setIsMapVisible(true);
   }, []);
-
   const hideMap = useCallback(() => {
+    console.log(
+      '🙈 [useMapLocationPicker] Hiding map and cleaning up resources'
+    );
+
+    // Clean up listeners when hiding map for better resource management
+    const currentContext = mapContext.current;
+
+    if (currentContext.mapClickListener) {
+      google.maps.event.removeListener(currentContext.mapClickListener);
+      currentContext.mapClickListener = null;
+    }
+
+    if (currentContext.markerDragListener) {
+      google.maps.event.removeListener(currentContext.markerDragListener);
+      currentContext.markerDragListener = null;
+    }
+
+    if (currentContext.autocomplete && currentContext.placeChangeHandler) {
+      currentContext.autocomplete.removeEventListener(
+        'gmp-placechange',
+        currentContext.placeChangeHandler
+      );
+    }
+
     // Reset map state to prevent issues on next open
     setIsMapInitialized(false);
     setIsMapReady(false);
     setSearchError(null);
     setIsMapVisible(false);
+
+    console.log(
+      '✅ [useMapLocationPicker] Map hidden and resources cleaned up'
+    );
   }, []);
 
   const handleConfirm = useCallback(async () => {

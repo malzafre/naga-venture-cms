@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 
 import { BusinessCreateFormSchema, type BusinessCreateForm } from '@/schemas';
 import { Business } from '@/types/supabase';
+import { extractCoordinatesFromPostGIS } from '@/utils/geoUtils';
 import { useMapLocationPicker } from './useMapLocationPicker';
 
 // Use the new type alias for better consistency
@@ -54,27 +55,14 @@ export function useBusinessForm({
   const [currentStep, setCurrentStep] = useState(1);
   const [isNavigating, setIsNavigating] = useState(false);
   const totalSteps = 4;
-
   // Extract coordinates from PostGIS GEOGRAPHY(POINT) format
   const extractCoordinates = useCallback(
     (location: string | null): { lat: number; lng: number } => {
-      const nagaCityCenter = { lat: 13.6218, lng: 123.1948 };
-
-      if (!location || typeof location !== 'string') {
-        return nagaCityCenter;
-      }
-
-      const match = location.match(
-        /POINT\(([-+]?\d*\.?\d+)\s+([-+]?\d*\.?\d+)\)/
-      );
-      if (match && match[1] && match[2]) {
-        return {
-          lng: parseFloat(match[1]),
-          lat: parseFloat(match[2]),
-        };
-      }
-
-      return nagaCityCenter;
+      const coords = extractCoordinatesFromPostGIS(location);
+      return {
+        lat: coords.latitude,
+        lng: coords.longitude,
+      };
     },
     []
   );

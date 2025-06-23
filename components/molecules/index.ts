@@ -1,4 +1,5 @@
 export { default as BusinessImageViewer } from './BusinessImageViewer';
+export { BusinessLocationViewer } from './BusinessLocationViewer';
 export { default as CMSHeader } from './CMSHeader';
 export { default as CMSImageGallery } from './CMSImageGallery';
 export { CMSNavigationSection } from './CMSNavigationSection';

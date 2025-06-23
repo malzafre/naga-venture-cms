@@ -27,9 +27,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 // Services
 import { NavigationService } from '@/services/NavigationService';
 
+// Utils
+import { extractCoordinatesFromPostGIS } from '@/utils/geoUtils';
+
 // Components
 import { CMSButton } from '@/components/atoms';
-import { BusinessImageViewer, StatusBadge } from '@/components/molecules';
+import {
+  BusinessImageViewer,
+  BusinessLocationViewer,
+  StatusBadge,
+} from '@/components/molecules';
 import { CMSRouteGuard } from '@/components/organisms';
 import { useBusiness } from '@/hooks/features/business/useBusinessManagement';
 
@@ -43,6 +50,34 @@ export default function ViewBusinessScreen() {
 
   // Fetch business data
   const { data: business, isLoading, isError, error } = useBusiness(id);
+
+  // Extract coordinates from PostGIS GEOGRAPHY(POINT) format
+  const extractCoordinates = (
+    location: string | null
+  ): { lat: number; lng: number } => {
+    const coords = extractCoordinatesFromPostGIS(location);
+    return {
+      lat: coords.latitude,
+      lng: coords.longitude,
+    };
+  };
+
+  // Get coordinates for map display
+  const coordinates = business?.location
+    ? extractCoordinates(business.location as string)
+    : null;
+
+  // Debug logging to understand location format
+  if (business?.location) {
+    console.log('🗺️ [ViewBusiness] Raw location data:', business.location);
+    console.log('🗺️ [ViewBusiness] Location type:', typeof business.location);
+    console.log(
+      '🗺️ [ViewBusiness] Location string length:',
+      business.location.length
+    );
+    console.log('🗺️ [ViewBusiness] Extracted coordinates:', coordinates);
+    console.log('🗺️ [ViewBusiness] Business address:', business.address);
+  }
 
   // Enhanced debug logging
   console.log('🏢 [ViewBusinessScreen] Component rendered');
@@ -240,6 +275,20 @@ export default function ViewBusinessScreen() {
                   {business.postal_code && ` ${business.postal_code}`}
                 </Text>
               </View>
+
+              {/* Map Viewer */}
+              {coordinates && (
+                <View style={styles.mapContainer}>
+                  <BusinessLocationViewer
+                    location={{
+                      latitude: coordinates.lat,
+                      longitude: coordinates.lng,
+                      address: business.address,
+                    }}
+                    height={250}
+                  />
+                </View>
+              )}
             </View>
           </View>
 
@@ -531,5 +580,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
     lineHeight: 24,
+  },
+  mapContainer: {
+    height: 200,
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginTop: 16,
   },
 });

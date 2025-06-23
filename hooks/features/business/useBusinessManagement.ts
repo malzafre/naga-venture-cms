@@ -81,7 +81,7 @@ const transformBusinessForInsert = (businessData: BusinessInsert) => {
 
   return {
     ...rest,
-    location: `POINT(${longitude} ${latitude})`,
+    location: `SRID=4326;POINT(${longitude} ${latitude})`,
   };
 };
 
@@ -95,7 +95,7 @@ const transformBusinessForUpdate = (updateData: BusinessUpdate) => {
   if (latitude !== undefined && longitude !== undefined) {
     return {
       ...rest,
-      location: `POINT(${longitude} ${latitude})`,
+      location: `SRID=4326;POINT(${longitude} ${latitude})`,
     };
   }
 
