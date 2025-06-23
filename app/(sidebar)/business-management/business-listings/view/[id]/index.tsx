@@ -312,6 +312,12 @@ export default function ViewBusinessScreen() {
                       address: business.address,
                     }}
                     height={400}
+                    businessName={business.business_name}
+                    businessImage={
+                      business.business_images?.find((img) => img.is_primary)
+                        ?.image_url || business.business_images?.[0]?.image_url
+                    }
+                    showCustomInfoWindow={true}
                   />
                 </View>
               )}

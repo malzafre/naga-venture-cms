@@ -13,6 +13,9 @@ export interface BusinessLocationViewerProps {
   height?: number;
   style?: any;
   apiKey?: string;
+  businessName?: string;
+  businessImage?: string;
+  showCustomInfoWindow?: boolean;
 }
 
 /**
@@ -26,11 +29,22 @@ export const BusinessLocationViewer: React.FC<BusinessLocationViewerProps> = ({
   height = 300,
   style,
   apiKey,
+  businessName,
+  businessImage,
+  showCustomInfoWindow = false,
 }) => {
+  // Enhance location data with business details
+  const enhancedLocation = {
+    ...location,
+    businessName,
+    businessImage,
+  };
+
   const { mapRef, isLoaded, isError, error }: UseMapLocationViewerReturn =
     useMapLocationViewer({
-      location,
+      location: enhancedLocation,
       apiKey,
+      showCustomInfoWindow,
     });
 
   if (isError) {
