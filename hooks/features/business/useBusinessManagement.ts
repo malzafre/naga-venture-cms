@@ -72,6 +72,36 @@ const handleBusinessError = (
   );
 };
 
+/**
+ * Transform business data for database insertion
+ * Converts latitude/longitude to PostGIS location format
+ */
+const transformBusinessForInsert = (businessData: BusinessInsert) => {
+  const { latitude, longitude, ...rest } = businessData;
+
+  return {
+    ...rest,
+    location: `POINT(${longitude} ${latitude})`,
+  };
+};
+
+/**
+ * Transform business data for database update
+ * Converts latitude/longitude to PostGIS location format if provided
+ */
+const transformBusinessForUpdate = (updateData: BusinessUpdate) => {
+  const { latitude, longitude, ...rest } = updateData;
+
+  if (latitude !== undefined && longitude !== undefined) {
+    return {
+      ...rest,
+      location: `POINT(${longitude} ${latitude})`,
+    };
+  }
+
+  return rest;
+};
+
 // ============================================================================
 // QUERY KEYS
 // ============================================================================
@@ -375,15 +405,21 @@ export function useCreateBusiness() {
       // Phase 5: Validate input data with the correct schema
       const validatedData = BusinessInsertSchema.parse(businessData);
 
+      // Transform data for database insertion (convert coordinates to PostGIS format)
+      const transformedData = transformBusinessForInsert(validatedData);
+
+      console.log('[useCreateBusiness] Inserting data:', transformedData);
+
       const response = await supabase
         .from('businesses')
-        .insert(validatedData)
+        .insert(transformedData)
         .select()
         .single();
 
       if (response.error) {
         handleBusinessError(response.error, 'create business', {
           businessData: validatedData,
+          transformedData,
         });
       }
 
@@ -436,9 +472,15 @@ export function useUpdateBusiness() {
       const validatedId = UuidSchema.parse(businessId);
       const validatedUpdateData = BusinessUpdateSchema.parse(updateData);
 
+      // Transform data for database update (convert coordinates to PostGIS format if provided)
+      const transformedUpdateData =
+        transformBusinessForUpdate(validatedUpdateData);
+
+      console.log('[useUpdateBusiness] Updating data:', transformedUpdateData);
+
       const response = await supabase
         .from('businesses')
-        .update(validatedUpdateData)
+        .update(transformedUpdateData)
         .eq('id', validatedId)
         .select()
         .single();

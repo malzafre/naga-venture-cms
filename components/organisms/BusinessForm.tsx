@@ -1,6 +1,6 @@
 // filepath: components/TourismCMS/organisms/BusinessForm.tsx
 import { Picker } from '@react-native-picker/picker';
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Controller } from 'react-hook-form';
 import { Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -9,7 +9,6 @@ import { CMSButton, CMSInput } from '@/components/atoms';
 import { CMSImageGallery } from '@/components/molecules';
 import MapLocationPicker from '@/components/organisms/MapLocationPicker';
 import { useBusinessForm } from '@/hooks/features/business/useBusinessForm';
-import { useMapLocationPicker } from '@/hooks/features/business/useMapLocationPicker';
 // Types
 import { Business } from '@/types/supabase';
 
@@ -44,8 +43,8 @@ export default function BusinessForm({
     isLoading,
     isEdit,
   });
+
   const {
-    form,
     control,
     errors,
     currentStep,
@@ -56,60 +55,14 @@ export default function BusinessForm({
     handleCancel,
     canGoNext,
     canGoPrev,
-    isLastStep,
     isCurrentStepValid,
     isNavigating,
+    mapLocationPicker,
   } = useBusinessForm({
     initialData,
     onSubmit,
     onCancel,
     isEdit,
-  });
-
-  // Map location picker hook for interactive location selection
-  const {
-    isMapVisible,
-    selectedLocation,
-    showMap,
-    hideMap,
-    handleLocationSelect,
-  } = useMapLocationPicker();
-  // Handle location selection from map and update form
-  const handleMapLocationSelect = useCallback(
-    (location: any) => {
-      handleLocationSelect(location);
-
-      // Update form fields with selected location using setValue
-      if (location.coordinates && form.setValue) {
-        // Set latitude and longitude
-        form.setValue('latitude', location.coordinates.latitude);
-        form.setValue('longitude', location.coordinates.longitude);
-
-        // Update address if provided
-        if (location.address) {
-          form.setValue('address', location.address);
-        }
-
-        // Update city and province if provided
-        if (location.city) {
-          form.setValue('city', location.city);
-        }
-        if (location.province) {
-          form.setValue('province', location.province);
-        }
-      }
-    },
-    [handleLocationSelect, form]
-  );
-  console.log('🏗️ [BusinessForm] Hook state:', {
-    currentStep,
-    totalSteps,
-    canGoNext,
-    canGoPrev,
-    isLastStep,
-    isCurrentStepValid,
-    isNavigating,
-    hasHandleCancel: typeof handleCancel === 'function',
   });
 
   // Debug wrapper for cancel button
@@ -289,14 +242,16 @@ export default function BusinessForm({
       <View style={styles.mapPickerContainer}>
         <CMSButton
           title="📍 Pick Location on Map"
-          onPress={showMap}
+          onPress={mapLocationPicker.showMap}
           variant="secondary"
           disabled={isLoading}
           style={styles.mapPickerButton}
         />
-        {selectedLocation && (
+        {mapLocationPicker.selectedLocation && (
           <Text style={styles.selectedLocationText}>
-            📍 Selected: {selectedLocation.address}
+            📍 Selected:{' '}
+            {mapLocationPicker.selectedLocation.latitude.toFixed(6)},{' '}
+            {mapLocationPicker.selectedLocation.longitude.toFixed(6)}
           </Text>
         )}
       </View>
@@ -548,7 +503,6 @@ export default function BusinessForm({
   return (
     <View style={styles.container}>
       {renderStepIndicator()}
-
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -557,7 +511,6 @@ export default function BusinessForm({
       >
         {renderStepContent()}
       </ScrollView>
-
       {/* Navigation Buttons */}
       <View style={styles.navigationButtons}>
         <View style={styles.buttonRow}>
@@ -595,22 +548,20 @@ export default function BusinessForm({
               style={styles.navButton}
             />
           )}
-        </View>
-      </View>
-
+        </View>{' '}
+      </View>{' '}
       {/* Map Location Picker Modal */}
-      {isMapVisible && (
+      {mapLocationPicker.isMapVisible && (
         <MapLocationPicker
-          isVisible={isMapVisible}
-          onClose={hideMap}
-          onLocationSelect={handleMapLocationSelect}
-          initialLocation={
-            selectedLocation?.coordinates || {
-              latitude: 13.6218,
-              longitude: 123.1815,
-            }
-          }
-          initialAddress={selectedLocation?.address || ''}
+          isMapVisible={mapLocationPicker.isMapVisible}
+          selectedLocation={mapLocationPicker.selectedLocation}
+          isLoading={mapLocationPicker.isLoading}
+          searchError={mapLocationPicker.searchError}
+          isMapReady={mapLocationPicker.isMapReady}
+          mapRef={mapLocationPicker.mapRef}
+          searchInputContainerRef={mapLocationPicker.searchInputContainerRef}
+          handleConfirm={mapLocationPicker.handleConfirm}
+          handleCancel={mapLocationPicker.handleCancel}
         />
       )}
     </View>

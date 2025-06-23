@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 
 import { BusinessCreateFormSchema, type BusinessCreateForm } from '@/schemas';
 import { Business } from '@/types/supabase';
+import { useMapLocationPicker } from './useMapLocationPicker';
 
 // Use the new type alias for better consistency
 export type BusinessFormData = BusinessCreateForm;
@@ -77,11 +78,28 @@ export function useBusinessForm({
     },
     []
   );
-
   // Get initial coordinates
   const initialCoords = extractCoordinates(
     (initialData?.location as string) || null
   );
+
+  // Map location picker integration
+  const mapLocationPicker = useMapLocationPicker({
+    onLocationSelect: (locationDetails) => {
+      console.log('📍 [useBusinessForm] Location selected:', locationDetails);
+      // Update form fields with the selected location
+      form.setValue('latitude', locationDetails.coordinates.latitude);
+      form.setValue('longitude', locationDetails.coordinates.longitude);
+      form.setValue('address', locationDetails.address);
+      form.setValue('city', locationDetails.city || 'Naga City');
+      form.setValue('province', locationDetails.province || 'Camarines Sur');
+    },
+    initialLocation: {
+      latitude: initialCoords.lat,
+      longitude: initialCoords.lng,
+    },
+    initialAddress: initialData?.address || '',
+  });
   // Form setup with React Hook Form
   const form = useForm<BusinessFormData>({
     resolver: zodResolver(BusinessCreateFormSchema),
@@ -279,7 +297,8 @@ export function useBusinessForm({
         city: data.city,
         province: data.province,
         postal_code: data.postal_code || null,
-        location: `POINT(${data.longitude} ${data.latitude})`,
+        latitude: data.latitude,
+        longitude: data.longitude,
 
         // Step 3 data
         phone: data.phone || null,
@@ -332,6 +351,9 @@ export function useBusinessForm({
     currentStep,
     totalSteps,
     isNavigating,
+
+    // Map location picker
+    mapLocationPicker,
 
     // Actions
     nextStep,

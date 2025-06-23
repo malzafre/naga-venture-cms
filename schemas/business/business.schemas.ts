@@ -119,16 +119,17 @@ export const BusinessSchema = BusinessBaseSchema.extend({
 export type Business = z.infer<typeof BusinessSchema>;
 
 /**
- * Schema for creating new businesses
+ * Schema for inserting businesses into database (with PostGIS location)
  */
-export const BusinessCreateSchema = BusinessBaseSchema.extend({
+export const BusinessInsertSchema = BusinessBaseSchema.omit({
+  location: true,
+}).extend({
   latitude: LatitudeSchema,
   longitude: LongitudeSchema,
   owner_id: UuidSchema.optional(),
-  images: z.array(z.any()).optional(), // For form handling
 });
 
-export type BusinessCreate = z.infer<typeof BusinessCreateSchema>;
+export type BusinessInsert = z.infer<typeof BusinessInsertSchema>;
 
 /**
  * Schema for updating businesses
@@ -338,10 +339,8 @@ export type BulkBusinessOperation = z.infer<typeof BulkBusinessOperationSchema>;
 /**
  * Legacy aliases for backwards compatibility with existing hooks
  */
-export const BusinessInsertSchema = BusinessCreateSchema;
 export const BusinessFiltersQuerySchema = BusinessFiltersSchema;
 
-export type BusinessInsert = BusinessCreate;
 export type BusinessFiltersQuery = BusinessFilters;
 
 /**
