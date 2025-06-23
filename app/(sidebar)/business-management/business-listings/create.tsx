@@ -100,10 +100,6 @@ export default function CreateBusinessScreen() {
         rawBusinessData.longitude != null
           ? Number(rawBusinessData.longitude)
           : 123.1815,
-      location:
-        rawBusinessData.latitude != null && rawBusinessData.longitude != null
-          ? `POINT(${rawBusinessData.longitude} ${rawBusinessData.latitude})`
-          : 'POINT(123.1815 13.6218)',
       status: 'pending',
       is_claimed: false,
       is_featured: false,
@@ -116,7 +112,6 @@ export default function CreateBusinessScreen() {
       onSuccess: async (newBusiness) => {
         console.log('✅ Business created successfully:', newBusiness);
         console.log('✅ Business ID:', newBusiness.id);
-
         try {
           // Upload images if any
           if (images && images.length > 0) {
@@ -134,26 +129,34 @@ export default function CreateBusinessScreen() {
             );
 
             // Upload images and wait for completion
-            uploadImages(newBusiness.id as string, images);
+            await uploadImages(newBusiness.id as string, images);
 
             console.log(
-              '📤 Image upload initiated for business:',
+              '📤 Image upload completed for business:',
               newBusiness.id
+            );
+
+            setSuccessMessage(
+              `Business "${newBusiness.business_name}" has been created successfully with ${images.length} images!`
             );
           } else {
             console.log('📤 No images to upload');
+            setSuccessMessage(
+              `Business "${newBusiness.business_name}" has been created successfully!`
+            );
           }
 
-          setSuccessMessage(
-            `Business "${newBusiness.business_name}" has been created successfully${images && images.length > 0 ? ` with ${images.length} images` : ''}!`
-          );
           setSuccessModalVisible(true);
         } catch (imageError) {
           console.error('❌ Image upload error:', imageError);
-          setSuccessMessage(
-            `Business "${newBusiness.business_name}" has been created successfully! However, some images failed to upload. You can add images later by editing the business.`
+          const errorMessage =
+            imageError instanceof Error
+              ? imageError.message
+              : String(imageError);
+          setErrorMessage(
+            `Business created successfully, but failed to upload images: ${errorMessage}`
           );
-          setSuccessModalVisible(true);
+          setErrorModalVisible(true);
         }
       },
       onError: (error) => {

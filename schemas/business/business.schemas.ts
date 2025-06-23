@@ -163,6 +163,19 @@ export const BusinessImageSchema = z.object({
 export type BusinessImage = z.infer<typeof BusinessImageSchema>;
 
 /**
+ * Business image insert schema (for database inserts)
+ */
+export const BusinessImageInsertSchema = z.object({
+  business_id: UuidSchema,
+  image_url: UrlSchema,
+  caption: OptionalNameSchema,
+  is_primary: z.boolean().default(false),
+  display_order: z.number().int().min(0).default(0),
+});
+
+export type BusinessImageInsert = z.infer<typeof BusinessImageInsertSchema>;
+
+/**
  * Business form image schema (for form state)
  */
 export const BusinessFormImageSchema = z.object({
@@ -291,13 +304,8 @@ export const BusinessCreateFormSchema = z.object({
   // Step 4: Social Media (optional)
   facebook_url: UrlSchema.or(z.literal('')).optional(),
   instagram_url: UrlSchema.or(z.literal('')).optional(),
-  twitter_url: UrlSchema.or(z.literal('')).optional(),
-
-  // Step 5: Images
-  images: z
-    .array(BusinessFormImageSchema)
-    .min(1, 'At least one image is required')
-    .max(10),
+  twitter_url: UrlSchema.or(z.literal('')).optional(), // Step 5: Images (optional, but define as optional in schema)
+  images: z.array(BusinessFormImageSchema).max(10).optional().default([]),
 });
 
 export type BusinessCreateForm = z.infer<typeof BusinessCreateFormSchema>;

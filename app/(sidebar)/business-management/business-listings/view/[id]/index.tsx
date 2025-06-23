@@ -38,7 +38,10 @@ import {
   StatusBadge,
 } from '@/components/molecules';
 import { CMSRouteGuard } from '@/components/organisms';
-import { useBusiness } from '@/hooks/features/business/useBusinessManagement';
+import {
+  useBusiness,
+  useRefreshBusiness,
+} from '@/hooks/features/business/useBusinessManagement';
 
 /**
  * View Business Page
@@ -47,9 +50,22 @@ import { useBusiness } from '@/hooks/features/business/useBusinessManagement';
  */
 export default function ViewBusinessScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
 
   // Fetch business data
   const { data: business, isLoading, isError, error } = useBusiness(id);
+
+  // Add refresh functionality for production use
+  const refreshBusiness = useRefreshBusiness();
+
+  // Handle manual refresh with loading state
+  const handleRefresh = async () => {
+    if (!id) return;
+    setIsRefreshing(true);
+    refreshBusiness(id);
+    // Add a small delay to show the loading state
+    setTimeout(() => setIsRefreshing(false), 1000);
+  };
 
   // Extract coordinates from PostGIS GEOGRAPHY(POINT) format
   const extractCoordinates = (
@@ -203,12 +219,22 @@ export default function ViewBusinessScreen() {
               View and manage business information
             </Text>
           </View>
-          <CMSButton
-            title="Edit"
-            onPress={handleEditBusiness}
-            variant="primary"
-            size="small"
-          />
+          <View style={styles.headerButtons}>
+            <CMSButton
+              title={isRefreshing ? 'Refreshing...' : 'Refresh'}
+              onPress={handleRefresh}
+              variant="secondary"
+              size="small"
+              style={styles.refreshButton}
+              disabled={isRefreshing}
+            />
+            <CMSButton
+              title="Edit"
+              onPress={handleEditBusiness}
+              variant="primary"
+              size="small"
+            />
+          </View>
         </View>
 
         <ScrollView
@@ -285,7 +311,7 @@ export default function ViewBusinessScreen() {
                       longitude: coordinates.lng,
                       address: business.address,
                     }}
-                    height={250}
+                    height={400}
                   />
                 </View>
               )}
@@ -582,9 +608,17 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   mapContainer: {
-    height: 200,
     borderRadius: 8,
     overflow: 'hidden',
     marginTop: 16,
+    marginBottom: 16,
+    marginHorizontal: 8,
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  refreshButton: {
+    marginRight: 8,
   },
 });

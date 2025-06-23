@@ -18,6 +18,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
+import { useCallback } from 'react';
 
 import { DOMAIN_CACHE_CONFIG } from '@/constants/CacheConstants';
 import queryKeys from '@/lib/queryKeys';
@@ -249,7 +250,6 @@ export function useBusinessListings(filters: Partial<BusinessFilters> = {}) {
  */
 export function useBusiness(businessId: string | undefined) {
   console.log('🔍 [useBusiness] Hook called with ID:', businessId);
-
   return useQuery({
     queryKey: businessQueryKeys.detail(businessId || ''),
     queryFn: async (): Promise<BusinessWithRelations | null> => {
@@ -312,7 +312,6 @@ export function useBusiness(businessId: string | undefined) {
         )
         .eq('id', validatedId)
         .single();
-
       console.log('🔍 [useBusiness] Supabase response - data:', response.data);
       console.log(
         '🔍 [useBusiness] Supabase response - error:',
@@ -322,7 +321,6 @@ export function useBusiness(businessId: string | undefined) {
         '🔍 [useBusiness] Business images from query:',
         response.data?.business_images
       );
-
       if (response.error) {
         console.error(
           '🔍 [useBusiness] Error fetching business:',
@@ -344,9 +342,13 @@ export function useBusiness(businessId: string | undefined) {
       return validatedData as BusinessWithRelations;
     },
     enabled: !!businessId,
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes
+    staleTime: 30 * 1000, // 30 seconds - very aggressive for production
+    gcTime: 2 * 60 * 1000, // 2 minutes
     retry: 2,
+    // Force refetch on window focus to catch new images immediately
+    refetchOnWindowFocus: true,
+    // Force refetch when component mounts
+    refetchOnMount: 'always',
   });
 }
 
@@ -526,22 +528,118 @@ export function useDeleteBusiness() {
 
   return useMutation({
     mutationFn: async (businessId: string): Promise<void> => {
-      // Phase 5: Validate businessId input
-      const validatedId = UuidSchema.parse(businessId);
+      try {
+        // Phase 5: Validate businessId input
+        const validatedId = UuidSchema.parse(businessId);
 
-      const response = await supabase
-        .from('businesses')
-        .delete()
-        .eq('id', validatedId);
+        console.log('[useDeleteBusiness] Starting deletion:', validatedId);
 
-      if (response.error) {
-        handleBusinessError(response.error, 'delete business', {
-          businessId: validatedId,
-        });
+        // Step 1: Get business images before deletion for storage cleanup
+        const { data: businessImages, error: imagesError } = await supabase
+          .from('business_images')
+          .select('image_url')
+          .eq('business_id', validatedId);
+
+        if (imagesError) {
+          console.warn(
+            '[useDeleteBusiness] Failed to fetch images for cleanup:',
+            imagesError
+          );
+        }
+
+        // Step 2: Delete the business record using secure RPC function
+        // This RPC only handles database operations, not storage
+        const { data: rpcResult, error: rpcError } = await supabase.rpc(
+          'delete_business_record_only',
+          {
+            business_id_param: validatedId,
+          }
+        );
+
+        if (rpcError) {
+          console.error('[useDeleteBusiness] RPC Error:', rpcError);
+          handleBusinessError(rpcError, 'delete business record via RPC', {
+            businessId: validatedId,
+          });
+          return;
+        }
+
+        console.log('[useDeleteBusiness] Business record deleted:', rpcResult); // Step 3: Clean up storage files (client-side)
+        if (businessImages && businessImages.length > 0) {
+          console.log(
+            `[useDeleteBusiness] Cleaning up ${businessImages.length} images from storage`
+          );
+          console.log(
+            '[useDeleteBusiness] Image URLs to process:',
+            businessImages.map((img) => img.image_url)
+          );
+
+          for (const image of businessImages) {
+            try {
+              // Extract the storage path from the full URL
+              // URL format: https://...supabase.co/storage/v1/object/public/business-images/businesses/BUSINESS_ID/FILENAME
+              const url = new URL(image.image_url);
+              const pathParts = url.pathname.split('/');
+
+              // Find the index of 'business-images' in the path
+              const bucketIndex = pathParts.findIndex(
+                (part) => part === 'business-images'
+              );
+              if (bucketIndex === -1) {
+                console.warn(
+                  `[useDeleteBusiness] Could not parse bucket from URL: ${image.image_url}`
+                );
+                continue;
+              }
+
+              // The file path is everything after the bucket name
+              const filePath = pathParts.slice(bucketIndex + 1).join('/');
+              console.log(
+                `[useDeleteBusiness] Attempting to delete: ${filePath} from bucket: business-images`
+              );
+
+              const { data: deleteData, error: deleteError } =
+                await supabase.storage
+                  .from('business-images')
+                  .remove([filePath]);
+
+              if (deleteError) {
+                console.error(
+                  `[useDeleteBusiness] Failed to delete image ${filePath}:`,
+                  deleteError
+                );
+              } else {
+                console.log(
+                  `[useDeleteBusiness] Successfully deleted image: ${filePath}`,
+                  deleteData
+                );
+              }
+            } catch (imageError) {
+              console.error(
+                '[useDeleteBusiness] Error processing image deletion:',
+                imageError
+              );
+            }
+          }
+        } else {
+          console.log('[useDeleteBusiness] No images found to clean up');
+        }
+
+        console.log('[useDeleteBusiness] Deletion completed successfully');
+      } catch (validationError) {
+        console.error('[useDeleteBusiness] Validation Error:', validationError);
+        handleBusinessError(
+          validationError as Error,
+          'validate business ID for deletion',
+          { businessId }
+        );
       }
     },
     onSuccess: (_, businessId) => {
-      console.log('[useDeleteBusiness] Success:', businessId);
+      console.log(
+        '[useDeleteBusiness] Success, invalidating queries for:',
+        businessId
+      );
       // Invalidate list queries and remove detail query
       queryClient.invalidateQueries({ queryKey: businessQueryKeys.lists() });
       queryClient.removeQueries({
@@ -550,6 +648,7 @@ export function useDeleteBusiness() {
     },
     onError: (error) => {
       console.error('[useDeleteBusiness] Mutation error:', error);
+      console.error('[useDeleteBusiness] Error details:', error.message);
     },
   });
 }
@@ -765,7 +864,115 @@ export function useBusinessAnalytics(
 }
 
 // ============================================================================
+// UTILITY FUNCTIONS FOR TESTING
+// ============================================================================
+
+/**
+ * Test utility: Check storage deletion paths
+ * Use this in the browser console to debug storage deletion issues
+ */
+export async function testStorageDeletion(businessId: string) {
+  try {
+    console.log('[testStorageDeletion] Testing for business:', businessId);
+
+    // Get business images
+    const { data: businessImages, error: imagesError } = await supabase
+      .from('business_images')
+      .select('image_url')
+      .eq('business_id', businessId);
+
+    if (imagesError) {
+      console.error(
+        '[testStorageDeletion] Error fetching images:',
+        imagesError
+      );
+      return;
+    }
+
+    if (!businessImages || businessImages.length === 0) {
+      console.log('[testStorageDeletion] No images found for this business');
+      return;
+    }
+
+    console.log('[testStorageDeletion] Found images:', businessImages);
+
+    // Test path extraction for each image
+    for (const image of businessImages) {
+      const url = new URL(image.image_url);
+      const pathParts = url.pathname.split('/');
+      const bucketIndex = pathParts.findIndex(
+        (part) => part === 'business-images'
+      );
+
+      if (bucketIndex === -1) {
+        console.warn(
+          '[testStorageDeletion] Invalid URL format:',
+          image.image_url
+        );
+        continue;
+      }
+
+      const filePath = pathParts.slice(bucketIndex + 1).join('/');
+      console.log('[testStorageDeletion] Extracted path:', filePath);
+
+      // Test if the file exists in storage
+      const { data: fileData, error: fileError } = await supabase.storage
+        .from('business-images')
+        .list(filePath.split('/').slice(0, -1).join('/'), {
+          search: filePath.split('/').pop(),
+        });
+
+      if (fileError) {
+        console.error(
+          '[testStorageDeletion] Error checking file existence:',
+          fileError
+        );
+      } else {
+        console.log('[testStorageDeletion] File exists in storage:', fileData);
+      }
+    }
+  } catch (error) {
+    console.error('[testStorageDeletion] Error:', error);
+  }
+}
+
+// ============================================================================
 // EXPORTS
 // ============================================================================
 
 // Types are already exported inline above
+
+/**
+ * Utility: Force refresh business data
+ * Use this to clear cache and fetch fresh data when images don't appear
+ */
+export function useRefreshBusiness() {
+  const queryClient = useQueryClient();
+
+  return useCallback(
+    (businessId: string) => {
+      console.log(
+        '[useRefreshBusiness] Force refreshing business:',
+        businessId
+      );
+
+      // Invalidate all queries for this business
+      queryClient.invalidateQueries({
+        queryKey: businessQueryKeys.detail(businessId),
+      });
+
+      // Also invalidate business lists that might contain this business
+      queryClient.invalidateQueries({
+        queryKey: businessQueryKeys.lists(),
+      });
+
+      // Force immediate refetch
+      queryClient.refetchQueries({
+        queryKey: businessQueryKeys.detail(businessId),
+      });
+
+      console.log('[useRefreshBusiness] Business refresh initiated');
+    },
+    [queryClient]
+  );
+}

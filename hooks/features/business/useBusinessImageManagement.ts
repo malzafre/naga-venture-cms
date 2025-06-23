@@ -11,7 +11,7 @@ import { useCallback, useState } from 'react';
 
 import queryKeys from '@/lib/queryKeys';
 import { supabase } from '@/lib/supabaseClient';
-import { BusinessImageUploadSchema, type BusinessImageUpload } from '@/schemas';
+import { BusinessImageInsertSchema, type BusinessImageInsert } from '@/schemas';
 import { StorageService, type ImageFile } from '@/services/StorageService';
 
 // ============================================================================
@@ -116,7 +116,7 @@ export function useBusinessImageManagement({
           }));
 
           // Save to database
-          const imageData: BusinessImageUpload = {
+          const imageData: BusinessImageInsert = {
             business_id: targetBusinessId,
             image_url: uploadResult.url,
             caption: image.caption || '',
@@ -130,7 +130,7 @@ export function useBusinessImageManagement({
           );
 
           // Validate data
-          const validatedData = BusinessImageUploadSchema.parse(imageData);
+          const validatedData = BusinessImageInsertSchema.parse(imageData);
 
           const { data, error } = await supabase
             .from('business_images')
@@ -171,12 +171,28 @@ export function useBusinessImageManagement({
     onSuccess: (data) => {
       // Invalidate business queries to refresh data
       if (businessId) {
+        console.log(
+          '[BusinessImageManagement] Invalidating cache for business:',
+          businessId
+        );
+
+        // Remove the cached query completely to force fresh fetch
+        queryClient.removeQueries({
+          queryKey: queryKeys.businesses.detail(businessId),
+        });
+
+        // Then invalidate to trigger refetch
         queryClient.invalidateQueries({
           queryKey: queryKeys.businesses.detail(businessId),
         });
         queryClient.invalidateQueries({
           queryKey: queryKeys.businesses.all,
         });
+
+        console.log(
+          '[BusinessImageManagement] Cache invalidated for business:',
+          businessId
+        );
       }
 
       onSuccess?.(
@@ -313,8 +329,7 @@ export function useBusinessImageManagement({
   );
   /**
    * Upload images for a business
-   */
-  const uploadImages = useCallback(
+   */ const uploadImages = useCallback(
     (targetBusinessId: string, images: ImageItem[]) => {
       console.log('🚀 [useBusinessImageManagement] uploadImages called with:', {
         targetBusinessId,
@@ -325,6 +340,14 @@ export function useBusinessImageManagement({
           size: img.size,
         })),
       });
+
+      // Early return if no images to upload
+      if (!images || images.length === 0) {
+        console.log(
+          '📤 [useBusinessImageManagement] No images to upload, skipping'
+        );
+        return Promise.resolve();
+      }
 
       const convertedImages = convertFormImagesToUpload(images);
       console.log(

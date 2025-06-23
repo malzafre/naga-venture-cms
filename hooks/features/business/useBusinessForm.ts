@@ -30,7 +30,7 @@ const STEP_FIELDS = {
     'instagram_url',
     'twitter_url',
   ] as const,
-  4: ['images'] as const,
+  4: [] as const, // Images are optional, no validation needed
 } as const;
 
 interface UseBusinessFormOptions {
@@ -87,9 +87,8 @@ export function useBusinessForm({
       longitude: initialCoords.lng,
     },
     initialAddress: initialData?.address || '',
-  });
-  // Form setup with React Hook Form
-  const form = useForm<BusinessFormData>({
+  }); // Form setup with React Hook Form
+  const form = useForm({
     resolver: zodResolver(BusinessCreateFormSchema),
     mode: 'onChange',
     defaultValues: {
@@ -294,9 +293,7 @@ export function useBusinessForm({
         website: data.website || null,
         facebook_url: data.facebook_url || null,
         instagram_url: data.instagram_url || null,
-        twitter_url: data.twitter_url || null,
-
-        // Step 4 data - Images (handled separately after business creation)
+        twitter_url: data.twitter_url || null, // Step 4 data - Images (optional, defaults to empty array)
         images: data.images || [],
       };
 

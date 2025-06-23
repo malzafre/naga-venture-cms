@@ -7,7 +7,7 @@
  */
 
 import { supabase } from '@/lib/supabaseClient';
-import { UuidSchema } from '@/schemas';
+import { UuidSchema } from '@/schemas/base.schemas';
 
 // ============================================================================
 // TYPES & SCHEMAS

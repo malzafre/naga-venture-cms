@@ -135,7 +135,7 @@ export function useImagePicker({
 
       // Launch image picker
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsMultipleSelection: remainingSlots > 1,
         selectionLimit: remainingSlots,
         quality: 0.8,
